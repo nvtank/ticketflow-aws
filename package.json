@@ -1,0 +1,19 @@
+{
+  "name": "tixflow",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.1",
+  "engines": { "node": ">=24.0.0 <25", "pnpm": ">=10 <11" },
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm -r --if-present build",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "infra:up": "docker compose --env-file .env -f infrastructure/docker-compose.yml up -d --wait",
+    "infra:down": "docker compose --env-file .env -f infrastructure/docker-compose.yml down"
+  }
+}
