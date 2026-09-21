@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #f8fafc;
+  --foreground: #10152b;
+  --card: #ffffff;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #7c3aed;
+  --accent: #06b6d4;
+  --muted: #eef0f6;
+  --muted-foreground: #64748b;
+  --border: #e3e7ef;
+  --ring: #4f46e5;
+  --radius: 0.875rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --font-sans: 'Inter', 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button:not(:disabled),
+select {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+::selection {
+  background: #c7d2fe;
+  color: #172554;
+}
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  border-radius: 8px;
+  background: white;
+  padding: 12px 20px;
+  color: #111827;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.container {
+  width: min(100% - 40px, 1200px);
+  margin-inline: auto;
+}
+.hero-grid {
+  background-image:
+    linear-gradient(#ffffff05 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff05 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.text-balance {
+  text-wrap: balance;
+}
+@keyframes pulse-soft {
+  50% {
+    opacity: 0.45;
+  }
+}
+.skeleton {
+  animation: pulse-soft 1.7s ease-in-out infinite;
+}
+@media (min-width: 768px) {
+  .container {
+    width: min(100% - 80px, 1200px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
