@@ -5,7 +5,7 @@ packages:
 # Nest CLI 11 pins webpack 5.106.2. New schema-utils 4.8 requires a newer
 # webpack peer; keep the compatible stable 4.3 line until the CLI updates.
 overrides:
-  'webpack>schema-utils': 4.3.3
+  'schema-utils@^4.0.0': 4.3.3
 
 onlyBuiltDependencies:
   - '@nestjs/core'
