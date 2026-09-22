@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Providers } from '@/components/providers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a href="#main-content" className="skip-link">
           Đến nội dung chính
         </a>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
