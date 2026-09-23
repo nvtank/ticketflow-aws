@@ -12,12 +12,7 @@ export enum UserRole {
 
 export type SeatStatus = 'AVAILABLE' | 'HELD' | 'SOLD' | 'UNAVAILABLE';
 export type OrderStatus =
-  | 'PENDING_PAYMENT'
-  | 'PAID'
-  | 'EXPIRED'
-  | 'CANCELLED'
-  | 'PAYMENT_FAILED'
-  | 'REFUND_REQUIRED';
+  'PENDING_PAYMENT' | 'PAID' | 'EXPIRED' | 'CANCELLED' | 'PAYMENT_FAILED' | 'REFUND_REQUIRED';
 export type TicketStatus = 'VALID' | 'USED' | 'CANCELLED';
 
 export interface ApiError {
@@ -65,11 +60,7 @@ export interface HealthResponse {
 
 // These contracts are preparatory; the realtime gateway is delivered in Phase 4.
 // Payloads invalidate REST snapshots; they never authorize a hold or purchase.
-export type InventoryEventName =
-  | 'seat:held'
-  | 'seat:released'
-  | 'seat:sold'
-  | 'inventory:updated';
+export type InventoryEventName = 'seat:held' | 'seat:released' | 'seat:sold' | 'inventory:updated';
 export interface InventoryUpdate {
   eventId: string;
   seatIds: string[];

@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, CalendarDays, MapPin, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
 import { apiGet, ApiClientError, eventListSchema } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,6 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
   const router = useRouter();
   const query = params.get('q') ?? '';
   const category = params.get('category') ?? '';
-  const [search, setSearch] = useState(query);
   const filter = new URLSearchParams({
     page: '1',
     pageSize: '6',
@@ -39,8 +37,10 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
           className="mb-8 flex max-w-2xl gap-3"
           onSubmit={(event) => {
             event.preventDefault();
+            const search = String(new FormData(event.currentTarget).get('q') ?? '').trim();
             const next = new URLSearchParams(params.toString());
-            search.trim() ? next.set('q', search.trim()) : next.delete('q');
+            if (search) next.set('q', search);
+            else next.delete('q');
             router.push(`/events?${next.toString()}`);
           }}
         >
@@ -51,8 +51,8 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
             key={query}
             id="event-search"
             placeholder="Bạn muốn trải nghiệm điều gì?"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            name="q"
+            defaultValue={query}
             maxLength={120}
           />
           <Button type="submit">
