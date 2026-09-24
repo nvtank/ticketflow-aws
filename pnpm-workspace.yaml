@@ -8,6 +8,8 @@ overrides:
   'schema-utils@^4.0.0': 4.3.3
 
 onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
   - '@nestjs/core'
   - '@swc/core'
   - esbuild

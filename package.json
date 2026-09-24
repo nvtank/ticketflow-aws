@@ -18,7 +18,16 @@
     "test": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && vitest run",
     "test:e2e": "pnpm build && playwright test",
     "infra:up": "docker compose --env-file .env -f infrastructure/docker-compose.yml up -d --wait",
-    "infra:down": "docker compose --env-file .env -f infrastructure/docker-compose.yml down"
+    "infra:down": "docker compose --env-file .env -f infrastructure/docker-compose.yml down",
+    "env:setup": "node scripts/setup-env.mjs",
+    "db:generate": "pnpm --filter @tixflow/api db:generate",
+    "db:migrate": "pnpm --filter @tixflow/api db:migrate",
+    "db:seed": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api db:seed",
+    "test:infra:up": "docker compose -f infrastructure/docker-compose.test.yml up -d --wait",
+    "test:infra:down": "docker compose -f infrastructure/docker-compose.test.yml down",
+    "test:db:prepare": "pnpm --filter @tixflow/api test:db:prepare",
+    "test:integration": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api test:integration",
+    "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
