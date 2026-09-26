@@ -9,6 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type * as ApplicationModule from '../src/app.module';
 import type * as BootstrapModule from '../src/bootstrap';
 import type * as EnvironmentModule from '../src/config/environment';
+import { Public } from '../src/auth/auth.decorators';
 import type * as ConfigurationModule from '../src/config/configuration.module';
 
 // Load the actual tsc-built Nest modules with decorator metadata intact.
@@ -24,6 +25,7 @@ class FaultController {
 }
 
 Controller('__test')(FaultController);
+Public()(FaultController);
 Get('failure')(
   FaultController.prototype,
   'failure',

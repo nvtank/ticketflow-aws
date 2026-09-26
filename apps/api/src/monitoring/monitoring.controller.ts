@@ -3,8 +3,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MetricsService } from '../common/http/metrics.service';
 import { ENVIRONMENT } from '../config/configuration.module';
 import type { Environment } from '../config/environment';
+import { Public } from '../auth/auth.decorators';
 
 @ApiTags('Local monitoring')
+@Public()
 @Controller('metrics')
 export class MonitoringController {
   constructor(
