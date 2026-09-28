@@ -15,6 +15,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { useAuthState } from '@/stores/auth';
+import { roleHome } from '@/lib/auth-session';
 
 const links = [
   { href: '/', label: 'Trang chủ' },
@@ -24,6 +26,7 @@ const links = [
 
 export function PublicHeader() {
   const pathname = usePathname();
+  const user = useAuthState((state) => state.user);
   const dark = pathname === '/';
   const [open, setOpen] = useState(false);
   return (
@@ -38,7 +41,7 @@ export function PublicHeader() {
         <nav aria-label="Điều hướng chính" className="hidden items-center gap-7 lg:flex">
           {links.map(({ href, label }) => (
             <Link
-              key={href}
+              key={`${href}:${label}`}
               href={href}
               aria-current={pathname === href ? 'page' : undefined}
               className={cn(
@@ -75,12 +78,10 @@ export function PublicHeader() {
             <ArrowUpRight className="size-4" />
           </Link>
           <span className="mx-1 hidden h-5 w-px bg-current opacity-15 sm:block" />
-          <Button
-            disabled
-            className="hidden sm:inline-flex"
-            title="Tài khoản sẽ khả dụng sau khi phân hệ đăng nhập hoàn tất"
-          >
-            Đăng nhập
+          <Button asChild className="hidden sm:inline-flex">
+            <Link href={user ? roleHome(user.role) : '/login'}>
+              {user ? user.name : 'Đăng nhập'}
+            </Link>
           </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -104,8 +105,12 @@ export function PublicHeader() {
                   ...links,
                   { href: '/organizer', label: 'Dành cho nhà tổ chức' },
                   { href: '/system', label: 'Trạng thái hệ thống' },
+                  {
+                    href: user ? roleHome(user.role) : '/login',
+                    label: user ? 'Tài khoản của tôi' : 'Đăng nhập',
+                  },
                 ].map(({ href, label }) => (
-                  <DialogClose asChild key={href}>
+                  <DialogClose asChild key={`${href}:${label}`}>
                     <Link href={href} className="rounded-xl px-4 py-3 font-medium hover:bg-muted">
                       {label}
                     </Link>

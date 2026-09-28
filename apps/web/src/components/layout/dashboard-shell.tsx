@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { UserRole } from '@tixflow/shared';
 import { Brand } from './brand';
+import { LogoutButton } from '@/components/auth/logout-button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useNavigation } from '@/stores/navigation';
@@ -48,6 +49,7 @@ export function DashboardShell({
       <nav aria-label="Điều hướng dashboard" className="flex-1 space-y-2 p-4">
         {[
           { href: details.base, label: 'Tổng quan', icon: LayoutDashboard },
+          { href: '/profile', label: 'Hồ sơ của tôi', icon: Users },
           { href: '/system', label: 'Trạng thái hệ thống', icon: Activity },
           { href: '/events', label: 'Khám phá sự kiện', icon: ArrowUpRight },
         ].map(({ href, label, icon: Icon }) => (
@@ -69,9 +71,12 @@ export function DashboardShell({
         ))}
       </nav>
       <div className="m-4 rounded-xl bg-slate-50 p-4">
-        <p className="text-xs font-semibold">Giao diện nền tảng</p>
+        <div className="mb-3">
+          <LogoutButton />
+        </div>
+        <p className="text-xs font-semibold">TixFlow Workspace</p>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">
-          Phân quyền và nghiệp vụ được bổ sung ở các phase tiếp theo.
+          Tài khoản đã được xác thực. Các nghiệp vụ sự kiện sẽ được mở ở phase tiếp theo.
         </p>
       </div>
     </div>
@@ -95,7 +100,7 @@ export function DashboardShell({
               <span className="font-medium">{details.title}</span>
             </nav>
           </div>
-          <Badge className="text-[10px] sm:text-xs">Bản xem trước · Phase 1</Badge>
+          <Badge className="text-[10px] sm:text-xs">Tài khoản được xác minh</Badge>
         </header>
         <main id="main-content" className="mx-auto max-w-7xl px-5 py-8 md:px-9 md:py-10">
           {children}

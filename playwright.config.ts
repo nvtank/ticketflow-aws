@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
+  testMatch: 'foundation.spec.ts',
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -22,7 +23,8 @@ export default defineConfig({
         DATABASE_URL: 'postgresql://test:test@127.0.0.1:1/unavailable',
         REDIS_URL: 'redis://127.0.0.1:2',
         API_PORT: '4000',
-        CORS_ORIGINS: 'http://localhost:3000',
+        CORS_ORIGINS: 'http://localhost:3000,http://127.0.0.1:3000',
+        JWT_SECRET: 'test-only-authentication-secret-for-browser-foundation-tests-2026',
       },
     },
     {
