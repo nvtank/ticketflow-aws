@@ -41,7 +41,7 @@ export function PublicFooter() {
       </div>
       <div className="container flex flex-wrap items-center justify-between gap-3 border-t py-5 text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} TixFlow.</p>
-        <p>Bản phát triển local · Phase 1</p>
+        <p>Bản phát triển local</p>
         <span className="inline-flex items-center gap-2">
           <span className="size-1.5 rounded-full bg-primary" />
           Made for memorable moments
