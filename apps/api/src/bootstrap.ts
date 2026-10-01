@@ -22,7 +22,9 @@ export function configureApplication(app: INestApplication, environment: Environ
   if (environment.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('TixFlow API')
-      .setDescription('Local modular monolith. Phase 2: database and authentication.')
+      .setDescription(
+        'Local modular monolith. Phase 3: organization-scoped events, seat grids and approval.',
+      )
       .setVersion('0.1.0')
       .addBearerAuth()
       .addCookieAuth('tixflow_refresh')
