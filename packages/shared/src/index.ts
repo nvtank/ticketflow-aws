@@ -10,6 +10,20 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  role: UserRole;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  accessToken: string;
+  expiresIn: number;
+}
+
 export type SeatStatus = 'AVAILABLE' | 'HELD' | 'SOLD' | 'UNAVAILABLE';
 export type OrderStatus =
   'PENDING_PAYMENT' | 'PAID' | 'EXPIRED' | 'CANCELLED' | 'PAYMENT_FAILED' | 'REFUND_REQUIRED';
@@ -66,4 +80,48 @@ export interface InventoryUpdate {
   seatIds: string[];
   revision: number;
   occurredAt: string;
+}
+
+export const EVENT_CATEGORIES = ['MUSIC', 'CONFERENCE', 'WORKSHOP', 'SPORTS', 'OTHER'] as const;
+export type EventCategory = (typeof EVENT_CATEGORIES)[number];
+export type EventStatus =
+  'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+export interface EventSectionSummary {
+  id: string;
+  name: string;
+  rowCount: number;
+  columnCount: number;
+  ticketType: { id: string; name: string; priceVnd: number };
+  totalSeats: number;
+  availableSeats: number;
+  soldSeats: number;
+}
+export interface EventDetail extends EventSummary {
+  status: EventStatus;
+  description: string;
+  endsAt: string;
+  salesStartAt: string;
+  salesEndAt: string;
+  ticketPolicy: string;
+  galleryUrls: string[];
+  maxTicketsPerOrder: number;
+  inventoryRevision: number;
+  rejectionReason: string | null;
+  organization: { id: string; name: string };
+  venue: { id: string; name: string; address: string; city: string };
+  sections: EventSectionSummary[];
+}
+export interface SeatSnapshot {
+  eventId: string;
+  revision: number;
+  serverTime: string;
+  seats: {
+    id: string;
+    sectionId: string;
+    code: string;
+    rowLabel: string;
+    columnNumber: number;
+    status: SeatStatus;
+    priceVnd: number;
+  }[];
 }

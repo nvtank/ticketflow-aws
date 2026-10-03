@@ -1,161 +1,188 @@
 # TixFlow — Real-time Event Ticketing Platform
 
-Nền tảng bán vé sự kiện được phát triển theo 7 phase. **Repository hiện triển khai
-Phase 1: Project Setup & Design System**, chưa phải MVP bán vé hoàn chỉnh.
-Chạy local, không dùng AWS hoặc yêu cầu AWS credentials.
+Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–3: nền tảng,
+Database & Authentication và Event Management.** Chưa hoàn thành luồng bán vé. Không dùng
+AWS hoặc yêu cầu AWS credentials.
 
-## Yêu cầu
+## Cài đặt và chạy
 
-- Node.js **24 LTS** (`.nvmrc`), pnpm **10.34.1**.
-- Docker Engine/Desktop có Docker Compose v2 để chạy PostgreSQL và Redis.
-- Trên WSL: bật Docker Desktop WSL integration cho distro đang sử dụng, hoặc cài
-  Docker Engine trong Linux. Node/pnpm và dependencies phải chạy trong cùng hệ điều hành;
-  không dùng `node_modules` Windows cho Node Linux.
+Yêu cầu Node.js 24 LTS, pnpm 10.34.1, Docker Engine/Desktop với Docker Compose.
+Trên WSL, dùng Docker Engine trong Ubuntu hoặc Docker Desktop WSL integration.
+Cài dependencies bằng Node của cùng hệ điều hành.
 
-Các phiên bản đã resolve được lưu trong `pnpm-lock.yaml`: Next.js 16.4.2, React
-19.3.1, NestJS 11.2.7, TypeScript 5.9.3, Tailwind CSS 4.3.3. Inter Variable được
-đóng gói local, không gọi Google Fonts khi build. Nest CLI 11 cần bản `schema-utils`
-4.3.3 tương thích Webpack; override được giải thích trong `pnpm-workspace.yaml`.
-ESLint 9 hiện được giữ vì peer dependencies của các plugin React/Next chưa hỗ trợ
-ESLint 10 đầy đủ. Không tắt strict peer dependency checks.
-
-## Khởi chạy
-
-Chạy tất cả lệnh từ thư mục gốc repository (thư mục này chính là `tixflow/` trong thiết kế).
+Docker Engine trên Ubuntu có thể cài theo [hướng dẫn chính thức](https://docs.docker.com/engine/install/ubuntu/).
+Môi trường WSL hiện tại đã cài và bật Docker; mở lại terminal hoặc chạy
+`newgrp docker` nếu phiên cũ chưa nhận quyền của docker group.
 
 ```sh
 npm install --global pnpm@10.34.1
 pnpm install --frozen-lockfile
-cp .env.example .env
-```
-
-Đặt mật khẩu local trong `POSTGRES_PASSWORD` và sửa `DATABASE_URL` cho khớp.
-Nếu mật khẩu chứa ký tự đặc biệt, URL-encode phần password của `DATABASE_URL`.
-Nếu thay đổi port database/Redis, cập nhật cả URL tương ứng. `.env` bị Git ignore.
-
-```sh
-docker compose --env-file .env -f infrastructure/docker-compose.yml config --quiet
-docker compose --env-file .env -f infrastructure/docker-compose.yml up -d --wait
+pnpm env:setup
+pnpm infra:up
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
 ```
 
-`pnpm dev` build shared package trước, rồi chạy Next.js và NestJS đồng thời, có watch.
-Sau khi sửa shared contracts, chạy lại `pnpm --filter @tixflow/shared build` để cập nhật
-JavaScript sử dụng bởi backend. Các app đọc chung `.env` ở root qua dotenv-cli.
+`env:setup` tạo `.env` bị Git ignore với mật khẩu PostgreSQL/JWT secret ngẫu nhiên,
+không ghi đè file đã có. Chạy `pnpm env:setup -- --upgrade` để thêm cấu hình auth
+còn thiếu. Nếu sửa database password/port, sửa cả DATABASE_URL tương ứng. JWT
+placeholder trong `.env.example` không dùng để chạy API.
 
-| Thành phần                   | Địa chỉ                                  |
-| ---------------------------- | ---------------------------------------- |
-| Frontend                     | http://localhost:3000                    |
-| REST API                     | http://localhost:4000/api/v1             |
-| Swagger                      | http://localhost:4000/api/docs           |
-| Liveness                     | http://localhost:4000/api/v1/health/live |
-| Readiness PostgreSQL + Redis | http://localhost:4000/api/v1/health      |
-| Metrics tiến trình local     | http://localhost:4000/api/v1/metrics     |
-| PostgreSQL                   | localhost:5432                           |
-| Redis                        | localhost:6379                           |
+`pnpm infra:up` dùng `docker compose --env-file .env -f infrastructure/docker-compose.yml
+up -d --wait`. PostgreSQL/Redis có healthcheck, named volumes và chỉ publish loopback.
+`pnpm infra:down` dừng containers nhưng giữ dữ liệu.
 
-Ứng dụng và containers bind loopback. Browser gọi `/api/v1` cùng origin; Next.js
-proxy đến `API_INTERNAL_URL`. Giá trị proxy được cố định khi build; thay đổi URL
-cần restart dev server hoặc build lại production. Không đưa secrets vào biến `NEXT_PUBLIC_*`.
+| Thành phần                 | Địa chỉ                                   |
+| -------------------------- | ----------------------------------------- |
+| Frontend                   | http://localhost:3000                     |
+| REST API                   | http://localhost:4000/api/v1              |
+| Swagger (development/test) | http://localhost:4000/api/docs            |
+| Readiness                  | http://localhost:4000/api/v1/health       |
+| Liveness / metrics local   | `/api/v1/health/live` / `/api/v1/metrics` |
+| PostgreSQL / Redis         | localhost:5432 / localhost:6379           |
 
-```sh
-# Build các workspace theo dependency order
-pnpm build
-# Sau đó chạy API và web trong hai terminal riêng
-pnpm --filter @tixflow/api start
-pnpm --filter @tixflow/web start
+`pnpm dev` build shared rồi chạy hai app với watch. Sau khi sửa shared, chạy lại
+`pnpm --filter @tixflow/shared build`. Production build local: `pnpm build`, rồi
+`pnpm --filter @tixflow/api start` và `pnpm --filter @tixflow/web start` trong hai terminal.
+Browser dùng Next.js proxy cùng origin. API_INTERNAL_URL được cố định lúc build;
+không đưa secrets vào NEXT_PUBLIC_*.
 
-# Dừng containers, giữ dữ liệu
-pnpm infra:down
-```
+Nếu Node `copyfile` báo `EPERM` khi build trên ổ Windows gắn qua WSL (`/mnt/c`,
+`/mnt/d`), dùng checkout trên filesystem Linux. Trong kiểm thử Phase 3, `.next` tạm dùng filesystem Linux trong `/tmp` để tránh
+lỗi này; sau kiểm thử đã chép bản build về thư mục `.next` thường của workspace.
+Các cấu hình/thư mục sinh tự động không được commit.
 
-`pnpm db:migrate`, `pnpm db:seed`, Prisma schema và tài khoản demo **chưa có ở
-Phase 1**; sẽ được thêm ở Phase 2 cùng authentication. Không có credentials giả
-hoặc nút Google Login chưa hoạt động. Nút đăng nhập hiện disabled.
+Lockfile ghi phiên bản thực: Next.js 16.4.2, React 19.3.1, NestJS 11.2.7, Prisma
+7.10.1, TypeScript 5.9.3, Tailwind CSS 4.3.3. Prisma dùng PostgreSQL driver adapter,
+generate client trước build/dev/typecheck. Inter được đóng gói local.
 
-## Các route hiện tại
+## Tài khoản demo
 
-- `/`: landing tiếng Việt, đồ họa sân khấu vector gốc, danh mục, public navigation/footer.
-- `/events`: nền tảng tìm kiếm đồng bộ URL và trạng thái từ REST. Event API chưa được
-  triển khai; phản hồi 404 hiển thị thông báo Phase 3 rõ ràng, không sinh event giả.
-- `/system`: trạng thái kết nối API/PostgreSQL/Redis thực tế, refresh và toast.
-- `/organizer`, `/staff`, `/admin`: bố cục dashboard responsive, sidebar/breadcrumb,
-  thông báo bản xem trước và kết nối thật. Chưa có đăng nhập, quyền hoặc dữ liệu riêng tư.
-- Loading skeleton, lỗi tải trang, global error và trang 404.
+Chỉ dùng development/test. Mật khẩu mặc định `TixFlowDemo!2026`, hoặc DEMO_PASSWORD
+của bạn lúc seed đầu. Seed lại giữ mật khẩu hiện có.
 
-Reusable UI theo cấu trúc shadcn/ui: Button, Card, Input, Badge, Skeleton, Dialog,
-EmptyState. Dialog dùng Radix để quản lý focus/keyboard. Tailwind CSS v4, Lucide,
-TanStack Query, Zustand cho menu, Sonner, Zod và date-fns đã được kết nối. React
-Hook Form/resolvers đã cài để dùng ở các form có nghiệp vụ từ Phase 2. Recharts,
-Socket.IO, QR và worker sẽ được thêm khi triển khai chức năng tương ứng.
+| Email                   | Role      | Trang sau đăng nhập |
+| ----------------------- | --------- | ------------------- |
+| admin@tixflow.local     | ADMIN     | `/admin`            |
+| organizer@tixflow.local | ORGANIZER | `/organizer`        |
+| staff@tixflow.local     | STAFF     | `/staff`            |
+| customer@tixflow.local  | CUSTOMER  | `/profile`          |
+| customer2@tixflow.local | CUSTOMER  | `/profile`          |
 
-## Kiểm tra
+Seed tạo 1 tổ chức, 3 sự kiện tương lai, 300 ghế (concert 200 ghế VIP/Standard),
+1 đơn PAID và 2 vé mẫu VALID/USED. Ngày tương đối theo lần seed đầu. Chạy lại giữ
+mật khẩu, ngày sự kiện và SOLD inventory. Vé mẫu không thay thế luồng phát hành QR.
+
+1. Mở `/system`: API/PostgreSQL/Redis phải báo đã kết nối.
+2. Đăng nhập từng role, kiểm tra workspace đúng và từ chối role khác.
+3. Organizer xem sự kiện, doanh thu đơn PAID, số ghế bán và tỷ lệ lấp đầy từ database.
+4. Đăng ký customer mới, cập nhật tên/điện thoại tại `/profile`.
+5. Reload hai tab để khôi phục phiên; đổi mật khẩu để thu hồi mọi phiên.
+6. Đăng nhập với mật khẩu mới, đăng xuất và kiểm tra trang riêng yêu cầu login.
+
+### Demo quản lý sự kiện Phase 3
+
+1. Đăng nhập Organizer, mở `/organizer/events/new`, chọn TixFlow Live và nhập nội dung,
+   địa điểm, URL banner/ảnh, chính sách, ngày sự kiện và cửa sổ bán vé (giờ Việt Nam).
+2. Lưu nháp, tạo VIP 2 hàng × 20 ghế và Standard 8 × 20, đặt giá từng khu.
+   Có thể bật/tắt ghế nháp và phân công `staff@tixflow.local`.
+3. Gửi duyệt. Nội dung và sơ đồ khóa khi chờ duyệt; chưa xuất hiện trong danh mục công khai.
+4. Admin mở `/admin/events`, xem chi tiết/lịch sử rồi duyệt hoặc từ chối kèm lý do.
+   Organizer sửa bản bị từ chối và gửi lại được.
+5. Sau duyệt, khách mở `/events`, tìm tên, lọc danh mục/thành phố/ngày/giá,
+   xem trang chi tiết và số ghế khả dụng. Bộ lọc được lưu trong URL.
+6. Chỉ xóa được nháp chưa có giao dịch. Sơ đồ có đơn hàng/lịch sử giữ ghế không được tạo lại;
+   ghế SOLD/HELD không được bật/tắt. Các thao tác được ghi audit trong transaction.
+
+Dashboard Organizer hiện có KPI tổng hợp thực; biểu đồ doanh thu/đơn hàng mới và
+analytics chi tiết thuộc Phase 6. Trang Admin Phase 3 tập trung duyệt sự kiện.
+Ảnh dùng URL http/https; chưa có upload/lưu trữ file.
+
+Chưa thể demo chọn ghế/thanh toán/check-in. Không hiển thị Google Login hoặc reset
+password khi chưa có OAuth/email delivery thực.
+
+## Kiểm thử
 
 ```sh
 pnpm lint
 pnpm typecheck
 pnpm format:check
 pnpm test
+pnpm test:infra:up
+pnpm test:db:prepare
+pnpm test:integration
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
+pnpm test:e2e:auth
+pnpm test:e2e:events
+pnpm test:infra:down
 ```
 
-Vitest build API/shared trước khi kiểm thử ứng dụng Nest thực qua HTTP. Các test
-hiện có kiểm tra config, CORS, Helmet, correlation ID, rate limit, error redaction,
-metrics, Swagger và trạng thái dependency không kết nối. PostgreSQL/Redis drivers
-thực được trỏ đến port local đóng; **đây chưa phải transaction/concurrency tests**.
-Không thay đổi dữ liệu database đang chạy của bạn.
+Test PostgreSQL riêng tại 55432, Redis 56379, DB tixflow_test dùng tmpfs. Test guard
+từ chối database ngoài local test DB; chỉ xóa fixtures của lần chạy, không truncate.
+TEST_DATABASE_URL/TEST_REDIS_URL có thể cấu hình nhưng phải giữ quy tắc an toàn đó.
 
-Playwright build app và tự chạy backend/frontend trên 4000/3000; hãy dừng `pnpm dev`
-trước khi chạy để tránh chiếm port. Chạy Chromium desktop và Pixel 7 viewport,
-kiểm tra navigation, focus, URL search/history, lỗi/rỗng, health UI và dashboard
-preview. Dịch vụ dependency được cố ý đặt không khả dụng để kiểm thử UI degraded.
-Không mock REST responses trong E2E. Báo cáo ở `playwright-report/`; ảnh/trace trong
-`test-results/` bị Git ignore. Kết quả thực tế và giới hạn được lưu tại
-[docs/progress.md](docs/progress.md).
+Vitest kiểm tra validation, JWT, RBAC, HTTP, event lifecycle/ownership, grid atomicity,
+review races, sold inventory và auth với DB/Redis thật. Concurrent
+refresh và duplicate registration chưa chứng minh chống overselling; tests seat
+hold 20/100 requests thuộc Phase 4.
+
+Playwright tự bật API/web trên 4000/3000: dừng pnpm dev trước khi chạy. Foundation
+suite cố ý dùng dependency ports đóng để kiểm tra lỗi; auth/events suites dùng DB test thật.
+Events E2E seed tài khoản demo vào DB test và tạo sự kiện có tên riêng cho mỗi lần chạy.
+Chạy desktop/mobile, không mock REST responses. Báo cáo/trace bị Git ignore.
+CI đã cấu hình; kết quả remote chỉ xác nhận sau khi CI chạy.
 
 ## Cấu trúc
 
 ```text
 apps/
-  api/src/
-    common/http/       # Errors, correlation IDs, measured HTTP counters
-    config/            # Validated environment
-    health/            # Real PostgreSQL/Redis readiness
-    monitoring/        # Local-only metrics
-  api/test/
+  api/
+    prisma/                # Schema, migrations và SQL constraints
+    prisma.config.ts
+    src/
+      auth/                # JWT provider, bcrypt, refresh sessions, guards, DTOs
+      users/               # Own profile and password management
+      organizations/       # Membership-scoped reads
+      events/              # Public catalog, organizer CRUD/grid/staff, admin review/audit
+      database/            # Prisma PostgreSQL lifecycle
+      common/http/         # Request IDs, logs, errors, measured metrics
+      config/ health/ monitoring/
+      seed.ts
+    test/                  # Unit, HTTP and real DB integration
   web/src/
-    app/(public)/      # Home, events, system
-    app/(workspace)/   # Organizer, Staff, Admin layout previews
-    components/        # UI, public/dashboard shells, query provider
-    lib/               # Validated API client, formatting
-    stores/            # UI state only
-packages/
-  shared/              # Types, constants, preparatory realtime contracts
-  config/              # Strict TypeScript configuration
-infrastructure/        # PostgreSQL/Redis Compose
-e2e/                   # Playwright
-docs/                  # Architecture, API, database plan, progress, commit plan
+    app/(public)/          # Home, events, system, login, register, profile
+    app/(workspace)/       # Organizer event management, admin review, staff shell
+    components/events/     # Catalog, forms, grids, dashboards and review dialogs
+    components/auth/       # Forms, gates, bootstrap, profile
+    components/ui/         # Accessible Radix/shadcn-style primitives
+    lib/ stores/           # Validated API client, memory-only auth state
+packages/shared/           # Shared types and constants
+packages/config/           # Strict TypeScript configuration
+infrastructure/            # Development and test Compose
+scripts/                   # Private environment setup, guarded test migrations
+e2e/ docs/
 ```
 
-`apps/worker` chưa được tạo vì Phase 1 chưa có background jobs. Không tạo worker rỗng.
+## Tiến độ
 
-## Tiến độ và giới hạn
+Phase 1: design system, public/dashboard layouts, Nest HTTP foundation, health/metrics.
+[PR #2](https://github.com/nvtank/ticketflow-aws/pull/2) đã merge vào develop.
+Phase 2: Prisma schema/migration/seed thật, đăng ký/login, bcrypt, JWT, refresh token
+hash/rotation/revocation, HttpOnly cookie, backend RBAC/membership, profile/password
+và route protection. Access token chỉ ở memory, không lưu browser storage.
 
-Phase 1 chưa cung cấp luồng mua vé. Authentication, Prisma migrations/seed,
-event CRUD/approval, seat hold transaction, realtime, thanh toán, QR/check-in,
-analytics và waiting room được thực hiện ở Phase 2–7 theo đúng thứ tự. Dashboard
-không có số liệu hardcode. Chưa có kết quả load test hoặc tuyên bố về concurrency.
+Phase 2 đã merge qua [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4).
+Phase 3: event CRUD theo tổ chức, seat generator, staff assignment, admin approval,
+public catalog/details và KPI Organizer thực. Phase 4–7 bổ sung
+atomic booking, realtime, payment, QR, check-in, analytics và waiting room. Không
+có KPI hardcode hoặc tuyên bố tải chưa đo. Chưa tạo worker khi chưa cần jobs.
 
-Theo dõi [kế hoạch 17 commit Phase 1](docs/phase-1-plan.md),
-[tiến độ](docs/progress.md), [kiến trúc](docs/architecture.md),
-[database](docs/database.md), [API](docs/api.md).
+Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 3 plan](docs/phase-3-plan.md),
+[kiến trúc](docs/architecture.md), [database](docs/database.md), [API](docs/api.md).
+Phase 2 được người dùng chuyển cho `nvtank <tuannguyen.120910@gmail.com>`;
+commit timestamps dùng thời gian thực.
 
-Phase owner: `hoangphatdev`, author được xác nhận trong phiên làm việc. Branch:
-`feature/phase-1-foundation`. `main` và `develop` trỏ tới commit kế hoạch ban đầu;
-code Phase 1 nằm trên feature branch để review. Không backdate, chưa push, mở PR
-hoặc merge. Danh sách commit thực:
-
-```sh
-git log --reverse --format='%h %s' feature/phase-1-foundation
-```
+Phase 3 dùng author được xác nhận `nguyen-van-hoan <nguyenvanh842k5@gmail.com>`
+trên branch `feature/phase-3-events`, base develop `16f6146`.
