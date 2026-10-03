@@ -49,6 +49,11 @@ export function DashboardShell({
       <nav aria-label="Điều hướng dashboard" className="flex-1 space-y-2 p-4">
         {[
           { href: details.base, label: 'Tổng quan', icon: LayoutDashboard },
+          ...(role === 'ORGANIZER'
+            ? [{ href: '/organizer/events', label: 'Quản lý sự kiện', icon: Ticket }]
+            : role === 'ADMIN'
+              ? [{ href: '/admin/events', label: 'Phê duyệt sự kiện', icon: Ticket }]
+              : []),
           { href: '/profile', label: 'Hồ sơ của tôi', icon: Users },
           { href: '/system', label: 'Trạng thái hệ thống', icon: Activity },
           { href: '/events', label: 'Khám phá sự kiện', icon: ArrowUpRight },
@@ -76,7 +81,7 @@ export function DashboardShell({
         </div>
         <p className="text-xs font-semibold">TixFlow Workspace</p>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">
-          Tài khoản đã được xác thực. Các nghiệp vụ sự kiện sẽ được mở ở phase tiếp theo.
+          Tài khoản đã được xác thực. Quyền thao tác được kiểm tra tại máy chủ.
         </p>
       </div>
     </div>

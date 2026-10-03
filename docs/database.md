@@ -1,4 +1,4 @@
-# Database — Phase 2
+# Database — Phase 3
 
 PostgreSQL 17 / Prisma 7.10.1 với PrismaPg adapter. Schema tại
 `apps/api/prisma/schema.prisma`; migration đầu tại
@@ -47,3 +47,22 @@ và ownership checks. Finalization phải atomically kiểm tra payment, hold/ex
 sale/ticket/order; callback trễ cần refund, không chiếm ghế đã bán. Check-in phải
 kiểm tra staff assignment và conditional VALID → USED. Chưa kiểm thử concurrency
 đặt ghế/check-in ở Phase 2.
+
+## Phase 3 migration and transactions
+
+`20261022010000_event_catalog` adds Event.galleryUrls (text array, empty default),
+Venue.city and TicketType(eventId, priceVnd) indexes. Applied to development and
+isolated test databases. Prices remain integer VND and all timestamps UTC.
+
+Event rows are locked with parameterized `SELECT ... FOR UPDATE` before content,
+grid, submit, approve/reject or assignment mutations. Approval and a competing
+rejection cannot both succeed. Grid generation/deletion is atomic and blocked by
+orders/hold history/occupied seats. Conditional seat configuration changes cannot
+turn SOLD/HELD into AVAILABLE. Lifecycle writes and audit records commit together.
+Draft deletion retains an AuditLog tombstone without a foreign key to deleted event.
+
+Editing creates a new venue row to avoid mutating venues shared by other events.
+Unused old venue rows are retained for now; no automatic venue cleanup is implemented.
+Public snapshots use repeatable read; effective held availability uses server time.
+Public catalog filters use parameterized SQL and escape wildcard search characters.
+Organizer aggregates count PAID order revenue and SOLD seats within membership scope.

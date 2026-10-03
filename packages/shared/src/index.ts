@@ -81,3 +81,47 @@ export interface InventoryUpdate {
   revision: number;
   occurredAt: string;
 }
+
+export const EVENT_CATEGORIES = ['MUSIC', 'CONFERENCE', 'WORKSHOP', 'SPORTS', 'OTHER'] as const;
+export type EventCategory = (typeof EVENT_CATEGORIES)[number];
+export type EventStatus =
+  'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+export interface EventSectionSummary {
+  id: string;
+  name: string;
+  rowCount: number;
+  columnCount: number;
+  ticketType: { id: string; name: string; priceVnd: number };
+  totalSeats: number;
+  availableSeats: number;
+  soldSeats: number;
+}
+export interface EventDetail extends EventSummary {
+  status: EventStatus;
+  description: string;
+  endsAt: string;
+  salesStartAt: string;
+  salesEndAt: string;
+  ticketPolicy: string;
+  galleryUrls: string[];
+  maxTicketsPerOrder: number;
+  inventoryRevision: number;
+  rejectionReason: string | null;
+  organization: { id: string; name: string };
+  venue: { id: string; name: string; address: string; city: string };
+  sections: EventSectionSummary[];
+}
+export interface SeatSnapshot {
+  eventId: string;
+  revision: number;
+  serverTime: string;
+  seats: {
+    id: string;
+    sectionId: string;
+    code: string;
+    rowLabel: string;
+    columnNumber: number;
+    status: SeatStatus;
+    priceVnd: number;
+  }[];
+}
