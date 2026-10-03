@@ -5,25 +5,25 @@ Branch: `feature/phase-3-events`. The user confirmed Phase 3 author/owner
 `nguyen-van-hoan <nguyenvanh842k5@gmail.com>`, overriding the initial team plan.
 Use real timestamps and meaningful commits; no AWS provisioning.
 
-| # | Planned commit | Files / modules | Validation |
-| --- | --- | --- | --- |
-| 01 | docs: record phase three event management plan | This plan | Scope/dependencies |
-| 02 | feat(shared): define event management contracts | shared event types | Shared build |
-| 03 | feat(db): store event galleries and catalog indexes | Prisma/migration | Real migration/generate |
-| 04 | feat(events): validate event dates and seat grids | DTOs/policies | Unit/type checks |
-| 05 | feat(events): create and edit organization scoped drafts | Organizer service | DB ownership tests |
-| 06 | feat(seats): generate grids and protect purchased inventory | Seat service | Atomic/immutability tests |
-| 07 | feat(events): submit reviewable events and record decisions | Lifecycle/audit | State/race tests |
-| 08 | feat(events): expose filtered public catalog and inventory | Public service/API | Filter/visibility tests |
-| 09 | feat(organizer): expose event management and real overview | Controllers/module | HTTP/RBAC checks |
-| 10 | feat(admin): review events with approval history | Admin API | HTTP/admin tests |
-| 11 | feat(web): add public event filters and details | Catalog/detail pages | URL/real API checks |
-| 12 | feat(web): manage organizer events and overview | Organizer pages | Real API/typecheck |
-| 13 | feat(web): edit event drafts with validated forms | RHF/Zod editor | Form/DB flow |
-| 14 | feat(web): manage seat grids and assigned staff | Seat/staff editor | Protection/error UX |
-| 15 | feat(web): review events in admin workspace | Admin review UI/nav | Decision/error UX |
-| 16 | test(events): verify lifecycle ownership and inventory safety | Unit/integration/E2E/CI | Real DB/Redis/browser |
-| 17 | docs: document phase three delivery and validation | README/API/progress | Lint/type/build/tests |
+| #   | Planned commit                                                | Files / modules         | Validation                |
+| --- | ------------------------------------------------------------- | ----------------------- | ------------------------- |
+| 01  | docs: record phase three event management plan                | This plan               | Scope/dependencies        |
+| 02  | feat(shared): define event management contracts               | shared event types      | Shared build              |
+| 03  | feat(db): store event galleries and catalog indexes           | Prisma/migration        | Real migration/generate   |
+| 04  | feat(events): validate event dates and seat grids             | DTOs/policies           | Unit/type checks          |
+| 05  | feat(events): create and edit organization scoped drafts      | Organizer service       | DB ownership tests        |
+| 06  | feat(seats): generate grids and protect purchased inventory   | Seat service            | Atomic/immutability tests |
+| 07  | feat(events): submit reviewable events and record decisions   | Lifecycle/audit         | State/race tests          |
+| 08  | feat(events): expose filtered public catalog and inventory    | Public service/API      | Filter/visibility tests   |
+| 09  | feat(organizer): expose event management and real overview    | Controllers/module      | HTTP/RBAC checks          |
+| 10  | feat(admin): review events with approval history              | Admin API               | HTTP/admin tests          |
+| 11  | feat(web): add public event filters and details               | Catalog/detail pages    | URL/real API checks       |
+| 12  | feat(web): manage organizer events and overview               | Organizer pages         | Real API/typecheck        |
+| 13  | feat(web): edit event drafts with validated forms             | RHF/Zod editor          | Form/DB flow              |
+| 14  | feat(web): manage seat grids and assigned staff               | Seat/staff editor       | Protection/error UX       |
+| 15  | feat(web): review events in admin workspace                   | Admin review UI/nav     | Decision/error UX         |
+| 16  | test(events): verify lifecycle ownership and inventory safety | Unit/integration/E2E/CI | Real DB/Redis/browser     |
+| 17  | docs: document phase three delivery and validation            | README/API/progress     | Lint/type/build/tests     |
 
 ## Business boundaries
 
@@ -46,3 +46,11 @@ submits; admin inspects details/history then approves/rejects; customer finds on
 published events and views ticket types/availability. Use actual PostgreSQL/Redis
 test services and browser calls, without mocked business APIs. Report exact results
 and limitations in progress; the commit plan may be adjusted for coherent groups.
+
+## Delivery adjustments
+
+Commit messages follow the implemented scopes. Validation commit also fixes the
+accessible names of event select fields found by the actual browser workflow.
+The 17-commit plan remains intact. Final results and real history are recorded in
+[progress.md](progress.md); generated browser artifacts and local runtime caches
+are ignored. No reservation/realtime or payment feature is claimed in Phase 3.
