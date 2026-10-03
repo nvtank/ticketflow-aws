@@ -7,9 +7,7 @@ test('home has Vietnamese navigation and no invented event inventory', async ({
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Đừng chỉ nghe kể.');
-  await expect(
-    page.getByRole('heading', { name: 'Những sự kiện mới đang được chuẩn bị' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Chưa thể tải dữ liệu' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
   await expect(page.getByRole('main')).toHaveCount(1);
   expect(pageErrors).toEqual([]);

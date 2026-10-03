@@ -154,9 +154,13 @@ export function EventEditor({ event }: { event?: EventDetail }) {
         onSubmit={form.handleSubmit((values) => save.mutate(values))}
         className="space-y-6"
       >
-        <label className="block text-sm font-medium">
-          Tổ chức
+        <div>
+          <label htmlFor="organizationId" className="block text-sm font-medium">
+            Tổ chức
+          </label>
           <select
+            id="organizationId"
+            aria-describedby="organizationId-error"
             {...form.register('organizationId')}
             disabled={!!event}
             className={fieldClass + ' mt-2'}
@@ -170,21 +174,23 @@ export function EventEditor({ event }: { event?: EventDetail }) {
                 </option>
               ))}
           </select>
-          <span className="mt-1 block text-xs text-red-600">
+          <span id="organizationId-error" className="mt-1 block text-xs text-red-600">
             {form.formState.errors.organizationId?.message}
           </span>
-        </label>
+        </div>
         {text('title', 'Tên sự kiện')}
-        <label className="block text-sm font-medium">
-          Danh mục
-          <select {...form.register('category')} className={fieldClass + ' mt-2'}>
+        <div>
+          <label htmlFor="category" className="block text-sm font-medium">
+            Danh mục
+          </label>
+          <select id="category" {...form.register('category')} className={fieldClass + ' mt-2'}>
             {Object.entries(categoryLabel).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
-        </label>
+        </div>
         {area('description', 'Mô tả sự kiện')}
         <div className="grid gap-5 sm:grid-cols-2">
           {text('venueName', 'Tên địa điểm')}
