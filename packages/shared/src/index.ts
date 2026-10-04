@@ -72,7 +72,7 @@ export interface HealthResponse {
   dependencies: { postgres: DependencyStatus; redis: DependencyStatus };
 }
 
-// These contracts are preparatory; the realtime gateway is delivered in Phase 4.
+// Realtime payloads invalidate authoritative REST snapshots.
 // Payloads invalidate REST snapshots; they never authorize a hold or purchase.
 export type InventoryEventName = 'seat:held' | 'seat:released' | 'seat:sold' | 'inventory:updated';
 export interface InventoryUpdate {
@@ -124,4 +124,56 @@ export interface SeatSnapshot {
     status: SeatStatus;
     priceVnd: number;
   }[];
+}
+
+export type BookingSeatStatus =
+  'AVAILABLE' | 'HELD_BY_ME' | 'HELD_BY_OTHERS' | 'SOLD' | 'UNAVAILABLE';
+export type HoldState = 'ACTIVE' | 'EXPIRED' | 'RELEASED';
+export interface HoldView {
+  id: string;
+  eventId: string;
+  seatIds: string[];
+  state: HoldState;
+  expiresAt: string;
+  serverTime: string;
+  orderId: string | null;
+}
+export interface BookingSnapshot {
+  eventId: string;
+  revision: number;
+  serverTime: string;
+  salesStartAt: string;
+  salesEndAt: string;
+  maxTicketsPerOrder: number;
+  activeHold: HoldView | null;
+  seats: (Omit<SeatSnapshot['seats'][number], 'status'> & { status: BookingSeatStatus })[];
+}
+export interface OrderView {
+  id: string;
+  eventId: string;
+  holdId: string;
+  status: OrderStatus;
+  totalVnd: number;
+  feeVnd: number;
+  expiresAt: string;
+  createdAt: string;
+  serverTime: string;
+  event: { title: string; slug: string; startsAt: string; venueName: string };
+  items: { seatId: string; code: string; section: string; priceVnd: number }[];
+}
+export interface EventRoomAck {
+  ok: boolean;
+  eventId?: string;
+  revision?: number;
+  message?: string;
+}
+export interface RealtimeServerEvents {
+  'seat:held': (update: InventoryUpdate) => void;
+  'seat:released': (update: InventoryUpdate) => void;
+  'seat:sold': (update: InventoryUpdate) => void;
+  'inventory:updated': (update: InventoryUpdate) => void;
+  'order:updated': (update: { orderId: string; eventId: string; status: OrderStatus }) => void;
+}
+export interface RealtimeClientEvents {
+  'event:join': (input: { eventId: string }, acknowledge: (result: EventRoomAck) => void) => void;
 }
