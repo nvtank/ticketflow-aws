@@ -2,6 +2,11 @@ import { z } from 'zod';
 
 const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  HOLD_RECONCILE_INTERVAL_MS: z.coerce.number().int().min(0).max(60000).default(5000),
+  SOCKET_REDIS_ADAPTER: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   JWT_SECRET: z
     .string()
