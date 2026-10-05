@@ -246,20 +246,24 @@ model Seat {
 }
 
 model SeatHold {
-  id         String    @id @default(uuid()) @db.Uuid
-  eventId    String    @db.Uuid
-  userId     String    @db.Uuid
-  event      Event     @relation(fields: [eventId], references: [id], onDelete: Restrict)
-  user       User      @relation(fields: [userId], references: [id], onDelete: Restrict)
-  expiresAt  DateTime  @db.Timestamptz(3)
-  releasedAt DateTime? @db.Timestamptz(3)
-  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
-  seats      Seat[]
-  order      Order?
+  idempotencyKey   String?   @db.VarChar(100)
+  requestedSeatIds String[]  @default([]) @db.Uuid
+  id               String    @id @default(uuid()) @db.Uuid
+  eventId          String    @db.Uuid
+  userId           String    @db.Uuid
+  event            Event     @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  expiresAt        DateTime  @db.Timestamptz(3)
+  releasedAt       DateTime? @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  seats            Seat[]
+  order            Order?
 
   @@unique([id, eventId])
+  @@unique([userId, idempotencyKey])
   @@index([expiresAt, releasedAt])
   @@index([userId, eventId])
+  @@index([eventId, userId, releasedAt, expiresAt])
 }
 
 model Order {
