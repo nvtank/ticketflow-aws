@@ -1,3 +1,5 @@
+import { BookingModule } from './booking/booking.module';
+import { RealtimeModule } from './realtime/realtime.module';
 import { EventsModule } from './events/events.module';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
@@ -21,6 +23,8 @@ import { OrganizationsModule } from './organizations/organizations.module';
     UsersModule,
     OrganizationsModule,
     EventsModule,
+    RealtimeModule,
+    BookingModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
   ],
   controllers: [MonitoringController],

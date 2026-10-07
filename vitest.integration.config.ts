@@ -11,6 +11,8 @@ export default defineConfig({
     hookTimeout: 30_000,
     env: {
       NODE_ENV: 'test',
+      HOLD_RECONCILE_INTERVAL_MS: '0',
+      SOCKET_REDIS_ADAPTER: 'true',
       DATABASE_URL:
         process.env.TEST_DATABASE_URL ??
         'postgresql://tixflow_test:tixflow_test_only@127.0.0.1:55432/tixflow_test',
