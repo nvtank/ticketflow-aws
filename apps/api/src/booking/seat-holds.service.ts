@@ -1,3 +1,4 @@
+import { Prisma } from '../generated/prisma/client';
 import {
   ConflictException,
   ForbiddenException,
@@ -120,6 +121,8 @@ export class SeatHoldsService {
       return result.hold;
     } catch (error) {
       this.metrics.record(false);
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+        throw new ConflictException('Mã thử lại đã được dùng cho lượt giữ ghế khác.');
       throw error;
     }
   }
