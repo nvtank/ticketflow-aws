@@ -176,7 +176,7 @@ export function ProfilePanel() {
         </Card>
       </div>
       <p className="mt-8 text-sm text-muted-foreground">
-        Lịch sử đơn hàng và vé sẽ được mở khi phân hệ thanh toán và phát hành vé hoàn tất.
+        Vé QR sẽ được mở khi phân hệ thanh toán và phát hành vé hoàn tất.
       </p>
     </div>
   );
