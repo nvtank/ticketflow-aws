@@ -140,9 +140,13 @@ export function EventInformation({ event }: { event: EventData }) {
             ))}
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Tối đa {event.maxTicketsPerOrder} vé mỗi đơn. Chức năng đặt vé trực tuyến hiện chưa khả
-            dụng.
+            Tối đa {event.maxTicketsPerOrder} vé mỗi đơn.
           </p>
+          {event.status === 'PUBLISHED' && (
+            <Button asChild className="mt-5 w-full">
+              <Link href={`/events/${event.slug}/booking`}>Chọn ghế</Link>
+            </Button>
+          )}
         </Card>
       </aside>
     </div>
