@@ -1,0 +1,61 @@
+phase,original,rewritten,originalDate,simulatedDate,subject
+1,4d7bee4cc8bda0a481369c625d320d6b4853c9dc,cfa7925fbe177659cda8776305cc61f5fa48f13d,2026-10-22T14:54:36+07:00,2026-09-20T09:00:00+07:00,docs: record phase one delivery and commit plan
+1,7a3e95d15059394ce86a707d2c040a6fe8f7f215,621b129275546c6b4da0ce08a4b4f65e90b10f31,2026-10-22T14:55:10+07:00,2026-09-20T10:30:00+07:00,chore: initialize pnpm workspace and repository tooling
+1,ee20db223b4bd141017dc2c05cc9171f7e09ea1b,7e384cf9c03ad5f996b17d537495629a467d4ec0,2026-10-22T14:55:56+07:00,2026-09-20T12:00:00+07:00,chore(config): add strict TypeScript and quality configuration
+1,10f2343ecfdbd6102c4313badc63746134597dd5,6e7b795d0be92636acef152590e6d24ae78a17ec,2026-10-22T14:56:32+07:00,2026-09-20T13:30:00+07:00,feat(shared): define platform constants and API contracts
+1,631554f5ad4f3164bdc7f3ee74ca4e56e405c054,5e71ca239d6b22dd285a4312a04d5a0799966f9c,2026-10-22T14:57:20+07:00,2026-09-20T15:00:00+07:00,chore(infra): configure local PostgreSQL and Redis
+1,b2136beb6b19e2fa901019f4ad2d665a5e98d29f,d0223abe25a0367e56b30ac5ccf97542259f6e60,2026-10-22T15:11:54+07:00,2026-09-21T09:00:00+07:00,feat(api): bootstrap modular NestJS application
+1,b22e63885577bdf6f883f9c608d5e7aa832870c4,8450ac968b65999074096959fa6e1bf4e7cd49b0,2026-10-22T15:12:21+07:00,2026-09-21T10:30:00+07:00,feat(api): standardize validation errors and request logging
+1,64c01d88112bcd5e06870e6eb215cbfe4b4a1aa3,e9756f9128ccdb336cf4728b29a6dca981fc80b8,2026-10-22T15:14:09+07:00,2026-09-21T12:00:00+07:00,feat(api): add dependency health and request metrics
+1,d51f1f6482c4f036937ea0ab307c17785faeffe4,6f5e68099d9220fab7dfdfc7c3ab2bd07c55ea25,2026-10-22T15:14:36+07:00,2026-09-21T13:30:00+07:00,feat(web): initialize Next.js App Router application
+1,ac34001dfc2f9fd8b87117c660fb51c994a4939b,b3eea0f9b187828352fe645b3104f4e00404af32,2026-10-22T15:15:01+07:00,2026-09-22T09:00:00+07:00,feat(ui): implement accessible design system primitives
+1,e6354b17c7c1d9d0f38acf5878eb7c7e2bccd598,5fef48ee32494c9ae67b606977fae41f2885c2f2,2026-10-22T15:15:01+07:00,2026-09-22T10:30:00+07:00,feat(web): configure query state and notification providers
+1,b6621823bd8698cff270c5b1577a6eb15507a4ff,b47f7f5de00d0f9198bde99cf59b523a91cdae5f,2026-10-22T15:15:15+07:00,2026-09-22T12:00:00+07:00,feat(web): build responsive public navigation and footer
+1,e206cf5b249af9c05a3539f92be9b8ba402791f6,f53431720fd00dac51c9cf1b980cb38fe8431be3,2026-10-22T15:15:16+07:00,2026-09-22T13:30:00+07:00,feat(web): create discovery landing and honest empty states
+1,5b77aecdaed991f611fa8461613175264cdb6abf,1d84e374944530df7313e7b070fd13a33940d4d5,2026-10-22T15:15:17+07:00,2026-09-23T09:00:00+07:00,feat(web): add responsive role dashboard layouts
+1,aae2f1d3a0aaec414d653dcc94f28fd5ab0ccae8,a457d2e05efad0ded542e687dd79929bba36bdb3,2026-10-22T15:15:28+07:00,2026-09-23T10:30:00+07:00,feat(web): add application loading and error boundaries
+1,8a023344cf09d23f969f217e04797bef287a6cb0,c4586cd063e8899519dac3721b6e59e52f31f80d,2026-10-22T15:54:46+07:00,2026-09-23T12:00:00+07:00,test: verify API foundation and responsive application shells
+1,88a6bfa59d0654a0fb2a4e34085ee96f7131c82a,44ca7a9396c80f0bb5b070c4d330a80d750dfed5,2026-10-22T16:03:04+07:00,2026-09-23T13:30:00+07:00,docs: document local setup architecture and phase results
+merge,f4a9f8e79e7aa562f8debd039c2ae094d77661e4,0bfa1f84764e12ff3e85b0f34c9c8e3f9632695d,2026-10-22T17:31:38+07:00,2026-09-23T14:30:00+07:00,Merge pull request #2 from nvtank/feature/phase-1-foundation
+2,6c98b87c2c2bcd48114f5ba0d31fb6a4cd467b99,01849f57c9f27b9751b30f5214662e704310302a,2026-10-22T17:04:08+07:00,2026-09-24T09:00:00+07:00,docs: record phase two database and authentication plan
+2,bfcae9e4ab81bf4a000f434685c23f032d7a9ac8,02ee015cb3bc0cba90e0ea38a0e0c925003a4d8f,2026-10-22T17:20:01+07:00,2026-09-24T10:30:00+07:00,chore(auth): configure Prisma and secure local authentication environment
+2,c8bcdf9a38be1253df59b7a3163d8898cb8ccafd,611f9562a7bbb0ea15ae8c29159e023850dca061,2026-10-22T17:20:13+07:00,2026-09-24T12:00:00+07:00,feat(db): model identity event inventory orders and tickets
+2,1826e8ff4b2e4370aba88a812b23472ad669d82c,753ab769f7a0ba9d645a94a206cf00b94bed5c91,2026-10-22T17:20:13+07:00,2026-09-24T13:30:00+07:00,feat(db): enforce relational inventory and session constraints
+2,f6bb0b7521f58c5181cf593936dd38a821389fb1,49f681802f6d89258b2d7c10817eda6915fb2eab,2026-10-22T17:20:14+07:00,2026-09-25T09:00:00+07:00,feat(db): manage Prisma PostgreSQL client lifecycle
+2,5560f865541c24498c24c61666c7e4242aece282,9c800b99aefce0ffc7045ee73425206b6477bfa9,2026-10-22T17:23:12+07:00,2026-09-25T10:30:00+07:00,feat(db): seed repeatable demo accounts and numbered inventory
+2,016cf29a3a941e3fec755196b8412402f90b2d25,1623c2c6bce4902514b309bd43a89017c274b9c7,2026-10-22T17:23:13+07:00,2026-09-25T12:00:00+07:00,feat(auth): implement bcrypt password and session backed JWT provider
+2,a5567709678ae71865c32802719c05ef10d23083,11bb47bae985af8fe221e64850e9dd4911815b8c,2026-10-22T17:23:13+07:00,2026-09-26T09:00:00+07:00,feat(auth): implement registration login and atomic refresh rotation
+2,21f524e4449ed1157da37b3a89069abce812e760,4a201e5afeebb314e53546628b6dd2e6566a279e,2026-10-22T17:23:14+07:00,2026-09-26T10:30:00+07:00,feat(auth): expose validated authentication with secure refresh cookies
+2,e25c2ce12759bff4a21d49078986a9461850c621,7b9648c9500bcd0135447dc3cfa927308220602e,2026-10-22T17:25:28+07:00,2026-09-26T12:00:00+07:00,feat(auth): enforce backend roles and organization membership
+2,7ef94a228ddc367d2c25727bbf8c94fb900e309e,715f3b212a2c3e5f4a4d0c48784c1537c45c9ee2,2026-10-22T17:25:29+07:00,2026-09-26T13:30:00+07:00,feat(users): manage profiles and revoke sessions on password change
+2,0698970cd1e570517e33d44b9b63831b3e47e43e,364185119e83cff70a2030364c6e184f1d23f0ac,2026-10-22T17:25:29+07:00,2026-09-27T09:00:00+07:00,feat(web): manage memory only sessions and coordinated token refresh
+2,75928e2545408e7c2d5ec5939ccbd002ccef0488,ded76db6ca814e58eb24537bf1f4bab6a4d95d2b,2026-10-22T17:30:09+07:00,2026-09-27T10:30:00+07:00,feat(web): implement Vietnamese login and registration forms
+2,8e366ee4c5e175381a6e054882a36b40ab6714b2,4a8d1a89fa5dd627b60769566f1edfb29ccd986b,2026-10-22T17:32:22+07:00,2026-09-27T12:00:00+07:00,feat(web): protect role workspaces and support profile management
+2,3484a57e04f839038eaa07405ba812221009a32a,cb10ca825738f4baa8150a246a185143eaec7b14,2026-10-22T17:32:23+07:00,2026-09-28T09:00:00+07:00,test(auth): verify password JWT and authorization policies
+2,585c51deb5020d4f0db25c7db48e7b6c7085d735,ee4e464f77d6fa14f1b5d1ff04b91d50c8140de2,2026-10-22T17:40:09+07:00,2026-09-28T10:30:00+07:00,test(auth): verify real database sessions and browser authentication
+2,340bc50ef74a897642e86c501d85354d50d48058,b651759452b1aae3d178c72bbe573ee11a1d95ef,2026-10-22T17:42:14+07:00,2026-09-28T12:00:00+07:00,docs: document phase two setup security and verified results
+merge,16f61469c6ea2943451f179207eef89461db96ed,b3b99f05a98c5b8d8c9c62a07fcd36662f779f99,2026-10-22T17:56:34+07:00,2026-09-28T13:00:00+07:00,Merge pull request #4 from nvtank/feature/phase-2-auth
+3,29861f03d19aa037daec77ee2ba660678c251365,0f02c9b0add61cf49c8c577cd3f9a90f48543a12,2026-10-22T21:42:03+07:00,2026-09-29T09:00:00+07:00,docs: record phase three event management plan
+3,8963913bf951bce2be3b4b29cd8cc2962c5d6731,b4ab51174b19cc10e6ca9a13a635d35a060342cd,2026-10-22T22:17:55+07:00,2026-09-29T10:30:00+07:00,feat(shared): define event lifecycle and inventory contracts
+3,fefdb13bd712ba4a6e89585e1ffc0dd9c134ff0c,c380719ad61bc08d6350a3acecdbcee9ac6aed5c,2026-10-22T22:17:56+07:00,2026-09-29T12:00:00+07:00,feat(db): store event galleries and catalog indexes
+3,a58b3c4eb157f09c30744f6486a0465b466fdf92,8502a124a43b4057738edf75b626d58679a3033a,2026-10-22T22:17:57+07:00,2026-09-29T13:30:00+07:00,feat(events): validate event schedules and seat grid configuration
+3,601447b09e4695ee2f615be374ac66adf7c62569,c4d3aba4484c25d2db78832435ffbfb16185ef6f,2026-10-22T22:36:17+07:00,2026-09-30T09:00:00+07:00,feat(events): manage organization scoped drafts and safe deletion
+3,5fbb5cc1f52ea4ad88ce2bf6663896a9648be1d9,3959f3232d710259b55bfdb81b9ecc2efcbc9ac8,2026-10-22T22:36:18+07:00,2026-09-30T10:30:00+07:00,feat(seats): generate atomic grids and protect sold inventory
+3,d9ba9fe3700ca4ca226c7de8ed4b093af8b43e83,9636d17926c982c0ab22fc9bc379cb10d1461322,2026-10-22T22:36:18+07:00,2026-09-30T12:00:00+07:00,feat(events): serialize submissions and audited review decisions
+3,d9867d79eff943e6d10a40626c26bfa5a23b7b37,e9b2f80df9b835a8c3fcaf5c587a3c7c028000f0,2026-10-22T22:36:19+07:00,2026-10-01T09:00:00+07:00,feat(events): expose filtered published catalog and inventory
+3,d3b50599ff7ada91ad2d9d2da42bf6334a7c0b70,30a82fae9cc0994b76f5c25ad5f60a18481dae2e,2026-10-22T22:44:49+07:00,2026-10-01T10:30:00+07:00,feat(organizer): expose event management and staff assignments
+3,75511ce85ee3f0f3665fa99065d562a9d1880268,93585c7239f799a4d93edfb0826f23b217580b14,2026-10-22T22:45:07+07:00,2026-10-01T12:00:00+07:00,feat(admin): wire event review APIs and Swagger schemas
+3,6ee8ebe7e5d3289b25c83083aea9d488fb7c42d2,267087bbde8ce7cea594fb195c84fec0c46ebf23,2026-10-22T22:48:45+07:00,2026-10-01T13:30:00+07:00,feat(web): browse real events with URL filters and details
+3,d6406bfaf4836352ceaa18ad2b23d0cc045ada26,2d9d8a2c30e9c18d856309366043544f3a1a2fcc,2026-10-22T22:49:21+07:00,2026-10-02T09:00:00+07:00,feat(web): show organizer event lists and real sales overview
+3,9a11d51ccb0581ae350f0ea92effdd4f54ea7db5,0b802d1203e8260495b948979be7a35c05b3eb65,2026-10-22T22:49:30+07:00,2026-10-02T10:30:00+07:00,feat(web): create and edit event drafts with validated forms
+3,0992f239105795ed9b13cbb8c7b77b4662c66b71,ea747cfa2c016f464e8e6f16489ee5fd13a5acb4,2026-10-22T22:50:02+07:00,2026-10-02T12:00:00+07:00,feat(web): manage event seat grids staff and audit history
+3,acd5f9923cc529f88fe0d8b0d8a6c3c065e2756a,e4a018207d313ce5c22bbb0d625677191cb9e485,2026-10-22T22:50:25+07:00,2026-10-03T09:00:00+07:00,feat(web): review and publish events in admin workspace
+3,75cfcd8998bec9cfcf3821c434b6aa4605b442f6,bcedd603d7ba08eeff381ef81ecb754e07a06007,2026-10-23T09:19:54+07:00,2026-10-03T10:30:00+07:00,test(events): verify lifecycle ownership inventory and browser workflows
+3,8fad82dabe2c3e0b45db26cd6c7af8100ce53280,ff4c12b9acb546d4c9d921b4ff8844ac3ecc0e68,2026-10-23T09:20:56+07:00,2026-10-03T12:00:00+07:00,docs: document phase three delivery and validation
+4,902e2fadafbc90b06fe7abe8097b4d2c7acd3e63,802d8535a7c4a830b71245e5e3dacb2958f7803b,2026-10-23T09:29:45+07:00,2026-10-04T09:00:00+07:00,docs: record phase four reservation and realtime plan
+4,fa7cc8b6a23ef16e2b7b1e1d217c2b91789434cb,f566267a7b83a1377be8fbb24953aadd41147b62,2026-10-23T09:35:56+07:00,2026-10-04T10:30:00+07:00,chore(realtime): install compatible Socket.IO dependencies
+4,07149f72f384af13a97a3f8e63ca463d6f523857,1699fba12069076f16ecc3f10b682488282e9418,2026-10-23T09:36:00+07:00,2026-10-04T12:00:00+07:00,feat(shared): define booking and realtime contracts
+merge,50d9543c82bb82560a9f926651f2e505ea918b3f,2d40747794666032693ebe0b8dd94d909575487e,2026-10-23T09:25:00+07:00,2026-10-03T13:00:00+07:00,Merge pull request #5 from nvtank/feature/phase-3-events
+merge,f0b14f05964928ea4be5cd94df126bb9dbf1c1a7,b426c77a8dbfe454717b721bfd94c28e65b025e4,2026-10-22T16:18:13+07:00,2026-09-23T14:30:00+07:00,Merge pull request #1 from nvtank/feature/phase-1-foundation
+merge,1c45e8094eecab7caf2878a4703cd0c875d3c2fe,d95cae31f79a3dee173df1530dbded1fc8028eab,2026-10-22T17:48:40+07:00,2026-09-23T15:30:00+07:00,Merge pull request #3 from nvtank/develop
+merge,10b5b2a42c0ac8773cadeb515fa52a10f706a4dd,65b475fccbcb2ecbf3642994cdd6d05f38f583a6,2026-10-23T09:25:30+07:00,2026-10-03T14:00:00+07:00,Merge pull request #6 from nvtank/develop

@@ -1,4 +1,4 @@
-# API — Phase 3
+# API — Phase 4
 
 Base http://localhost:4000/api/v1; Swagger development/test tại
 http://localhost:4000/api/docs. Default yêu cầu Bearer JWT; chỉ route Public bỏ qua
@@ -94,5 +94,67 @@ serverTime, seats. Expired/released HELD entries are projected as AVAILABLE;
 SOLD remains SOLD. This is read-side availability, not a reservation endpoint.
 Private organizer snapshots expose configuration status; no hold identities.
 
-Booking, payment, ticket issuance, check-in and detailed analytics APIs remain for
-later phases. Staff assignment alone does not implement check-in.
+Payment, ticket issuance, check-in and detailed analytics APIs remain for later
+phases. Staff assignment alone does not implement check-in.
+
+## Reservations and checkout
+
+All routes below require current CUSTOMER JWT/session authorization. UUID params
+are event IDs (public event detail resolves slug → ID). Money comes from PostgreSQL.
+
+| Method | Path                        | Behavior                                                                   |
+| ------ | --------------------------- | -------------------------------------------------------------------------- |
+| POST   | `/events/:id/holds`         | `{seatIds, idempotencyKey}` UUIDs; atomic group reservation (201)          |
+| GET    | `/holds/:id`                | Owner only; original requested IDs, effective state, expiry and serverTime |
+| DELETE | `/holds/:id`                | Owner only; idempotent release (200), pending order cancels/expires        |
+| GET    | `/events/:id/booking-state` | Private consistent snapshot with my active hold                            |
+| POST   | `/orders`                   | `{holdId, idempotencyKey}`, owner only, server-priced items (201)          |
+| GET    | `/orders/me`                | Paginated own order history (`page`, `pageSize`)                           |
+| GET    | `/orders/:id`               | Owner only; effective expiry status, event/items/prices                    |
+| DELETE | `/orders/:id`               | Cancel own unpaid order; return authoritative current order (200)          |
+
+One effective active hold/customer/event, event max (default 4, configurable 1–10).
+Duplicate/case-equivalent IDs and excess quantity are rejected. Retry key binds to
+the same event/sorted seat list; repeated success neither duplicates nor extends the
+hold. Conflicting key/seat/active hold → 409. Invalid DTOs/extra prices → 400,
+wrong role/owner → 403, anonymous → 401. Hold POST has 240/IP/min and order POST
+30/IP/min; authentication endpoints retain stricter limits. Limits are process-local.
+
+Hold expiry is `min(PostgreSQL clock + 300 seconds, sales end)`. Checkout uses the
+same expiration and creates no payment/ticket. Expired pending orders are projected
+as EXPIRED before background cleanup updates their stored status. Release/cleanup
+only clears matching HELD rows, never SOLD. Reclaim does not depend on cleanup.
+
+Booking snapshot returns eventId, revision, serverTime, sale window, maximum,
+activeHold (owner only) and seats. States: AVAILABLE, HELD_BY_ME, HELD_BY_OTHERS,
+SOLD, UNAVAILABLE. No other customer/hold identity is exposed. Public seat endpoints
+retain the generic HELD state. Own hold responses include own orderId for reload.
+
+## Socket.IO
+
+Endpoint: API origin port 4000, path `/socket.io`, WebSocket transport only. Handshake
+`auth: {token: accessJWT}` is verified against current DB session. Origin must match
+CORS_ORIGINS (non-browser clients without Origin still require JWT). No credentials
+in query strings. Event messages never reserve or sell seats.
+
+Emit `event:join` with `{eventId}` and acknowledgement callback. Server revalidates
+session/public event, limits join frequency and joins one `event:{id}` room. Joining
+arbitrary room names is rejected. `user:{id}` is assigned only from authenticated
+identity for minimal private order notifications.
+
+`seat:held`, `seat:released`, `seat:sold`, `inventory:updated` carry
+`{eventId, seatIds, revision, occurredAt}` after commit. `order:updated` carries
+`{orderId, eventId, status}` to its owner. The frontend listens to inventory hints,
+refetches complete REST snapshots, ignores stale revisions/responses, resyncs on
+reconnect/focus and polls every 10 seconds. Order UI refreshes every 5 seconds.
+
+Redis adapter may be enabled with SOCKET_REDIS_ADAPTER=true. It distributes events,
+not ownership. Redis outages/missed messages require REST resync; no durable outbox
+or guaranteed event replay is implemented yet. API must start with reachable Redis
+when this adapter is enabled. With it disabled, degraded dependencies can still be
+reported through readiness.
+
+Metrics add actual current-process hold successes/failures, socket connection count,
+adapter configuration and validHeldSeats queried from the shared DB. DB outage
+returns null for validHeldSeats, not a fabricated zero. Production metrics remain
+forbidden. No queue/payment/check-in counters are invented.

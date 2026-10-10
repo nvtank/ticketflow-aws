@@ -1,8 +1,12 @@
 # Phase 4 — Booking & Realtime
 
 Owner/author confirmed: `nvtank <tuannguyen.120910@gmail.com>`.
-Branch: `feature/phase-4-booking-realtime`, stacked on Phase 3 `8fad82d` while PR #5
-is open. Do not merge the previous PR automatically. Real timestamps only.
+Branch: `feature/phase-4-booking-realtime`, based on reconstructed Phase 3 `ff4c12b`.
+PR #5 and the develop-to-main PR #6 were merged on GitHub during this phase;
+those merges were preserved. User changed date policy on 23/10: use simulated
+dates from the project timeline. The approved rewrite is applied with original
+remote history retained; see [commit-timeline.md](commit-timeline.md).
+GitHub PR timestamps and test execution dates remain real.
 
 | #   | Planned commit                                                 | Scope / verification                 |
 | --- | -------------------------------------------------------------- | ------------------------------------ |
