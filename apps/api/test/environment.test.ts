@@ -51,3 +51,36 @@ describe('Environment validation', () => {
     expect(() => parseEnvironment({ ...local, CORS_ORIGINS: '*' })).toThrow('CORS_ORIGINS');
   });
 });
+
+describe('Payment environment', () => {
+  it('requires all PayOS channel secrets without exposing their values', () => {
+    expect(() =>
+      parseEnvironment({ ...local, PAYMENT_PROVIDER: 'payos', PAYOS_CLIENT_ID: 'private-client' }),
+    ).toThrow('PAYOS_API_KEY');
+    expect(() =>
+      parseEnvironment({ ...local, PAYMENT_PROVIDER: 'payos', PAYOS_CLIENT_ID: 'private-client' }),
+    ).not.toThrow('private-client');
+  });
+  it('disables mock in production and requires persistent signing key', () => {
+    expect(() =>
+      parseEnvironment({ ...local, NODE_ENV: 'production', PAYMENT_PROVIDER: 'mock' }),
+    ).toThrow('PAYMENT_PROVIDER');
+    expect(() =>
+      parseEnvironment({
+        ...local,
+        NODE_ENV: 'production',
+        PAYMENT_RETURN_ORIGIN: 'https://tickets.example.com',
+      }),
+    ).toThrow('TICKET_SIGNING_KEY');
+  });
+  it('rejects return origins containing paths or credentials', () => {
+    for (const value of [
+      'https://example.com/path',
+      'https://user:password@example.com',
+      'https://example.com?query=1',
+    ])
+      expect(() => parseEnvironment({ ...local, PAYMENT_RETURN_ORIGIN: value })).toThrow(
+        'PAYMENT_RETURN_ORIGIN',
+      );
+  });
+});
