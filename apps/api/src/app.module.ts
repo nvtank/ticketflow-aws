@@ -1,3 +1,4 @@
+import { PaymentsModule } from './payments/payments.module';
 import { BookingModule } from './booking/booking.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { EventsModule } from './events/events.module';
@@ -25,6 +26,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
     EventsModule,
     RealtimeModule,
     BookingModule,
+    PaymentsModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
   ],
   controllers: [MonitoringController],
