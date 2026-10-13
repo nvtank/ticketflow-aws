@@ -1,4 +1,5 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { credentialHash, ticketCredential } from './tickets/ticket-credential';
+import { createHash, createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { hash } from 'bcryptjs';
 import { PrismaClient } from './generated/prisma/client';
@@ -12,6 +13,11 @@ async function seed(): Promise<void> {
   const password = process.env.DEMO_PASSWORD;
   if (!url || !password || password.length < 12 || Buffer.byteLength(password, 'utf8') > 72)
     throw new Error('Set DATABASE_URL and a valid DEMO_PASSWORD in root .env.');
+  const signingKey =
+    process.env.TICKET_SIGNING_KEY ??
+    (process.env.JWT_SECRET
+      ? createHmac('sha256', process.env.JWT_SECRET).update('tixflow-ticket-key-v1').digest('hex')
+      : null);
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: url, max: 2 }) });
   try {
     const passwordHash = await hash(password, 12);
@@ -244,13 +250,18 @@ async function seed(): Promise<void> {
             const item = await tx.orderItem.create({
               data: { orderId: order.id, eventId: id(201), seatId: seat.id, priceVnd: 1_200_000 },
             });
+            const ticketId = randomUUID();
             const ticket = await tx.ticket.create({
               data: {
+                id: ticketId,
                 orderItemId: item.id,
                 eventId: id(201),
                 seatId: seat.id,
                 code: `TF-DEMO-${index + 1}`,
-                qrTokenHash: createHash('sha256').update(randomBytes(32)).digest('hex'),
+                qrVersion: signingKey ? 1 : 0,
+                qrTokenHash: signingKey
+                  ? credentialHash(ticketCredential(ticketId, signingKey))
+                  : createHash('sha256').update(randomBytes(32)).digest('hex'),
                 status: index === 0 ? 'VALID' : 'USED',
               },
             });
@@ -274,6 +285,23 @@ async function seed(): Promise<void> {
               entityId: order.id,
             },
           });
+        }
+        if (signingKey) {
+          const legacy = await tx.ticket.findMany({
+            where: {
+              code: { in: ['TF-DEMO-1', 'TF-DEMO-2'] },
+              qrVersion: 0,
+              orderItem: { orderId: id(700) },
+            },
+          });
+          for (const ticket of legacy)
+            await tx.ticket.update({
+              where: { id: ticket.id },
+              data: {
+                qrVersion: 1,
+                qrTokenHash: credentialHash(ticketCredential(ticket.id, signingKey)),
+              },
+            });
         }
       },
       { timeout: 60_000 },
