@@ -176,7 +176,9 @@ export function ProfilePanel() {
         </Card>
       </div>
       <p className="mt-8 text-sm text-muted-foreground">
-        Vé QR sẽ được mở khi phân hệ thanh toán và phát hành vé hoàn tất.
+        <a href="/my-tickets" className="text-primary underline">
+          Xem vé và mã QR của tôi
+        </a>
       </p>
     </div>
   );

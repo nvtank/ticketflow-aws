@@ -39,7 +39,10 @@ export function PublicHeader() {
       <div className="container flex h-20 items-center justify-between gap-6">
         <Brand light={dark} />
         <nav aria-label="Điều hướng chính" className="hidden items-center gap-7 lg:flex">
-          {links.map(({ href, label }) => (
+          {[
+            ...links,
+            ...(user?.role === 'CUSTOMER' ? [{ href: '/my-tickets', label: 'Vé của tôi' }] : []),
+          ].map(({ href, label }) => (
             <Link
               key={`${href}:${label}`}
               href={href}
@@ -103,6 +106,9 @@ export function PublicHeader() {
               <nav aria-label="Điều hướng trên di động" className="mt-6 flex flex-col gap-2">
                 {[
                   ...links,
+                  ...(user?.role === 'CUSTOMER'
+                    ? [{ href: '/my-tickets', label: 'Vé của tôi' }]
+                    : []),
                   { href: '/organizer', label: 'Dành cho nhà tổ chức' },
                   { href: '/system', label: 'Trạng thái hệ thống' },
                   {
