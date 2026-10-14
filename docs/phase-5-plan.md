@@ -2,6 +2,7 @@
 
 Owner/author authorized by the user: `hoangphatdev <latruonghoangphat@gmail.com>`.
 Branch: `feature/phase-5-payments`, based on Phase 4 `d94dd7c`.
+Phase 4 PR #7 was merged on GitHub during implementation; Phase 5 targets develop.
 17 meaningful commits, simulated author/committer dates 11–14/10/2026 per the
 approved timeline. Actual execution/test dates are reported separately.
 
@@ -10,25 +11,25 @@ these stay in ignored .env, never source/logs/PR. No public HTTPS webhook URL ex
 yet: complete local verification first. Do not claim a real bank transfer/webhook
 round trip without observing one. Mock provider is test/development only.
 
-| # | Planned commit | Files / scope |
-| --- | --- | --- |
-| 1 | docs: plan phase five PayOS payment and ticket delivery | This plan |
-| 2 | chore(payments): install PayOS SDK and QR renderer | Manifests/lockfile |
-| 3 | feat(db): persist payment sessions and verifiable ticket credentials | Schema/migration |
-| 4 | feat(config): validate private payment provider configuration | Env/config/tests |
-| 5 | feat(shared): define payment and ticket contracts | Shared API types |
-| 6 | feat(payments): implement verified PayOS provider adapter | Provider interface/SDK |
-| 7 | feat(payments): prepare idempotent server priced payment sessions | Creation service |
-| 8 | feat(tickets): sign and authorize QR ticket credentials | Ticket service/crypto |
-| 9 | feat(payments): finalize verified payments atomically | Locks/state/tickets/audit |
-| 10 | feat(payments): expose callbacks and owner payment reconciliation | DTO/controller/module |
-| 11 | feat(payments): support isolated local payment simulation | Dev-only signed provider |
-| 12 | feat(web): connect checkout to PayOS and verified payment status | Checkout/result pages |
-| 13 | feat(web): display owned tickets with QR and order links | My tickets/detail/navigation |
-| 14 | test(payments): verify signatures and state transitions | Unit/HTTP |
-| 15 | test(payments): prove callback retry and late payment integrity | Real DB/Redis integration |
-| 16 | test(web): verify payment and ticket flow across viewports | Playwright/CI |
-| 17 | docs: document PayOS configuration and phase five evidence | README/API/progress |
+| #   | Planned commit                                                         | Files / scope                   |
+| --- | ---------------------------------------------------------------------- | ------------------------------- |
+| 1   | docs: plan phase five PayOS payment and ticket delivery                | This plan                       |
+| 2   | chore(payments): install PayOS SDK and QR renderer                     | Manifests/lockfile              |
+| 3   | feat(db): persist payment sessions and verifiable ticket credentials   | Schema/migration                |
+| 4   | feat(config): validate private payment provider configuration          | Env/config/tests                |
+| 5   | feat(shared): define payment and ticket contracts                      | Shared API types                |
+| 6   | feat(payments): implement verified PayOS provider adapter              | Provider interface/SDK          |
+| 7   | feat(payments): prepare idempotent server priced payment sessions      | Creation service                |
+| 8   | feat(tickets): sign and authorize QR ticket credentials                | Ticket service/crypto           |
+| 9   | feat(payments): finalize verified payments atomically                  | Locks/state/tickets/audit       |
+| 10  | feat(payments): expose callbacks, reconciliation and local simulation  | DTO/controller/module/mock      |
+| 11  | feat(seed): prepare verifiable demo QR and persistent signing keys     | Seed/environment upgrade        |
+| 12  | feat(web): connect checkout to PayOS and verified payment status       | Checkout/result pages           |
+| 13  | feat(web): display owned tickets with QR and order links               | My tickets/detail/navigation    |
+| 14  | fix(payments): track settlement references and verify payment policies | Migration/SDK/finalization/unit |
+| 15  | test(payments): prove callback retry and late payment integrity        | Real DB/Redis integration       |
+| 16  | test(web): verify payment and ticket flow across viewports             | Playwright/CI                   |
+| 17  | docs: document PayOS configuration and phase five evidence             | README/API/progress             |
 
 ## Invariants
 
