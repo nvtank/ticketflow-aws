@@ -48,6 +48,19 @@ export class PaymentsController {
   status(@Param('id', ParseUUIDPipe) id: string, @CurrentPrincipal() p: Principal) {
     return this.payments.status(id, p.user.id);
   }
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['data', 'signature'],
+      properties: {
+        data: { type: 'object', additionalProperties: true },
+        signature: { type: 'string' },
+        code: { type: 'string' },
+        desc: { type: 'string' },
+        success: { type: 'boolean' },
+      },
+    },
+  })
   @Post('webhook')
   @Public()
   @HttpCode(200)

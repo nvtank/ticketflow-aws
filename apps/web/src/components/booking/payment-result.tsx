@@ -22,6 +22,7 @@ function Result({ id }: { id: string | null }) {
     queryKey: ['payments', id],
     queryFn: () => apiGet(`/payments/${id}/status`, paymentSchema),
     enabled: !!id,
+    refetchOnMount: 'always',
     retry: false,
     refetchInterval: (q) => (q.state.data?.status === 'PENDING' ? 5000 : false),
   });
@@ -69,7 +70,9 @@ function Result({ id }: { id: string | null }) {
           {paid
             ? 'Vé đã được phát hành và có trong tài khoản của bạn.'
             : review
-              ? 'Máy chủ đã ghi nhận tiền nhưng đơn không đủ điều kiện phát hành vé. Giao dịch được đánh dấu để xử lý hoàn tiền; đây chưa phải xác nhận đã hoàn tiền.'
+              ? p.orderStatus === 'PAID'
+                ? 'Đơn đã có vé hợp lệ và có khoản tiền thêm cần đối soát hoàn lại. Các vé đã phát hành vẫn được giữ nguyên. Việc hoàn tiền cần được xử lý riêng.'
+                : 'Máy chủ đã ghi nhận tiền nhưng đơn không đủ điều kiện phát hành vé. Giao dịch được đánh dấu để xử lý hoàn tiền; đây chưa phải xác nhận đã hoàn tiền.'
               : pending
                 ? 'Máy chủ chưa xác nhận thanh toán thành công. Trang sẽ tự kiểm tra lại; chỉ chuyển hướng về đây không làm đơn thành công.'
                 : 'Giao dịch đã thất bại hoặc bị hủy theo kết quả máy chủ xác minh.'}

@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserRole } from '@tixflow/shared';
 import { toast } from 'sonner';
 import { AuthGate } from '@/components/auth/auth-gate';
@@ -18,6 +18,7 @@ export function MockPayment({ id }: { id: string }) {
 }
 function Simulation({ id }: { id: string }) {
   const router = useRouter();
+  const cache = useQueryClient();
   const query = useQuery({
     queryKey: ['payments', id],
     queryFn: () => apiGet(`/payments/${id}/status`, paymentSchema),
@@ -26,10 +27,12 @@ function Simulation({ id }: { id: string }) {
   const simulate = useMutation({
     mutationFn: (outcome: string) =>
       apiRequest('POST', `/payments/${id}/simulate`, paymentSchema, { outcome }),
-    onSuccess: (p) =>
+    onSuccess: (p) => {
+      cache.setQueryData(['payments', id], p);
       router.push(
         `/payment/${p.status === 'FAILED' || p.status === 'CANCELLED' ? 'failed' : 'success'}?paymentId=${id}`,
-      ),
+      );
+    },
     onError: (e) => toast.error(e.message),
   });
   if (!query.data)

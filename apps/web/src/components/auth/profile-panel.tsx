@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -176,9 +177,9 @@ export function ProfilePanel() {
         </Card>
       </div>
       <p className="mt-8 text-sm text-muted-foreground">
-        <a href="/my-tickets" className="text-primary underline">
+        <Link href="/my-tickets" className="text-primary underline">
           Xem vé và mã QR của tôi
-        </a>
+        </Link>
       </p>
     </div>
   );

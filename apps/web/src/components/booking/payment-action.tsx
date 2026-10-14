@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -6,6 +7,7 @@ import { apiGet, apiRequest } from '@/lib/api-client';
 import { paymentConfigSchema, paymentSchema, verifiedCheckoutUrl } from '@/lib/payments';
 import { Button } from '@/components/ui/button';
 export function PaymentAction({ orderId }: { orderId: string }) {
+  const router = useRouter();
   const key = useRef<string | null>(null);
   const config = useQuery({
     queryKey: ['payments', 'config'],
@@ -21,7 +23,7 @@ export function PaymentAction({ orderId }: { orderId: string }) {
     },
     onSuccess: (session) => {
       if (session.status !== 'PENDING') {
-        window.location.assign(`/payment/success?paymentId=${session.id}`);
+        router.push(`/payment/success?paymentId=${session.id}`);
         return;
       }
       if (!session.checkoutUrl) {
