@@ -313,6 +313,7 @@ model Payment {
   order             Order         @relation(fields: [orderId], references: [id], onDelete: Restrict)
   provider          String        @db.VarChar(30)
   providerReference String        @unique @db.VarChar(150)
+  settledReferences String[]      @default([])
   providerOrderCode BigInt?       @unique
   idempotencyKey    String?       @unique @db.Uuid
   checkoutUrl       String?

@@ -99,6 +99,7 @@ export class PayOSPaymentProvider extends PaymentProvider {
       return {
         provider: this.name,
         eventId: `transfer:${data.reference}`,
+        transactionReferences: [data.reference],
         reference: data.paymentLinkId,
         orderCode: data.orderCode,
         amountVnd: data.amount,
@@ -132,6 +133,7 @@ export class PayOSPaymentProvider extends PaymentProvider {
       return {
         provider: this.name,
         eventId: `status:${link.id}:${link.status}:${link.amountPaid}`,
+        transactionReferences: link.transactions.map((t) => t.reference).sort(),
         reference: link.id,
         orderCode,
         amountVnd: link.amountPaid,

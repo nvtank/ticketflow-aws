@@ -40,9 +40,9 @@ export class PaymentSessionsService {
           const retried = await tx.payment.findUnique({ where: { idempotencyKey: key } });
           if (retried && (retried.orderId !== orderId || retried.provider !== this.provider.name))
             throw new ConflictException('Mã thử lại đã dùng cho thanh toán khác.');
-          const existing = await tx.payment.findUnique({
-            where: { orderId_provider: { orderId, provider: this.provider.name } },
-          });
+          const existing = await tx.payment.findFirst({ where: { orderId } });
+          if (existing && existing.provider !== this.provider.name)
+            throw new ConflictException('Đơn đã có phiên thanh toán qua nhà cung cấp khác.');
           if (
             order.status !== 'PENDING_PAYMENT' ||
             order.expiresAt <= now ||

@@ -21,6 +21,7 @@ export interface VerifiedPaymentEvent {
   orderCode: number;
   amountVnd: number;
   currency: string;
+  transactionReferences?: string[];
   status: VerifiedPaymentStatus;
 }
 export abstract class PaymentProvider {

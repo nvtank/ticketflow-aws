@@ -31,6 +31,7 @@ export class PaymentFinalizationService {
           orderCode: input.orderCode,
           amountVnd: input.amountVnd,
           currency: input.currency,
+          transactionReferences: input.transactionReferences ?? [],
           status: input.status,
         }),
       )
@@ -79,6 +80,35 @@ export class PaymentFinalizationService {
           if (order.status === 'PAID' || payment.status === 'REFUND_REQUIRED') {
             // A status query and its webhook may represent the same settlement.
             outcome = 'ALREADY_TERMINAL';
+            if (
+              order.status === 'PAID' &&
+              input.status === 'SUCCEEDED' &&
+              payment.status !== 'REFUND_REQUIRED' &&
+              (input.amountVnd !== payment.amountVnd ||
+                input.currency !== 'VND' ||
+                input.transactionReferences?.some(
+                  (ref) => !payment.settledReferences.includes(ref),
+                ))
+            ) {
+              // Extra money does not revoke existing tickets or issue additional tickets.
+              await tx.payment.update({
+                where: { id: payment.id },
+                data: { status: 'REFUND_REQUIRED' },
+              });
+              await tx.auditLog.create({
+                data: {
+                  action: 'PAYMENT_EXTRA_TRANSFER_REVIEW',
+                  entityType: 'Payment',
+                  entityId: payment.id,
+                  metadata: {
+                    orderId: order.id,
+                    receivedVnd: input.amountVnd,
+                    currency: input.currency,
+                  },
+                },
+              });
+              outcome = 'EXTRA_TRANSFER_REVIEW';
+            }
           } else if (input.status === 'SUCCEEDED') {
             const seats = await tx.seat.findMany({
               where: { id: { in: order.items.map((i) => i.seatId) }, eventId: event.id },
@@ -149,7 +179,10 @@ export class PaymentFinalizationService {
                 where: { id: order.id },
                 data: { status: 'PAID', paidAt: now },
               });
-              await tx.payment.update({ where: { id: payment.id }, data: { status: 'SUCCEEDED' } });
+              await tx.payment.update({
+                where: { id: payment.id },
+                data: { status: 'SUCCEEDED', settledReferences: input.transactionReferences ?? [] },
+              });
               const revision = await tx.event.update({
                 where: { id: event.id },
                 data: { inventoryRevision: { increment: 1 } },
