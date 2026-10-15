@@ -179,6 +179,7 @@ model Event {
   rejectionReason    String?
   waitingRoomEnabled Boolean                @default(false)
   maxTicketsPerOrder Int                    @default(4)
+  checkInRevision    Int                    @default(0)
   inventoryRevision  Int                    @default(0)
   createdAt          DateTime               @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime               @updatedAt @db.Timestamptz(3)
@@ -290,6 +291,7 @@ model Order {
   @@index([userId, createdAt])
   @@index([eventId, status])
   @@index([status, expiresAt])
+  @@index([status, paidAt])
 }
 
 model OrderItem {
@@ -358,6 +360,7 @@ model CheckIn {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([staffId, createdAt])
+  @@index([createdAt])
 }
 
 model EventStaffAssignment {
