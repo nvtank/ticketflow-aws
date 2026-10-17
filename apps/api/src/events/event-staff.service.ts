@@ -1,10 +1,14 @@
+import { InventoryPublisher } from '../booking/inventory-publisher';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { auditEvent, lockEvent, requireMember } from './event-record';
 const staffInclude = { user: { select: { id: true, name: true, email: true } } };
 @Injectable()
 export class EventStaffService {
-  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
+  constructor(
+    @Inject(DatabaseService) private readonly db: DatabaseService,
+    @Inject(InventoryPublisher) private readonly publisher: InventoryPublisher,
+  ) {}
   async list(id: string, userId: string) {
     const event = await this.db.event.findUnique({ where: { id } });
     if (!event) throw new NotFoundException('Không tìm thấy sự kiện.');
@@ -35,11 +39,12 @@ export class EventStaffService {
     });
   }
   async remove(id: string, userId: string, staffId: string) {
-    return this.db.$transaction(async (tx) => {
+    await this.db.$transaction(async (tx) => {
       const event = await lockEvent(tx, id);
       await requireMember(tx, event.organizationId, userId);
       await tx.eventStaffAssignment.deleteMany({ where: { eventId: id, userId: staffId } });
       await auditEvent(tx, id, userId, 'EVENT_STAFF_REMOVED', { staffId });
     });
+    this.publisher.revokeStaff(staffId, id);
   }
 }
