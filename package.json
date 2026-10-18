@@ -31,7 +31,8 @@
     "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts",
     "test:e2e:booking": "pnpm build && playwright test --config playwright.booking.config.ts",
     "test:e2e:payments": "pnpm build && playwright test --config playwright.payments.config.ts",
-    "payos:webhook:register": "node scripts/register-payos-webhook.mjs"
+    "payos:webhook:register": "node scripts/register-payos-webhook.mjs",
+    "test:e2e:checkin": "pnpm build && playwright test --config playwright.checkin.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

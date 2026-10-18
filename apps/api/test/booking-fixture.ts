@@ -132,6 +132,10 @@ export async function bookingFixture(
       ...holds.map((h) => h.id),
       ...orders.map((o) => o.id),
       ...payments.map((p) => p.id),
+      ...(
+        await db.ticket.findMany({ where: { eventId: { in: events } }, select: { id: true } })
+      ).map((t) => t.id),
+      org.id,
     ];
     await db.webhookEvent.deleteMany({ where: { paymentId: { in: payments.map((p) => p.id) } } });
     await db.checkIn.deleteMany({ where: { ticket: { eventId: { in: events } } } });
@@ -151,6 +155,7 @@ export async function bookingFixture(
     await db.seat.deleteMany({ where: { eventId: { in: events } } });
     await db.eventSection.deleteMany({ where: { eventId: { in: events } } });
     await db.ticketType.deleteMany({ where: { eventId: { in: events } } });
+    await db.eventStaffAssignment.deleteMany({ where: { eventId: { in: events } } });
     await db.event.deleteMany({ where: { id: { in: events } } });
     await db.venue.deleteMany({ where: { id: { in: venues } } });
     await db.organization.delete({ where: { id: org.id } });

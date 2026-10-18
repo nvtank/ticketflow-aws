@@ -15,6 +15,7 @@
     "playwright.auth.config.ts",
     "playwright.events.config.ts",
     "playwright.booking.config.ts",
-    "playwright.payments.config.ts"
+    "playwright.payments.config.ts",
+    "playwright.checkin.config.ts"
   ]
 }
