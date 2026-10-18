@@ -1,7 +1,7 @@
 # TixFlow — Real-time Event Ticketing Platform
 
-Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–5: authentication, event management, booking/realtime,
-thanh toán PayOS và vé QR.** Staff check-in, analytics chi tiết và waiting room còn ở các phase sau. Không dùng
+Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–6: authentication, event management, booking/realtime,
+thanh toán PayOS và vé QR.** Đã có staff check-in, analytics và quản trị; waiting room thuộc Phase 7. Không dùng
 AWS hoặc yêu cầu AWS credentials.
 
 ## Cài đặt và chạy
@@ -241,3 +241,15 @@ Ngày Git đã được mô phỏng theo yêu cầu mới của người dùng; 
 Kết quả kiểm thử dùng thời gian chạy thực, không mô phỏng.
 
 Phase 5: [kế hoạch 17 commits](docs/phase-5-plan.md), [cấu hình PayOS và giới hạn](docs/payments.md).
+
+### Phase 6 — Check-in và analytics
+
+Staff đăng nhập `staff@tixflow.local`, mở `/staff` rồi chọn sự kiện được phân công.
+Quét bằng camera hoặc nhập mã vé; “Kiểm tra vé” chỉ xác minh, “Xác nhận vào cổng”
+mới tiêu thụ vé. Quét lại bị từ chối. `/organizer/analytics` hiển thị doanh thu theo
+ngày Việt Nam và tồn kho/check-in thực. `/admin` có KPI, users/organizations review
+và `/admin/monitoring`. Khóa tài khoản thu hồi session; ADMIN không bị khóa qua UI.
+
+Kiểm thử: `pnpm test:e2e:checkin`. QR decoder đã kiểm tra bằng ảnh render thật;
+chưa kiểm tra camera vật lý trên điện thoại. Không có giới hạn giờ mở cổng tự động
+ở phase này: STAFF được phân công có thể check-in sự kiện PUBLISHED để demo local.

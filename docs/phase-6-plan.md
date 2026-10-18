@@ -5,25 +5,25 @@ and previously confirmed Git identity). Branch `feature/phase-6-checkin`, based 
 Phase 5 `113c52b`. PR #9 is merged on GitHub. 17 meaningful commits use explicitly
 simulated dates 15–18/10/2026; tests and external actions report actual dates.
 
-| # | Planned commit | Scope |
-| --- | --- | --- |
-| 1 | docs: plan phase six check-in and analytics | Breakdown/invariants |
-| 2 | chore(web): install QR scanner and analytics charts | ZXing/Recharts/lockfile |
-| 3 | feat(db): index check-in and reporting queries | Revision/migration/indexes |
-| 4 | feat(shared): define check-in analytics and admin contracts | Typed API/realtime |
-| 5 | feat(checkin): authorize assigned staff and verify ticket credentials | Policy/DTO/resolution |
-| 6 | feat(checkin): confirm admission atomically with audit | Transaction/concurrency |
-| 7 | feat(staff): expose assigned events and attendance stats | REST/module |
-| 8 | feat(analytics): aggregate scoped sales and attendance | Date/range/reporting |
-| 9 | feat(admin): aggregate platform dashboard and measured monitoring | Real KPIs/process metrics |
-| 10 | feat(admin): manage account access and organization review | DTO/authorization/audit |
-| 11 | feat(realtime): publish private check-in revisions and revoke rooms | Staff rooms/reconnect |
-| 12 | feat(web): implement mobile staff scanner and manual admission | Camera/fallback/results |
-| 13 | feat(web): visualize organizer sales and attendance | Recharts/filter/tables |
-| 14 | feat(web): implement admin overview access and review | Users/orgs/monitoring |
-| 15 | test(checkin): verify credential state and reporting policies | Unit/HTTP |
-| 16 | test(checkin): prove concurrent admission and full browser flow | Real DB/Redis/E2E/CI |
-| 17 | docs: record phase six evidence and operating instructions | README/progress/API |
+| #   | Planned commit                                                        | Scope                      |
+| --- | --------------------------------------------------------------------- | -------------------------- |
+| 1   | docs: plan phase six check-in and analytics                           | Breakdown/invariants       |
+| 2   | chore(web): install QR scanner and analytics charts                   | ZXing/Recharts/lockfile    |
+| 3   | feat(db): index check-in and reporting queries                        | Revision/migration/indexes |
+| 4   | feat(shared): define check-in analytics and admin contracts           | Typed API/realtime         |
+| 5   | feat(checkin): authorize assigned staff and verify ticket credentials | Policy/DTO/resolution      |
+| 6   | feat(checkin): confirm admission atomically with audit                | Transaction/concurrency    |
+| 7   | feat(staff): expose assigned events and attendance stats              | REST/module                |
+| 8   | feat(analytics): aggregate scoped sales and attendance                | Date/range/reporting       |
+| 9   | feat(admin): aggregate platform dashboard and measured monitoring     | Real KPIs/process metrics  |
+| 10  | feat(admin): manage account access and organization review            | DTO/authorization/audit    |
+| 11  | feat(realtime): publish private check-in revisions and revoke rooms   | Staff rooms/reconnect      |
+| 12  | feat(web): implement mobile staff scanner and manual admission        | Camera/fallback/results    |
+| 13  | feat(web): visualize organizer sales and attendance                   | Recharts/filter/tables     |
+| 14  | feat(web): implement admin overview access and review                 | Users/orgs/monitoring      |
+| 15  | test(checkin): verify credential state and reporting policies         | Unit/HTTP                  |
+| 16  | test(checkin): prove concurrent admission and full browser flow       | Real DB/Redis/E2E/CI       |
+| 17  | docs: record phase six evidence and operating instructions            | README/progress/API        |
 
 ## Invariants and scope
 
