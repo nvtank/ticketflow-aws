@@ -1,6 +1,6 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Prisma } from '../generated/prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 import { MetricsService } from '../common/http/metrics.service';
 import { BookingMetrics } from '../booking/booking-metrics';
 import { RealtimeGateway } from '../realtime/realtime.gateway';

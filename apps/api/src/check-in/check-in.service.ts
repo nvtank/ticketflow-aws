@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import type { AdmissionResult, AttendanceStats } from '@tixflow/shared';
 import { DatabaseService } from '../database/database.service';
-import { Prisma } from '../generated/prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 import { ENVIRONMENT } from '../config/configuration.module';
 import type { Environment } from '../config/environment';
 import { databaseNow, lockBookingEvent } from '../booking/booking-record';
