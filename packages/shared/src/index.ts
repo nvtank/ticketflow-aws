@@ -284,3 +284,16 @@ export interface AnalyticsReport {
     status: OrderStatus;
   }[];
 }
+
+export interface WaitingRoomStatus {
+  eventId: string;
+  state: 'DISABLED' | 'NOT_JOINED' | 'WAITING' | 'ADMITTED';
+  position: number;
+  peopleAhead: number;
+  queued: number;
+  active: number;
+  capacity: number;
+  expiresAt: string | null;
+  serverTime: string;
+  admissionToken: string | null;
+}
