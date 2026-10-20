@@ -48,6 +48,8 @@ export function eventView(event: EventRecord) {
     galleryUrls: event.galleryUrls,
     ticketPolicy: event.ticketPolicy,
     maxTicketsPerOrder: event.maxTicketsPerOrder,
+    waitingRoomEnabled: event.waitingRoomEnabled,
+    waitingRoomCapacity: event.waitingRoomCapacity,
     inventoryRevision: event.inventoryRevision,
     rejectionReason: event.rejectionReason,
     organization: { id: event.organization.id, name: event.organization.name },

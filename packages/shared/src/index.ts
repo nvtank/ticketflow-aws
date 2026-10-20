@@ -105,6 +105,8 @@ export interface EventDetail extends EventSummary {
   ticketPolicy: string;
   galleryUrls: string[];
   maxTicketsPerOrder: number;
+  waitingRoomEnabled: boolean;
+  waitingRoomCapacity: number;
   inventoryRevision: number;
   rejectionReason: string | null;
   organization: { id: string; name: string };
