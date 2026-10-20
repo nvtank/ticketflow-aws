@@ -16,6 +16,7 @@ export function assertSale(
     waitingRoomEnabled: boolean;
   },
   now: Date,
+  admitted = false,
 ) {
   if (
     event.status !== 'PUBLISHED' ||
@@ -25,8 +26,8 @@ export function assertSale(
     event.startsAt <= now
   )
     throw new ConflictException('Sự kiện chưa mở bán hoặc đã ngừng bán vé.');
-  if (event.waitingRoomEnabled)
-    throw new ConflictException('Sự kiện đang dùng phòng chờ; admission control chưa khả dụng.');
+  if (event.waitingRoomEnabled && !admitted)
+    throw new ConflictException('Bạn cần lượt vào còn hạn từ phòng chờ.');
 }
 export const holdExpiry = (now: Date, salesEnd: Date) =>
   new Date(Math.min(now.getTime() + DEFAULT_HOLD_SECONDS * 1000, salesEnd.getTime()));

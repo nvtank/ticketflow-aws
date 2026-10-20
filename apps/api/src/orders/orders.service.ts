@@ -51,7 +51,7 @@ export class OrdersService {
               throw new ConflictException('Mã thử lại đã dùng cho lượt giữ ghế khác.');
             return { view: toOrderView(existing, now), created: false };
           }
-          assertSale(event, now);
+          assertSale(event, now, true);
           if (hold.userId !== userId || hold.releasedAt || hold.expiresAt <= now)
             throw new ConflictException('Lượt giữ ghế đã hết hạn hoặc đã hủy.');
           if (hold.order)
