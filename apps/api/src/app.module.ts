@@ -1,3 +1,4 @@
+import { NotificationsModule } from './notifications/notifications.module';
 import { WaitingRoomModule } from './waiting-room/waiting-room.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AdminModule } from './admin/admin.module';
@@ -23,6 +24,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
   imports: [
     ConfigurationModule,
     WaitingRoomModule,
+    NotificationsModule,
     MetricsModule,
     HealthModule,
     DatabaseModule,
