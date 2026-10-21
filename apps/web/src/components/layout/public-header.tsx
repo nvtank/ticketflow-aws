@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowUpRight, Menu, Search } from 'lucide-react';
+import { ArrowUpRight, Menu, Search, Bell } from 'lucide-react';
 import { useState } from 'react';
 import { Brand } from './brand';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,15 @@ export function PublicHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
+          {user && (
+            <Link
+              href="/notifications"
+              aria-label="Thông báo"
+              className="rounded-xl p-2.5 hover:bg-muted"
+            >
+              <Bell className="size-5" />
+            </Link>
+          )}
           <Link
             href="/events#search"
             aria-label="Tìm kiếm sự kiện"
