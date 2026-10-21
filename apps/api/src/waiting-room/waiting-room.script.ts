@@ -10,6 +10,10 @@ for _,id in ipairs(expired) do
 end
 redis.call('ZREMRANGEBYSCORE',KEYS[2],'-inf',now)
 local raw=redis.call('HGET',KEYS[4],uid);local m=raw and cjson.decode(raw) or nil
+-- Always expire the caller even when a large cleanup batch remains.
+if m and tonumber(m.expiresAt)<=now then
+ redis.call('ZREM',KEYS[1],uid);redis.call('ZREM',KEYS[2],uid);redis.call('ZREM',KEYS[5],uid);redis.call('HDEL',KEYS[4],uid);m=nil
+end
 if op=='validate' then
   if not m or m.sid~=sid or m.nonce~=nonce or m.state~='ADMITTED' or tonumber(m.expiresAt)<=now then return cjson.encode({valid=false,serverTime=now}) end
   local score=redis.call('ZSCORE',KEYS[2],uid)

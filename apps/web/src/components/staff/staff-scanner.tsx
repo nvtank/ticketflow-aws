@@ -40,6 +40,9 @@ export function StaffScanner({ eventId }: { eventId: string }) {
   });
   useAttendance(eventId);
   useEffect(() => {
+    if (stats.isError) controls.current?.stop();
+  }, [stats.isError]);
+  useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
