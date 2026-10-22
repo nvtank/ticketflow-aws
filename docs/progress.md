@@ -675,3 +675,89 @@ a412138 test(checkin): prove concurrent admission and customer to staff flow
 Full list: `git log --reverse --format='%h %s' 113c52b..feature/phase-6-checkin`;
 count: `git rev-list --count 113c52b..feature/phase-6-checkin`.
 Artifacts/logs: `.local/phase-6-*.log`, `test-results/phase-6-commits.txt` (ignored).
+
+## Phase 7 — Waiting Room & Quality
+
+Authorized owner per assignment: **nguyen-van-hoan <nguyenvanh842k5@gmail.com>**.
+Branch `feature/phase-7-optimization`, base `4239dab` (Phase 6). Phase 6 PR #12 is
+merged on GitHub. Phase 7 uses 17 meaningful commits with explicitly simulated
+19–22/10/2026 dates. Actual checks took place 23/10/2026.
+
+Implemented: stable per-user/event sessions, atomic Redis TIME/FIFO/capacity/TTL
+Lua, HMAC nonce admission, owner/signature/current-lease checks, fail-closed gate,
+server deadline recheck inside PostgreSQL hold transaction, checkout continuation
+for confirmed holds. Membership-scoped Organizer/ADMIN settings with audit, customer
+position/countdown/poll/reload/release, owner-only receipt inbox/unread/read tracking.
+Fixed transaction query sequencing in seat generator and limited staff socket auth
+refresh to actual authentication failures. CI runs suites in isolated API processes
+so shared-IP login throttling remains unchanged.
+
+Verified: full unit 102/102 across 10 files (127.53s), full PostgreSQL/Redis
+integration 91/91 across 7 files (249.44s), API and Next production builds, strict
+typecheck and lint. Waiting integration 7/7 independently (32.46s): 100 distinct users
+with capacity five => five leases and 95 queued; FIFO/refresh/expiry/stolen tokens,
+real hold and checkout, scoped settings/audit, notification ownership/idempotency.
+Final targeted rerun 7/7 (40.24s) also checks uppercase UUID refresh resolves to the
+same Redis room. Customer room countdown resync uses server timestamp without
+double subtracting elapsed time after polling.
+No private runtime secret matched candidate source files. Authenticated browser
+regression completed 16/16 across desktop/mobile, including timer resync, refresh
+position, promotion, purchase/inbox, event create/approve, realtime holding, payment
+success/failure and single-use staff admission/analytics. Foundation dependency-failure/anonymous-route/accessibility suite passed 20/20
+(1.1m), giving 36/36 final browser cases. All suites used real HTTP responses;
+no REST interception or fabricated dependency health. Local readiness confirmed PostgreSQL/Redis up, three real public events, frontend
+HTTP/static assets 200 and explicit Swagger settings/inbox-pagination contracts.
+
+The first combined browser run hit real per-IP auth limits because previously
+separate suites shared an API process; it was stopped. Security limits were not
+relaxed. The regression runner now starts/stops the real API per suite and viewport.
+
+Limits: local prototype, approximate lease presence, Redis restart requires rejoin,
+capacity reductions preserve leases, no verified anti-bot/production fairness/load
+capacity, no durable Socket.IO outbox. No AWS or email/worker service. Physical
+camera not tested; actual rendered QR image decoder and manual browser check-in
+were exercised. PayOS public webhook and real bank settlement still require an
+HTTPS callback and actual transfer. No automatic refund execution. pg@8 still emits a concurrent-query deprecation
+warning in some paths; current tests pass and no pg@9 compatibility is claimed.
+
+16 implementation commits recorded (delivery documentation follows):
+
+```text
+f35b2d5 docs: plan waiting room admission and final quality work
+36ff7fc feat(db): persist waiting room capacity and runtime configuration
+bfc416f feat(shared): define admission contracts and signed token policy
+c1814af feat(waiting): atomically queue and admit Redis sessions
+fbbf62c feat(waiting): manage stable user sessions and admission leases
+88b0813 feat(waiting): expose authenticated room endpoints
+34ba2e3 feat(booking): enforce admission before atomic holds
+600c067 feat(events): authorize audited waiting room settings
+0d731c9 feat(web): render waiting position and server admission deadline
+c465d51 feat(web): manage event waiting room settings
+456b22c feat(notifications): expose owned receipt notification inbox
+41050fb feat(web): display receipt notifications and unread state
+62f06bb fix(quality): harden queue expiry and realtime recovery
+49b27b9 test(waiting): verify signed leases and admission boundaries
+34c2e0e test(waiting): prove bounded admission and hold authorization
+7bba0f2 test(web): verify waiting flow and isolate browser rate limits
+```
+
+Full list after delivery:
+`git log --reverse --format='%h %s' 4239dab..feature/phase-7-optimization`.
+Count: `git rev-list --count 4239dab..feature/phase-7-optimization`.
+Logs `.local/phase-7-*.log`, copied screenshots `test-results/phase-7-verified/`,
+full commit exports `test-results/phase-6-commits.txt` / `phase-7-commits.txt` are local
+ignored verification artifacts. See [waiting-room runbook](waiting-room.md).
+
+Final Next build output restored to a regular workspace `.next` directory after
+all browser tests, with matching BUILD_ID, so startup does not depend on `/tmp`.
+
+Local servers left running after verification: web http://localhost:3000, API
+http://localhost:4000, Swagger http://localhost:4000/api/docs. API uses development
+configuration and the web serves the verified production build. Local artifacts:
+`.local/phase-7-local-readiness.log`, `.local/phase-7-web-local.log`,
+`.local/phase-7-api-local.log`. Restart using the normal README commands after
+stopping the existing local servers.
+
+Phases 6 and 7 local implementations are delivered. Follow-up validation is a real
+PayOS settlement/public HTTPS webhook, physical mobile camera and measured Locust
+load testing; these are not claimed complete. No AWS deployment was performed.

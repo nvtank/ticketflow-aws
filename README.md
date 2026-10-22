@@ -226,7 +226,7 @@ Phase 2 đã merge qua [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4).
 Phase 3: event CRUD theo tổ chức, seat generator, staff assignment, admin approval,
 public catalog/details và KPI Organizer thực. Phase 4: atomic booking, TTL cleanup,
 server-priced checkout orders và realtime. Phase 5 bổ sung PayOS, payment integrity
-và QR tickets. Phase 6–7 còn check-in, analytics và waiting room. Không
+và QR tickets. Phase 6 bổ sung check-in/analytics; Phase 7 bổ sung waiting room Redis và thông báo. Không
 có KPI hardcode hoặc tuyên bố tải chưa đo. Chưa tạo worker khi chưa cần jobs.
 
 Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 3 plan](docs/phase-3-plan.md),
@@ -253,3 +253,21 @@ và `/admin/monitoring`. Khóa tài khoản thu hồi session; ADMIN không bị
 Kiểm thử: `pnpm test:e2e:checkin`. QR decoder đã kiểm tra bằng ảnh render thật;
 chưa kiểm tra camera vật lý trên điện thoại. Không có giới hạn giờ mở cổng tự động
 ở phase này: STAFF được phân công có thể check-in sự kiện PUBLISHED để demo local.
+
+### Phase 7 — Phòng chờ và kiểm thử cuối
+
+Organizer mở một sự kiện của mình, bật phòng chờ và lưu giới hạn số phiên (1–500).
+Hai CUSTOMER đăng nhập ở hai trình duyệt riêng để xem thứ tự chờ, refresh giữ vị trí,
+rời hàng đợi cấp lượt cho người tiếp theo. Quyền vào có hạn 10 phút mặc định;
+giữ ghế vẫn chỉ 5 phút. Backend xác minh token/owner/Redis trước khi giữ ghế.
+`/notifications` hiển thị biên nhận đã lưu sau thanh toán và trạng thái chưa đọc.
+
+```sh
+pnpm test:e2e:waiting
+pnpm test:e2e:integration
+```
+
+[Waiting room runbook](docs/waiting-room.md) giải thích TTL, lỗi Redis và giới hạn.
+Đây là prototype local; chưa xác minh chống bot/fairness production hay tải 1.000 người.
+PayOS tạo/đọc/hủy payment link đã thử thật; chưa có public HTTPS webhook và chưa
+chuyển tiền ngân hàng thật để xác minh settlement. Xem [PayOS](docs/payments.md).

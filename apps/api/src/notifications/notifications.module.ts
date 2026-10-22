@@ -9,15 +9,24 @@ import {
   Module,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiQuery, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, Min, Max } from 'class-validator';
 import { CurrentPrincipal } from '../auth/auth.decorators';
 import type { Principal } from '../auth/auth.types';
 import { DatabaseService } from '../database/database.service';
 class InboxQueryDto {
-  @Type(() => Number) @IsInt() @Min(1) page = 1;
-  @Type(() => Number) @IsInt() @Min(1) @Max(50) pageSize = 20;
+  @ApiPropertyOptional({ default: 1, minimum: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 50 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  pageSize = 20;
 }
 @ApiBearerAuth()
 @ApiTags('Notifications')
