@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Providers } from '@/components/providers';
+import '@fontsource-variable/inter';
 import './globals.css';
 
 export const metadata: Metadata = {

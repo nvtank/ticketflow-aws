@@ -2,5 +2,7 @@
   "name": "@tixflow/config",
   "version": "0.1.0",
   "private": true,
-  "exports": { "./typescript/base": "./typescript/base.json" }
+  "exports": {
+    "./typescript/base": "./typescript/base.json"
+  }
 }
