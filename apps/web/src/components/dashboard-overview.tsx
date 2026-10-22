@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { ArrowUpRight, CircleHelp } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import type { DashboardRole } from '@/components/layout/dashboard-shell';
 import { SystemStatus } from '@/components/system-status';
-import { Card } from '@/components/ui/card';
+import { WorkspaceAccount } from '@/components/auth/workspace-account';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 
@@ -12,7 +12,7 @@ const content = {
     subtitle: 'Từ ý tưởng đầu tiên đến những khán đài đầy cảm xúc.',
     title: 'Sẵn sàng cho sự kiện đầu tiên',
     description:
-      'Quản lý sự kiện, sơ đồ ghế và doanh thu sẽ khả dụng ở Phase 3. Hiện chưa có dữ liệu tổ chức hoặc doanh thu để hiển thị.',
+      'Quản lý sự kiện, sơ đồ ghế và doanh thu sẽ khả dụng ở Phase 3. Các chỉ số bán vé chưa được triển khai.',
   },
   STAFF: {
     heading: 'Không gian soát vé',
@@ -26,7 +26,7 @@ const content = {
     subtitle: 'Theo dõi nền tảng TixFlow trong môi trường local.',
     title: 'Chưa có dữ liệu quản trị',
     description:
-      'Quản lý người dùng và phê duyệt sự kiện sẽ được bổ sung sau authentication. Các chỉ số kinh doanh không được giả lập.',
+      'Quản lý người dùng và phê duyệt sự kiện sẽ được bổ sung ở Phase 3 và 6. Các chỉ số kinh doanh không được giả lập.',
   },
 } as const;
 
@@ -49,13 +49,7 @@ export function DashboardOverview({ role }: { role: DashboardRole }) {
           </Link>
         </Button>
       </div>
-      <Card className="mb-8 flex items-start gap-3 border-indigo-100 bg-indigo-50/50">
-        <CircleHelp className="mt-0.5 size-5 shrink-0 text-primary" />
-        <p className="text-sm leading-6 text-slate-600">
-          Đây là bản xem trước bố cục, chưa có authentication hoặc dữ liệu riêng tư. API chưa cung
-          cấp endpoint quản trị. Phân quyền backend và bảo vệ route sẽ được bổ sung từ Phase 2.
-        </p>
-      </Card>
+      <WorkspaceAccount workspace={role.toLowerCase() as 'organizer' | 'staff' | 'admin'} />
       <div className="mb-9">
         <EmptyState title={copy.title} description={copy.description} />
       </div>

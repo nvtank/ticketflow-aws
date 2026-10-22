@@ -10,6 +10,20 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  role: UserRole;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  accessToken: string;
+  expiresIn: number;
+}
+
 export type SeatStatus = 'AVAILABLE' | 'HELD' | 'SOLD' | 'UNAVAILABLE';
 export type OrderStatus =
   'PENDING_PAYMENT' | 'PAID' | 'EXPIRED' | 'CANCELLED' | 'PAYMENT_FAILED' | 'REFUND_REQUIRED';
