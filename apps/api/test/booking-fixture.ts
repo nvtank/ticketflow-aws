@@ -156,6 +156,7 @@ export async function bookingFixture(
     await db.eventSection.deleteMany({ where: { eventId: { in: events } } });
     await db.ticketType.deleteMany({ where: { eventId: { in: events } } });
     await db.eventStaffAssignment.deleteMany({ where: { eventId: { in: events } } });
+    await db.waitingRoomSession.deleteMany({ where: { eventId: { in: events } } });
     await db.event.deleteMany({ where: { id: { in: events } } });
     await db.venue.deleteMany({ where: { id: { in: venues } } });
     await db.organization.delete({ where: { id: org.id } });
