@@ -8,7 +8,7 @@ import { EventQueryDto } from './events.dto';
 @Controller('events')
 export class PublicEventsController {
   constructor(@Inject(PublicEventsService) private readonly events: PublicEventsService) {}
-  @ApiQuery({type:EventQueryDto})
+  @ApiQuery({ type: EventQueryDto })
   @Get()
   @ApiOperation({
     summary: 'List published upcoming events; price filters apply to the lowest ticket price',
