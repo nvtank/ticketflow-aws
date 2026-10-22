@@ -18,18 +18,30 @@ try {
 } catch (error) {
   if (error instanceof Error && 'code' in error && error.code === 'EEXIST') {
     if (!process.argv.includes('--upgrade')) {
-      console.log('.env already exists; preserved it. Use pnpm env:setup --upgrade to append missing auth settings.');
+      console.log(
+        '.env already exists; preserved it. Use pnpm env:setup --upgrade to append missing auth settings.',
+      );
     } else {
       const file = new URL('../.env', import.meta.url);
       let existing = await readFile(file, 'utf8');
       for (const line of contents.split('\n')) {
-        if (!/^(JWT_SECRET|JWT_ISSUER|JWT_AUDIENCE|ACCESS_TOKEN_SECONDS|REFRESH_TOKEN_DAYS|SESSION_MAX_DAYS|DEMO_PASSWORD)=/.test(line)) continue;
+        if (
+          !/^(JWT_SECRET|JWT_ISSUER|JWT_AUDIENCE|ACCESS_TOKEN_SECONDS|REFRESH_TOKEN_DAYS|SESSION_MAX_DAYS|DEMO_PASSWORD)=/.test(
+            line,
+          )
+        )
+          continue;
         const key = line.split('=')[0];
         if (!new RegExp(`^${key}=`, 'm').test(existing)) existing += `\n${line}`;
       }
-      existing = existing.replace(/^JWT_SECRET=generate-with-pnpm-env-setup$/m, `JWT_SECRET=${jwtSecret}`);
+      existing = existing.replace(
+        /^JWT_SECRET=generate-with-pnpm-env-setup$/m,
+        `JWT_SECRET=${jwtSecret}`,
+      );
       await writeFile(file, existing.endsWith('\n') ? existing : `${existing}\n`, { mode: 0o600 });
-      console.log('Appended missing authentication settings; existing database settings and valid JWT secret preserved.');
+      console.log(
+        'Appended missing authentication settings; existing database settings and valid JWT secret preserved.',
+      );
     }
   } else throw error;
 }
