@@ -89,7 +89,8 @@ export function WaitingGate({
         )}
         {data.expiresAt && !expired && (
           <HoldCountdown
-            key={data.expiresAt}
+            key={data.expiresAt + data.serverTime}
+            label={admitted ? 'Thời gian vào đặt vé còn lại' : 'Thời gian phiên chờ còn lại'}
             expiresAt={data.expiresAt}
             serverTime={data.serverTime}
             onExpired={() => {

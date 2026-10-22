@@ -84,6 +84,7 @@ export class WaitingRoomService implements OnApplicationShutdown {
   }
   async status(eventId: string, userId: string, join = false) {
     const event = await this.event(eventId);
+    eventId = event.id;
     if (!event.waitingRoomEnabled)
       return {
         eventId,
@@ -146,16 +147,18 @@ export class WaitingRoomService implements OnApplicationShutdown {
     };
   }
   async leave(eventId: string, userId: string) {
-    const event = await this.event(eventId),
-      session = await this.db.waitingRoomSession.findUnique({
-        where: { eventId_userId: { eventId, userId } },
-      });
+    const event = await this.event(eventId);
+    eventId = event.id;
+    const session = await this.db.waitingRoomSession.findUnique({
+      where: { eventId_userId: { eventId, userId } },
+    });
     if (session)
       await this.execute(eventId, userId, session.id, '', event.waitingRoomCapacity, 'leave');
     return { left: true };
   }
   async authorize(eventId: string, userId: string, token?: string): Promise<Date | null> {
     const event = await this.event(eventId);
+    eventId = event.id;
     if (!event.waitingRoomEnabled) return null;
     const proof = token ? parseAdmissionCredential(token, this.env.JWT_SECRET) : null;
     if (!proof) throw new ForbiddenException('Bạn cần được cấp lượt từ phòng chờ.');

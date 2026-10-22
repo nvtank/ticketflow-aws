@@ -27,12 +27,14 @@
     "test:infra:down": "docker compose -f infrastructure/docker-compose.test.yml down",
     "test:db:prepare": "pnpm --filter @tixflow/api test:db:prepare",
     "test:integration": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api test:integration",
-    "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts",
-    "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts",
-    "test:e2e:booking": "pnpm build && playwright test --config playwright.booking.config.ts",
-    "test:e2e:payments": "pnpm build && playwright test --config playwright.payments.config.ts",
+    "test:e2e:auth": "pnpm build && node scripts/run-browser-regression.mjs auth",
+    "test:e2e:events": "pnpm build && node scripts/run-browser-regression.mjs events",
+    "test:e2e:booking": "pnpm build && node scripts/run-browser-regression.mjs booking",
+    "test:e2e:payments": "pnpm build && node scripts/run-browser-regression.mjs payments",
     "payos:webhook:register": "node scripts/register-payos-webhook.mjs",
-    "test:e2e:checkin": "pnpm build && playwright test --config playwright.checkin.config.ts"
+    "test:e2e:checkin": "pnpm build && node scripts/run-browser-regression.mjs checkin",
+    "test:e2e:waiting": "pnpm build && node scripts/run-browser-regression.mjs waiting",
+    "test:e2e:integration": "pnpm build && node scripts/run-browser-regression.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

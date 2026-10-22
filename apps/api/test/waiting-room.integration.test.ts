@@ -47,7 +47,7 @@ describe('Real Redis admission and PostgreSQL gate', () => {
     expect(replies.filter((r) => r.body.state === 'WAITING')).toHaveLength(95);
     expect(await room.redis.zcard(room.keys(e.id)[1]!)).toBe(5);
     for (const i of [0, 99]) {
-      const refreshed = await join(e.id, i).expect(201);
+      const refreshed = await join(e.id.toUpperCase(), i).expect(201);
       expect(refreshed.body.state).toBe(replies[i]!.body.state);
       expect(refreshed.body.position).toBe(replies[i]!.body.position);
       expect(refreshed.body.expiresAt).toBe(replies[i]!.body.expiresAt);

@@ -4,10 +4,12 @@ export function HoldCountdown({
   expiresAt,
   serverTime,
   onExpired,
+  label = 'Thời gian giữ ghế còn lại',
 }: {
   expiresAt: string;
   serverTime: string;
   onExpired?: () => void;
+  label?: string;
 }) {
   const [started] = useState(() => performance.now()),
     [tick, setTick] = useState(started),
@@ -30,7 +32,7 @@ export function HoldCountdown({
     <p
       className={`font-mono text-2xl font-bold ${seconds < 60 ? 'text-red-600' : 'text-primary'}`}
       role="timer"
-      aria-label="Thời gian giữ ghế còn lại"
+      aria-label={label}
     >
       {String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}
     </p>
