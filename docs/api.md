@@ -239,3 +239,9 @@ renewing admission. Public/managed event detail includes waitingRoomEnabled/Capa
 
 Settings enabled/capacity and optional inbox page/pageSize are explicit Swagger
 properties, verified against the running local `/api/docs-json` document.
+
+## Google authentication
+
+Google configuration/challenge/login and authenticated link/methods endpoints are
+documented in [google-auth.md](google-auth.md). Google-only users have no local
+password; email collisions require explicit linking by the authenticated owner.

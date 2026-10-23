@@ -416,12 +416,13 @@ model WebhookEvent {
 }
 
 model ExternalIdentity {
- id String @id @default(uuid()) @db.Uuid
- provider String @db.VarChar(30)
- subject String @db.VarChar(255)
- userId String @db.Uuid
- user User @relation(fields:[userId],references:[id],onDelete:Cascade)
- createdAt DateTime @default(now()) @db.Timestamptz(3)
- @@unique([provider,subject])
- @@unique([userId,provider])
+  id        String   @id @default(uuid()) @db.Uuid
+  provider  String   @db.VarChar(30)
+  subject   String   @db.VarChar(255)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([provider, subject])
+  @@unique([userId, provider])
 }
