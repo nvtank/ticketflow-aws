@@ -4,6 +4,15 @@ const environmentSchema = z
   .object({
     WAITING_ROOM_ADMISSION_SECONDS: z.coerce.number().int().min(30).max(1800).default(600),
     WAITING_ROOM_QUEUE_SECONDS: z.coerce.number().int().min(60).max(7200).default(1800),
+    GOOGLE_CLIENT_ID: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .trim()
+        .regex(/^[0-9]+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$/)
+        .max(254)
+        .optional(),
+    ),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     HOLD_RECONCILE_INTERVAL_MS: z.coerce.number().int().min(0).max(60000).default(5000),
     SOCKET_REDIS_ADAPTER: z

@@ -761,3 +761,56 @@ stopping the existing local servers.
 Phases 6 and 7 local implementations are delivered. Follow-up validation is a real
 PayOS settlement/public HTTPS webhook, physical mobile camera and measured Locust
 load testing; these are not claimed complete. No AWS deployment was performed.
+
+## Google Login — extension after Phase 7
+
+Branch `feature/google-login`, based on Phase 7 `3d6d423`; Phase 7 PR #14 has merged.
+Uses the existing confirmed local Git author nvtank and actual commit timestamps
+for this extension outside the seven-phase simulated schedule.
+
+Implemented: official GIS popup button on login/register, runtime feature flag,
+backend Google SDK verification, five-minute Redis/HttpOnly browser nonce with
+atomic single use, local JWT/rotating refresh sessions, passwordless CUSTOMER
+creation and subject-based returning login. Existing email collisions require
+explicit current-owner linking from profile, matching email and recent active
+session; role/order ownership is preserved. Google-only accounts cannot use the
+bcrypt dummy password. Profile shows real auth methods. Popup headers, expiry,
+SDK failure/retry and safe next-route handling included. No Google API access/
+refresh token or Client Secret is stored. Actual Client ID is only in ignored
+local `.env`; tracked `.env.example` is blank. Private config scan passed.
+
+Validation: full unit run 115/115 across 11 files (354.55s); final Google verifier
+rerun 13/13 (47.44s); final real PostgreSQL/Redis auth integration 21/21 across two
+files (283.46s). Initial integration caught missing PostgreSQL void-result cast in
+advisory locking; fixed with `::text` and all cases reran successfully. Google SDK
+also fetched real public signing certificates successfully (two keys), without
+an account token. Backend and Next production builds passed. Browser tests passed 10/10: four Google nonce/SDK-failure cases and six existing
+password/session/readiness/unconfigured-Google cases across desktop/mobile. Strict
+typecheck, lint, formatting and API/Next builds passed. Validation began 23/10/2026
+and finished 24/10/2026 (Asia/Ho_Chi_Minh). Local readiness is recorded below.
+
+Google library loads lazily on credential verification. Browser startup timeout
+allows slow WSL filesystem imports; authentication rate limits are unchanged.
+Unit/integration tests substitute only the external Google certificate source,
+using actual RSA signatures and Google's SDK verification. Browser Google tests
+substitute only the external SDK script; all REST reaches the actual local API.
+No live Google account authorization is claimed. Google Console authorized origins
+and interactive account authorization remain the account owner's step.
+
+Run/configuration/security details: [google-auth.md](google-auth.md). Logs are local
+`.local/google-*.log`; `.env` is ignored and not tracked. Local source/build artifacts
+are restored before delivery. No AWS resources or messaging services added.
+
+Final local verification on 24/10/2026: API/web restarted from the new regular
+workspace build; PostgreSQL/Redis readiness ok, Google runtime config enabled,
+nonce endpoint 201. The actual GIS script and official Google button rendered at
+http://localhost:3000/login. Google returned `The given origin is not allowed for
+the given client ID`, so live interactive login remains blocked by the OAuth
+client's external Authorized JavaScript origins configuration/propagation. No
+completed real Google account login is claimed. The actual client ID remains only
+in ignored `.env`. Local screenshot `test-results/google-verified/google-live-inspection.png`
+and sanitized `.local/google-ui-inspection.log` record this boundary.
+
+Four commits cover schema/config, verified backend sessions/linking, UI and
+security/browser tests/runbook. Full hashes are exported after the final commit
+at `test-results/google-login-commits.txt` (ignored); Git is authoritative.

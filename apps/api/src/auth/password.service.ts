@@ -16,9 +16,10 @@ export class PasswordService {
     return hash(password, 12);
   }
 
-  async verify(password: string, passwordHash?: string): Promise<boolean> {
+  async verify(password: string, passwordHash?: string | null): Promise<boolean> {
     // bcrypt silently truncates beyond 72 bytes; never allow such aliases.
     if (Buffer.byteLength(password, 'utf8') > 72) return false;
-    return compare(password, passwordHash ?? this.dummyHash);
+    const matches = await compare(password, passwordHash ?? this.dummyHash);
+    return !!passwordHash && matches;
   }
 }

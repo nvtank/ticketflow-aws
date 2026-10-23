@@ -271,3 +271,10 @@ pnpm test:e2e:integration
 Đây là prototype local; chưa xác minh chống bot/fairness production hay tải 1.000 người.
 PayOS tạo/đọc/hủy payment link đã thử thật; chưa có public HTTPS webhook và chưa
 chuyển tiền ngân hàng thật để xác minh settlement. Xem [PayOS](docs/payments.md).
+
+### Google Login
+
+Đăng nhập/đăng ký hỗ trợ nút Google chính thức khi `GOOGLE_CLIENT_ID` được cấu hình
+trong `.env` local. Tài khoản đã có email/mật khẩu cần đăng nhập rồi liên kết Google
+tại `/profile`. Không cần Client Secret; không lưu Google token.
+Xem [cấu hình Google, luồng liên kết và kiểm thử](docs/google-auth.md).

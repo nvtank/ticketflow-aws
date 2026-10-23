@@ -10,6 +10,7 @@ export default defineConfig({
     hookTimeout: 30_000,
     env: {
       NODE_ENV: 'test',
+      GOOGLE_CLIENT_ID: '',
       DATABASE_URL: 'postgresql://test:test@127.0.0.1:1/unavailable',
       REDIS_URL: 'redis://127.0.0.1:2',
       CORS_ORIGINS: 'http://localhost:3000',
