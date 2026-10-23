@@ -154,6 +154,8 @@ model Venue {
   address String
   city    String  @db.VarChar(100)
   events  Event[]
+
+  @@index([city])
 }
 
 model Event {
@@ -171,6 +173,7 @@ model Event {
   endsAt             DateTime               @db.Timestamptz(3)
   salesStartAt       DateTime               @db.Timestamptz(3)
   salesEndAt         DateTime               @db.Timestamptz(3)
+  galleryUrls        String[]               @default([])
   coverUrl           String?
   ticketPolicy       String
   rejectionReason    String?
@@ -202,6 +205,7 @@ model TicketType {
 
   @@unique([id, eventId])
   @@unique([eventId, name])
+  @@index([eventId, priceVnd])
 }
 
 model EventSection {

@@ -1,7 +1,7 @@
 # TixFlow — Real-time Event Ticketing Platform
 
-Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai nền tảng Phase 1 và
-Database & Authentication của Phase 2.** Chưa hoàn thành luồng bán vé. Không dùng
+Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–3: nền tảng,
+Database & Authentication và Event Management.** Chưa hoàn thành luồng bán vé. Không dùng
 AWS hoặc yêu cầu AWS credentials.
 
 ## Cài đặt và chạy
@@ -48,11 +48,16 @@ up -d --wait`. PostgreSQL/Redis có healthcheck, named volumes và chỉ publish
 Browser dùng Next.js proxy cùng origin. API_INTERNAL_URL được cố định lúc build;
 không đưa secrets vào NEXT_PUBLIC_*.
 
+Nếu Node `copyfile` báo `EPERM` khi build trên ổ Windows gắn qua WSL (`/mnt/c`,
+`/mnt/d`), dùng checkout trên filesystem Linux. Trong kiểm thử Phase 3, `.next` tạm dùng filesystem Linux trong `/tmp` để tránh
+lỗi này; sau kiểm thử đã chép bản build về thư mục `.next` thường của workspace.
+Các cấu hình/thư mục sinh tự động không được commit.
+
 Lockfile ghi phiên bản thực: Next.js 16.4.2, React 19.3.1, NestJS 11.2.7, Prisma
 7.10.1, TypeScript 5.9.3, Tailwind CSS 4.3.3. Prisma dùng PostgreSQL driver adapter,
 generate client trước build/dev/typecheck. Inter được đóng gói local.
 
-## Tài khoản demo Phase 2
+## Tài khoản demo
 
 Chỉ dùng development/test. Mật khẩu mặc định `TixFlowDemo!2026`, hoặc DEMO_PASSWORD
 của bạn lúc seed đầu. Seed lại giữ mật khẩu hiện có.
@@ -71,10 +76,28 @@ mật khẩu, ngày sự kiện và SOLD inventory. Vé mẫu không thay thế 
 
 1. Mở `/system`: API/PostgreSQL/Redis phải báo đã kết nối.
 2. Đăng nhập từng role, kiểm tra workspace đúng và từ chối role khác.
-3. Organizer xem membership thực; dashboard chưa có KPI kinh doanh.
+3. Organizer xem sự kiện, doanh thu đơn PAID, số ghế bán và tỷ lệ lấp đầy từ database.
 4. Đăng ký customer mới, cập nhật tên/điện thoại tại `/profile`.
 5. Reload hai tab để khôi phục phiên; đổi mật khẩu để thu hồi mọi phiên.
 6. Đăng nhập với mật khẩu mới, đăng xuất và kiểm tra trang riêng yêu cầu login.
+
+### Demo quản lý sự kiện Phase 3
+
+1. Đăng nhập Organizer, mở `/organizer/events/new`, chọn TixFlow Live và nhập nội dung,
+   địa điểm, URL banner/ảnh, chính sách, ngày sự kiện và cửa sổ bán vé (giờ Việt Nam).
+2. Lưu nháp, tạo VIP 2 hàng × 20 ghế và Standard 8 × 20, đặt giá từng khu.
+   Có thể bật/tắt ghế nháp và phân công `staff@tixflow.local`.
+3. Gửi duyệt. Nội dung và sơ đồ khóa khi chờ duyệt; chưa xuất hiện trong danh mục công khai.
+4. Admin mở `/admin/events`, xem chi tiết/lịch sử rồi duyệt hoặc từ chối kèm lý do.
+   Organizer sửa bản bị từ chối và gửi lại được.
+5. Sau duyệt, khách mở `/events`, tìm tên, lọc danh mục/thành phố/ngày/giá,
+   xem trang chi tiết và số ghế khả dụng. Bộ lọc được lưu trong URL.
+6. Chỉ xóa được nháp chưa có giao dịch. Sơ đồ có đơn hàng/lịch sử giữ ghế không được tạo lại;
+   ghế SOLD/HELD không được bật/tắt. Các thao tác được ghi audit trong transaction.
+
+Dashboard Organizer hiện có KPI tổng hợp thực; biểu đồ doanh thu/đơn hàng mới và
+analytics chi tiết thuộc Phase 6. Trang Admin Phase 3 tập trung duyệt sự kiện.
+Ảnh dùng URL http/https; chưa có upload/lưu trữ file.
 
 Chưa thể demo chọn ghế/thanh toán/check-in. Không hiển thị Google Login hoặc reset
 password khi chưa có OAuth/email delivery thực.
@@ -92,6 +115,7 @@ pnpm test:integration
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm test:e2e:auth
+pnpm test:e2e:events
 pnpm test:infra:down
 ```
 
@@ -99,12 +123,14 @@ Test PostgreSQL riêng tại 55432, Redis 56379, DB tixflow_test dùng tmpfs. Te
 từ chối database ngoài local test DB; chỉ xóa fixtures của lần chạy, không truncate.
 TEST_DATABASE_URL/TEST_REDIS_URL có thể cấu hình nhưng phải giữ quy tắc an toàn đó.
 
-Vitest kiểm tra validation, JWT, RBAC, HTTP và auth với DB/Redis thật. Concurrent
+Vitest kiểm tra validation, JWT, RBAC, HTTP, event lifecycle/ownership, grid atomicity,
+review races, sold inventory và auth với DB/Redis thật. Concurrent
 refresh và duplicate registration chưa chứng minh chống overselling; tests seat
 hold 20/100 requests thuộc Phase 4.
 
 Playwright tự bật API/web trên 4000/3000: dừng pnpm dev trước khi chạy. Foundation
-suite cố ý dùng dependency ports đóng để kiểm tra lỗi; auth suite dùng DB test thật.
+suite cố ý dùng dependency ports đóng để kiểm tra lỗi; auth/events suites dùng DB test thật.
+Events E2E seed tài khoản demo vào DB test và tạo sự kiện có tên riêng cho mỗi lần chạy.
 Chạy desktop/mobile, không mock REST responses. Báo cáo/trace bị Git ignore.
 CI đã cấu hình; kết quả remote chỉ xác nhận sau khi CI chạy.
 
@@ -119,6 +145,7 @@ apps/
       auth/                # JWT provider, bcrypt, refresh sessions, guards, DTOs
       users/               # Own profile and password management
       organizations/       # Membership-scoped reads
+      events/              # Public catalog, organizer CRUD/grid/staff, admin review/audit
       database/            # Prisma PostgreSQL lifecycle
       common/http/         # Request IDs, logs, errors, measured metrics
       config/ health/ monitoring/
@@ -126,7 +153,8 @@ apps/
     test/                  # Unit, HTTP and real DB integration
   web/src/
     app/(public)/          # Home, events, system, login, register, profile
-    app/(workspace)/       # Protected organizer/staff/admin shells
+    app/(workspace)/       # Organizer event management, admin review, staff shell
+    components/events/     # Catalog, forms, grids, dashboards and review dialogs
     components/auth/       # Forms, gates, bootstrap, profile
     components/ui/         # Accessible Radix/shadcn-style primitives
     lib/ stores/           # Validated API client, memory-only auth state
@@ -140,16 +168,21 @@ e2e/ docs/
 ## Tiến độ
 
 Phase 1: design system, public/dashboard layouts, Nest HTTP foundation, health/metrics.
-[PR #2](https://github.com/nvtank/ticketflow-aws/pull/2) đã mở vào develop, chưa merge.
+[PR #2](https://github.com/nvtank/ticketflow-aws/pull/2) đã merge vào develop.
 Phase 2: Prisma schema/migration/seed thật, đăng ký/login, bcrypt, JWT, refresh token
 hash/rotation/revocation, HttpOnly cookie, backend RBAC/membership, profile/password
 và route protection. Access token chỉ ở memory, không lưu browser storage.
 
-Phase 3 tiếp theo: event CRUD, seat generator, admin approval. Phase 4–7 bổ sung
+Phase 2 đã merge qua [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4).
+Phase 3: event CRUD theo tổ chức, seat generator, staff assignment, admin approval,
+public catalog/details và KPI Organizer thực. Phase 4–7 bổ sung
 atomic booking, realtime, payment, QR, check-in, analytics và waiting room. Không
 có KPI hardcode hoặc tuyên bố tải chưa đo. Chưa tạo worker khi chưa cần jobs.
 
-Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 2 plan](docs/phase-2-plan.md),
+Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 3 plan](docs/phase-3-plan.md),
 [kiến trúc](docs/architecture.md), [database](docs/database.md), [API](docs/api.md).
 Phase 2 được người dùng chuyển cho `nvtank <tuannguyen.120910@gmail.com>`;
 commit timestamps dùng thời gian thực.
+
+Phase 3 dùng author được xác nhận `nguyen-van-hoan <nguyenvanh842k5@gmail.com>`
+trên branch `feature/phase-3-events`, base develop `16f6146`.
