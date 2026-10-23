@@ -1,4 +1,4 @@
-# Database — Phase 5
+# Database — Phase 6
 
 PostgreSQL 17 / Prisma 7.10.1 với PrismaPg adapter. Schema tại
 `apps/api/prisma/schema.prisma`; migration đầu tại
@@ -114,3 +114,12 @@ callbacks. A ticket uniqueness error rolls back all inventory/order/payment/webh
 writes and permits a safe retry after the underlying inconsistency is repaired.
 Extra distinct transfers are tracked for refund review without revoking valid
 existing tickets. The partial unique active-ticket/seat index remains unchanged.
+
+## Phase 6
+
+Migration 20261023030000_attendance_reporting adds Event.checkInRevision and indexes
+CheckIn.createdAt / Order(status,paidAt), applied to development/test. Admission
+locks event KEY SHARE, staff user SHARE, then ticket FOR UPDATE. Assignment removal
+and event changes take event UPDATE locks; account locks take user UPDATE locks.
+VALID -> USED, unique CheckIn(ticketId), staff/time/audit/revision commit together.
+A second concurrent confirm sees USED and returns 409. Verify does not mutate.

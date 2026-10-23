@@ -1,4 +1,4 @@
-import { AdminEventQueue } from '@/components/events/admin-event-review';
+import { AdminOverview } from '@/components/admin/admin-panels';
 export default function Page() {
-  return <AdminEventQueue />;
+  return <AdminOverview />;
 }

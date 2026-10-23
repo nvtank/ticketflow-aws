@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Global, Module, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MetricsService {
@@ -22,3 +22,7 @@ export class MetricsService {
     };
   }
 }
+
+@Global()
+@Module({ providers: [MetricsService], exports: [MetricsService] })
+export class MetricsModule {}
