@@ -23,7 +23,7 @@ export function configureApplication(app: INestApplication, environment: Environ
     const config = new DocumentBuilder()
       .setTitle('TixFlow API')
       .setDescription(
-        'Local modular monolith. Phase 3: organization-scoped events, seat grids and approval.',
+        'Local modular monolith. Phase 4: atomic reservation, server-priced orders and realtime inventory.',
       )
       .setVersion('0.1.0')
       .addBearerAuth()

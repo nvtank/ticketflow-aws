@@ -1,7 +1,11 @@
 # Tiến độ TixFlow
 
 Cập nhật: 23/10/2026, múi giờ Asia/Ho_Chi_Minh. Timeline 20/09–22/10 trong đề bài là
-kế hoạch; lịch sử Git dùng thời điểm thực tế, không backdate.
+kế hoạch. Theo yêu cầu thay đổi ngày 23/10, author/committer dates đã được mô phỏng
+theo timeline, giữ nguyên source và danh tính. Lịch sử gốc nằm trên các nhánh
+`archive/real-20261023/...`; xem [commit-timeline.md](commit-timeline.md).
+Các kết quả kiểm tra dưới đây ghi thời gian chạy thực tế. Các hash Phase 1–3
+trong báo cáo bàn giao cũ là hash gốc, vẫn tra được trên nhánh archive.
 
 ## Phase 1 — Project Setup & Design System
 
@@ -79,8 +83,8 @@ Kế hoạch atomic commits: [phase-1-plan.md](phase-1-plan.md).
 Danh sách đầy đủ bao gồm commit tài liệu chứa file này được lấy từ Git:
 
 ```sh
-git log --reverse --format='%h %s' feature/phase-1-foundation
-git rev-list --count feature/phase-1-foundation
+git log --reverse --format='%h %s' archive/real-20261023/feature/phase-1-foundation
+git rev-list --count archive/real-20261023/feature/phase-1-foundation
 ```
 
 Các commit đã tồn tại trước commit tài liệu cuối:
@@ -113,7 +117,7 @@ Phụ trách được người dùng chuyển từ nguyen-van-hoan sang **nvtank
 nhận `nvtank <tuannguyen.120910@gmail.com>`. Branch `feature/phase-2-auth` dựa trên
 Phase 1 `88a6bfa` trong lúc PR #2 chờ review. Cập nhật Phase 3: Phase 2 đã push và
 [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4) đã merge vào develop tại `16f6146`. Kế hoạch
-17 atomic commits; dùng timestamp thực tế. Xem [phase-2-plan.md](phase-2-plan.md).
+17 atomic commits; ban đầu dùng timestamp thực tế, đã tái dựng theo chính sách mới ở trên. Xem [phase-2-plan.md](phase-2-plan.md).
 
 ### Đã triển khai
 
@@ -188,8 +192,8 @@ và AuthGate cùng điều hướng login sau đổi password; đã bỏ điều
 Lấy lịch sử commit Phase 2 thực tế (kể cả commit tài liệu chứa file này):
 
 ```sh
-git log --reverse --format='%h %s' 88a6bfa..feature/phase-2-auth
-git rev-list --count 88a6bfa..feature/phase-2-auth
+git log --reverse --format='%h %s' 88a6bfa..archive/real-20261023/feature/phase-2-auth
+git rev-list --count 88a6bfa..archive/real-20261023/feature/phase-2-auth
 ```
 
 Các commit đã tồn tại trước commit bàn giao cuối:
@@ -222,7 +226,7 @@ của một commit chưa tồn tại.
 Phụ trách/author theo xác nhận mới của người dùng:
 **nguyen-van-hoan <nguyenvanh842k5@gmail.com>**. Branch `feature/phase-3-events`,
 base develop `16f61469c6ea2943451f179207eef89461db96ed`. Xem
-[commit breakdown](phase-3-plan.md). Dùng thời gian thực, không gán author khác.
+[commit breakdown](phase-3-plan.md). Author giữ nguyên; ngày commit đã tái dựng theo chính sách mới ở trên.
 
 ### Đã triển khai
 
@@ -328,10 +332,149 @@ Commit bàn giao cuối dùng message `docs: document phase three delivery and v
 Lấy toàn bộ lịch sử và số lượng thực tế (bao gồm chính commit tài liệu này):
 
 ```sh
-git log --reverse --format='%h %s' 16f6146..feature/phase-3-events
-git rev-list --count 16f6146..feature/phase-3-events
+git log --reverse --format='%h %s' 16f6146..archive/real-20261023/feature/phase-3-events
+git rev-list --count 16f6146..archive/real-20261023/feature/phase-3-events
 ```
 
 Danh sách hash/message cuối được xuất từ Git tại `test-results/phase-3-commits.txt`
-sau commit bàn giao, không tự tạo hash cho commit chưa tồn tại. Phase 3 chờ review
-qua PR vào develop; không tự merge khi chưa review.
+sau commit bàn giao, không tự tạo hash cho commit chưa tồn tại. Cập nhật Phase 4:
+[PR #5](https://github.com/nvtank/ticketflow-aws/pull/5) đã merge vào develop và
+[PR #6](https://github.com/nvtank/ticketflow-aws/pull/6) đã merge develop vào main
+trên GitHub. Đợt tái dựng bảo toàn hai merge này; không có merge tự động từ agent.
+
+## Phase 4 — Booking & Realtime
+
+Phụ trách/author đã xác nhận: **nvtank <tuannguyen.120910@gmail.com>**.
+Branch `feature/phase-4-booking-realtime`, base Phase 3 đã tái dựng `ff4c12b`.
+Kế hoạch 20 atomic commits: [phase-4-plan.md](phase-4-plan.md).
+Ngày author/committer mô phỏng 04–10/10/2026; các lần kiểm tra bên dưới chạy thực
+ngày 23/10/2026. Không dùng ngày mô phỏng làm bằng chứng thời gian thực hiện.
+
+### Đã triển khai
+
+- Migration retry keys + immutable requestedSeatIds; đã áp dụng development/test.
+  Seed tiếp tục giữ SOLD inventory, điền requested IDs cho đơn mẫu.
+- Hold PostgreSQL nguyên tử, DB clock/TTL tối đa 300 giây và không quá giờ đóng bán;
+  lock theo thứ tự ổn định, kiểm tra event/org/sales/giới hạn trước cập nhật có điều kiện.
+  Nhóm ghế rollback toàn bộ khi xung đột. Một active hold/customer/event.
+- Retry giữ ghế/checkout có key, không gia hạn hoặc tạo bản ghi trùng; retry key dùng
+  đồng thời cho hai event trả một thành công/một 409, không lộ lỗi unique constraint.
+- Chỉ chủ hold được xem/hủy; thu hồi và cleanup chỉ tác động HELD đúng hold, không
+  giải phóng SOLD. Ghế hết hạn được giữ lại ngay trước khi scheduler dọn.
+- Snapshot nhất quán, trạng thái riêng HELD_BY_ME/HELD_BY_OTHERS, revision/serverTime,
+  khôi phục hold/order sau reload; không lộ thông tin người giữ khác.
+- Order pending do server tính giá, item copy giá server, cùng expiry với hold,
+  chỉ chủ được xem/hủy, lịch sử có phân trang và trạng thái hết hạn thực tế.
+- Socket.IO xác thực JWT/session/Origin, room theo public event, private order room
+  lấy từ principal; chỉ phát hint sau commit. Redis adapter tùy cấu hình, đã chạy
+  hai backend thật. Không chờ Redis trong database transaction.
+- Seat map tương tác, sân khấu/khu/hàng, legend/trạng thái, chọn tối đa theo event,
+  zoom/cuộn ngang mobile, toast/error/skeleton, xác nhận hủy và countdown server.
+  Reconnect/revision invalidation + REST định kỳ; selection khác quyền giữ ghế.
+- Tách việc tải sự kiện booking sau xác minh phiên để không kẹt cache khi reload.
+  E2E ban đầu phát hiện lỗi này; đã sửa và chạy lại đạt, không bỏ assertion realtime.
+- Checkout pending và lịch sử đơn thật tại profile. Chưa có nút thanh toán giả.
+- Metrics đo hold successes/failures, current sockets và DB valid-held seats; không
+  giả dữ liệu khi DB mất kết nối. Config/Swagger/API docs, CI booking E2E cập nhật.
+
+### Kiểm tra thực tế ngày 23/10/2026
+
+**Phase 4 hoàn tất; chưa phải toàn bộ MVP.** Tổng cộng 20 commit có nội dung thực
+khi gồm commit bàn giao cuối. PostgreSQL test 55432/Redis 56379 là dịch vụ thật.
+
+| Kiểm tra             | Kết quả thực tế                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| Lint                 | PASS, không warnings/errors                                                                   |
+| Typecheck            | PASS shared/API source + tests/web/root configs                                               |
+| Prettier             | PASS toàn repository; cache/runtime local được ignore                                         |
+| Production build     | PASS shared/NestJS; Next.js build cuối compile 12.0s, TypeScript 18.9s, 17 application routes |
+| Unit/HTTP            | 64/64, 6 files, 121.76s                                                                       |
+| Integration cuối     | 55/55, 4 files, 141.54s                                                                       |
+| Foundation E2E       | 20/20, desktop/mobile, 58.5s; cố ý tắt DB/Redis để kiểm tra lỗi                               |
+| Auth E2E             | 4/4, desktop/mobile, 55.3s                                                                    |
+| Event management E2E | 2/2, desktop/mobile, 1.1 phút                                                                 |
+| Booking E2E          | 2/2, desktop/mobile, 1.5 phút; hai khách thật/context riêng                                   |
+| Timeline integrity   | 60/60 cặp tree/author/committer identity khớp; 5 backup refs được xác minh trên GitHub        |
+
+55 integration cases gồm auth 14, event management 22, booking 14, realtime 5.
+Booking chứng minh 20 và 100 HTTP requests đồng thời chỉ có một hold cho một ghế,
+nhóm ghế atomic, tranh nhóm ngược thứ tự không deadlock, expiry/reclaim, khác chủ
+bị từ chối, key retries, giá server, order expiry và cleanup không giải phóng SOLD.
+Realtime qua hai backend/Redis kiểm tra JWT/Origin/room, sau commit, rollback không
+phát hint, privacy/private order room, reconnect snapshot và metrics.
+
+28 E2E cases không mock REST. Booking kiểm tra giới hạn 4 vé, nhận cập nhật dưới
+4 giây (ngắn hơn polling 10 giây), reload khôi phục hold/countdown, tổng đơn
+4.800.000 VND, hủy trả ghế realtime và từ chối xem đơn khách khác. Screenshot
+mobile kiểm tra không tràn viewport. Không suy ra năng lực tải production từ các
+kiểm tra này; chưa kiểm thử callback/check-in.
+
+Một cảnh báo pg@8 về query đồng thời trên cùng connection xuất hiện ở luồng
+seat generator Phase 3 (`Promise.all` trong transaction); tests vẫn đạt. Cần tuần tự
+hóa các query đó trước nâng pg@9. Phase 4 lock/reservation không dùng mẫu này.
+Log local: `.local/phase-4-*.log`, `.local/booking-e2e.log`; screenshot tại
+`test-results/phase-4-verified/` (ignored). Build `.next` được đưa về thư mục thường
+trong workspace sau E2E để không phụ thuộc symlink `/tmp`.
+Kết quả GitHub Actions chỉ được xác nhận sau khi workflow remote chạy.
+
+### Giới hạn và Phase 5
+
+- Chưa triển khai payment provider/callback, QR issuance hay atomic check-in. Không
+  tạo vé khi frontend điều hướng. Phase 5 cần xử lý callback trùng/đến muộn và
+  REFUND_REQUIRED trước khi có thể gọi đây là MVP bán vé hoàn chỉnh.
+- Waiting room chưa triển khai; booking fail closed khi event bật waiting room.
+- Socket hint không có durable outbox/replay; reconnect/polling REST bù mất thông
+  báo. Không tuyên bố chống bot/fairness hoặc phục vụ 1.000 người đồng thời.
+- Scheduler trong API quét tối đa 100 expired holds/lần. PostgreSQL quyết định
+  khả dụng ngay cả khi cleanup chậm. Throttle/metrics hiện theo từng process.
+- Redis adapter đã test hai instance, chưa benchmark tải hay Redis failover.
+- Phase 5 kế hoạch phụ trách nguyen-van-hoan; cần xác nhận author nếu người dùng
+  thay phân công, không tự gán email chưa được phép.
+
+### Tái dựng lịch sử đã áp dụng
+
+Người dùng đã duyệt bảng xem trước và yêu cầu áp dụng, giữ backup gốc. Năm refs
+main/develop/feature Phase 1–3 đã cập nhật nguyên tử bằng force-with-lease sau khi
+kiểm tra remote tips. Backup `archive/real-20261023/...` có trên GitHub. Hai merge
+PR #5/#6 mới nhất được bảo toàn. Đối chiếu 60 commit: tree và author/committer
+identity giống hệt bản gốc; chỉ dates/parent/hash/signature thay theo tái dựng.
+Bảng đối chiếu đầy đủ: [commit-timeline-map.csv](commit-timeline-map.csv).
+Chi tiết refs/chữ ký/thời gian thực: [commit-timeline.md](commit-timeline.md).
+
+### Lịch sử commit Phase 4
+
+19 commit đã tồn tại trước commit tài liệu bàn giao cuối:
+
+```text
+802d853 docs: record phase four reservation and realtime plan
+f566267 chore(realtime): install compatible Socket.IO dependencies
+1699fba feat(shared): define booking and realtime contracts
+9a0c77c feat(db): persist reservation retry keys and requested seats
+8b150ec feat(booking): validate sales and lock inventory consistently
+e37ca35 feat(booking): reserve seat groups atomically
+c6116cb feat(booking): release and reconcile expired holds
+5f4408e feat(booking): expose authoritative customer snapshots
+05c59b2 feat(orders): create server priced idempotent checkout orders
+4ab5fee feat(realtime): authenticate event rooms and publish committed revisions
+8d76892 feat(realtime): configure Redis adapter module and runtime options
+8813c2f feat(api): wire reservation checkout and reconciliation endpoints
+770adc5 test(booking): verify policies and stale snapshot handling
+4099763 test(booking): prove concurrent PostgreSQL reservations and retry safety
+63cfe16 test(realtime): verify committed rooms across Redis instances
+707a71b feat(web): render interactive customer seat map
+8c023c5 feat(web): confirm holds with realtime snapshots and server countdown
+7a30acd feat(web): show authoritative pending orders and customer history
+74ec458 test(web): verify customer reservation and order flow on desktop and mobile
+
+```
+
+Commit thứ 20 chứa tài liệu bàn giao và kết quả kiểm tra. Lấy hash/message và số
+lượng đầy đủ sau khi commit bằng Git, không ghi hash chưa tồn tại:
+
+```sh
+git log --reverse --format='%h %s' ff4c12b..feature/phase-4-booking-realtime
+git rev-list --count ff4c12b..feature/phase-4-booking-realtime
+```
+
+Danh sách sau commit được xuất vào `test-results/phase-4-commits.txt` (ignored).
+PR Phase 4 hướng vào develop, không tự merge.

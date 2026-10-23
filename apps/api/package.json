@@ -21,10 +21,13 @@
     "@nestjs/core": "^11.1.0",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.1.0",
+    "@nestjs/platform-socket.io": "^11.2.7",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/throttler": "^6.4.0",
+    "@nestjs/websockets": "^11.2.7",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "@socket.io/redis-adapter": "^8.3.0",
     "@tixflow/shared": "workspace:*",
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
@@ -36,6 +39,7 @@
     "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "socket.io": "^4.8.4",
     "zod": "^4.3.0"
   },
   "devDependencies": {

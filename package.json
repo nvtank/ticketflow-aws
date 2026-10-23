@@ -28,7 +28,8 @@
     "test:db:prepare": "pnpm --filter @tixflow/api test:db:prepare",
     "test:integration": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api test:integration",
     "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts",
-    "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts"
+    "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts",
+    "test:e2e:booking": "pnpm build && playwright test --config playwright.booking.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
@@ -38,6 +39,7 @@
     "eslint-config-next": "^16.2.0",
     "eslint-config-prettier": "^10.1.0",
     "prettier": "^3.6.0",
+    "socket.io-client": "^4.8.4",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.0",
     "vitest": "^4.0.0"

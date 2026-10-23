@@ -1,4 +1,4 @@
-# Database — Phase 3
+# Database — Phase 4
 
 PostgreSQL 17 / Prisma 7.10.1 với PrismaPg adapter. Schema tại
 `apps/api/prisma/schema.prisma`; migration đầu tại
@@ -39,11 +39,12 @@ và SOLD inventory. QR mẫu chỉ lưu hash, chưa phải luồng phát hành Q
 Seed đã chạy hai lần và kiểm tra row counts bằng psql. Test stack riêng 55432/56379,
 PostgreSQL tmpfs; 14 auth integration tests đã chạy với DB/Redis thật.
 
-## Invariants cần triển khai Phase 4–6
+## Các bước sau schema Phase 2
 
-Schema chưa thực thi quy trình bán vé. Cần hold bằng conditional update/row locks
-sorted seat IDs, rollback cả nhóm, server TTL/reconciliation không giải phóng SOLD,
-và ownership checks. Finalization phải atomically kiểm tra payment, hold/expiry,
+Schema Phase 2 mới chuẩn bị quan hệ. Phase 4 đã triển khai hold bằng conditional
+update/row locks sorted seat IDs, rollback cả nhóm, server TTL/reconciliation không
+giải phóng SOLD và ownership checks; xem phần bên dưới. Phase 5 finalization cần
+atomically kiểm tra payment, hold/expiry,
 sale/ticket/order; callback trễ cần refund, không chiếm ghế đã bán. Check-in phải
 kiểm tra staff assignment và conditional VALID → USED. Chưa kiểm thử concurrency
 đặt ghế/check-in ở Phase 2.
@@ -66,3 +67,32 @@ Unused old venue rows are retained for now; no automatic venue cleanup is implem
 Public snapshots use repeatable read; effective held availability uses server time.
 Public catalog filters use parameterized SQL and escape wildcard search characters.
 Organizer aggregates count PAID order revenue and SOLD seats within membership scope.
+
+## Phase 4 reservation invariants
+
+`20261023000000_reservation_retries` adds nullable user-scoped unique retry key,
+immutable requestedSeatIds UUID array and active-hold query index. Migration
+backfills requested seats from existing seat relations and order items. Seed now
+populates requested IDs for the sample paid order. Hold history survives release.
+
+Lock order is event FOR KEY SHARE → user/event advisory lock → sorted canonical
+seat UUID rows FOR UPDATE → hold/order. Event KEY SHARE protects configuration
+against Phase 3 exclusive edits without shared-lock upgrade deadlocks between
+competing buyers; revision-only updates use PostgreSQL's non-key update lock.
+PostgreSQL clock is read after seat locks; network/Redis calls are outside transactions.
+
+Conditional group update accepts AVAILABLE or expired/released HELD seats only.
+Mismatch rolls back hold, seat writes, audit and revision together. Unique retry
+keys resolve concurrent attempts; same-user active holds are serialized. Expired
+old holds cannot reclaim seats taken by a newer hold. Order items copy authoritative
+prices and expire with the original hold. Partial tickets/payments are not issued.
+
+Reconciliation scans at most 100 expired unreleased holds per run, locks their
+original seat IDs, only updates seats still HELD by that exact hold, expires pending
+orders, and never changes SOLD/PAID. Multiple reconcilers safely repeat the same work.
+Effective expiry is checked at every mutation and snapshot, independent of cleanup.
+
+Real integration coverage includes 100 different authenticated customers racing via
+HTTP, overlapping opposite-order groups, rollback, early sale end, key races,
+ownership, reload recovery, order retry/pricing and SOLD cleanup safety. This is
+correctness evidence, not a throughput/capacity benchmark.

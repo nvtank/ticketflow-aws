@@ -1,7 +1,7 @@
 # TixFlow — Real-time Event Ticketing Platform
 
-Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–3: nền tảng,
-Database & Authentication và Event Management.** Chưa hoàn thành luồng bán vé. Không dùng
+Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–4: nền tảng,
+authentication, event management và booking/realtime.** Chưa hoàn thành luồng bán vé. Không dùng
 AWS hoặc yêu cầu AWS credentials.
 
 ## Cài đặt và chạy
@@ -99,8 +99,31 @@ Dashboard Organizer hiện có KPI tổng hợp thực; biểu đồ doanh thu/�
 analytics chi tiết thuộc Phase 6. Trang Admin Phase 3 tập trung duyệt sự kiện.
 Ảnh dùng URL http/https; chưa có upload/lưu trữ file.
 
-Chưa thể demo chọn ghế/thanh toán/check-in. Không hiển thị Google Login hoặc reset
+Đã có chọn/giữ ghế và tạo đơn chờ thanh toán. Thanh toán, phát hành QR và check-in
+còn ở các phase tiếp theo. Không hiển thị Google Login hoặc reset
 password khi chưa có OAuth/email delivery thực.
+
+### Demo booking và realtime Phase 4
+
+1. Đăng nhập `customer@tixflow.local`, mở concert → Chọn ghế. Dùng browser/context khác
+   đăng nhập `customer2@tixflow.local` và mở cùng sơ đồ.
+2. Chọn tối đa 4 ghế (theo cấu hình event), bấm Xác nhận giữ ghế. Chỉ phản hồi thành công
+   từ backend mới xác lập hold. Browser thứ hai thấy ghế đang được người khác giữ.
+3. Countdown tối đa 300 giây dựa trên thời gian server. Reload khôi phục hold đang hiệu lực;
+   tạo đơn hàng không gia hạn. Khi hết hạn người khác có thể giữ ngay dù cleanup chưa chạy.
+4. Tiếp tục đến đơn hàng: giá tính từ server, chỉ chủ hold được tạo/xem/hủy. Hủy đơn hoặc
+   hold trả ghế chưa bán. Lịch sử đơn thật nằm ở `/profile`.
+5. Checkout chưa có thanh toán; không có endpoint tự phát hành vé. Payment thuộc Phase 5.
+
+Socket.IO kết nối trực tiếp API port 4000 (WebSocket only). Có thể đặt
+`NEXT_PUBLIC_REALTIME_URL` trước build nếu dùng origin khác; CORS/Origin whitelist
+phải khớp frontend. Mất kết nối tự reconnect và tải snapshot REST; REST cũng đồng bộ
+mỗi 10 giây. Payload WebSocket chỉ là gợi ý invalidate theo revision.
+
+`HOLD_RECONCILE_INTERVAL_MS=5000` quét PostgreSQL định kỳ, không dựa Redis expiry events.
+`SOCKET_REDIS_ADAPTER=true` bật Redis Pub/Sub để room updates đi giữa nhiều API instance;
+đã integration-test qua hai instance thật. PostgreSQL luôn quyết định quyền giữ ghế.
+Chưa có durable outbox hoặc benchmark tải; không suy ra năng lực production từ 100 requests.
 
 ## Kiểm thử
 
@@ -116,6 +139,7 @@ pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm test:e2e:auth
 pnpm test:e2e:events
+pnpm test:e2e:booking
 pnpm test:infra:down
 ```
 
@@ -124,12 +148,12 @@ từ chối database ngoài local test DB; chỉ xóa fixtures của lần chạ
 TEST_DATABASE_URL/TEST_REDIS_URL có thể cấu hình nhưng phải giữ quy tắc an toàn đó.
 
 Vitest kiểm tra validation, JWT, RBAC, HTTP, event lifecycle/ownership, grid atomicity,
-review races, sold inventory và auth với DB/Redis thật. Concurrent
-refresh và duplicate registration chưa chứng minh chống overselling; tests seat
-hold 20/100 requests thuộc Phase 4.
+review races, sold inventory và auth với DB/Redis thật. Phase 4 bổ sung HTTP
+concurrency 20/100 yêu cầu tranh một ghế, rollback nhóm ghế, TTL/ownership/retry,
+giá đơn từ server và Socket.IO qua hai backend dùng Redis thật.
 
 Playwright tự bật API/web trên 4000/3000: dừng pnpm dev trước khi chạy. Foundation
-suite cố ý dùng dependency ports đóng để kiểm tra lỗi; auth/events suites dùng DB test thật.
+suite cố ý dùng dependency ports đóng để kiểm tra lỗi; auth/events/booking dùng DB test thật.
 Events E2E seed tài khoản demo vào DB test và tạo sự kiện có tên riêng cho mỗi lần chạy.
 Chạy desktop/mobile, không mock REST responses. Báo cáo/trace bị Git ignore.
 CI đã cấu hình; kết quả remote chỉ xác nhận sau khi CI chạy.
@@ -146,6 +170,8 @@ apps/
       users/               # Own profile and password management
       organizations/       # Membership-scoped reads
       events/              # Public catalog, organizer CRUD/grid/staff, admin review/audit
+      booking/ orders/     # Atomic holds, reconciliation and server-priced orders
+      realtime/            # JWT room gateway, optional Redis adapter
       database/            # Prisma PostgreSQL lifecycle
       common/http/         # Request IDs, logs, errors, measured metrics
       config/ health/ monitoring/
@@ -155,6 +181,7 @@ apps/
     app/(public)/          # Home, events, system, login, register, profile
     app/(workspace)/       # Organizer event management, admin review, staff shell
     components/events/     # Catalog, forms, grids, dashboards and review dialogs
+    components/booking/    # Interactive map, countdown, realtime, checkout and orders
     components/auth/       # Forms, gates, bootstrap, profile
     components/ui/         # Accessible Radix/shadcn-style primitives
     lib/ stores/           # Validated API client, memory-only auth state
@@ -175,14 +202,18 @@ và route protection. Access token chỉ ở memory, không lưu browser storage
 
 Phase 2 đã merge qua [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4).
 Phase 3: event CRUD theo tổ chức, seat generator, staff assignment, admin approval,
-public catalog/details và KPI Organizer thực. Phase 4–7 bổ sung
-atomic booking, realtime, payment, QR, check-in, analytics và waiting room. Không
+public catalog/details và KPI Organizer thực. Phase 4: atomic booking, TTL cleanup,
+server-priced checkout orders và realtime. Phase 5–7 bổ sung payment, QR, check-in,
+analytics và waiting room. Không
 có KPI hardcode hoặc tuyên bố tải chưa đo. Chưa tạo worker khi chưa cần jobs.
 
 Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 3 plan](docs/phase-3-plan.md),
 [kiến trúc](docs/architecture.md), [database](docs/database.md), [API](docs/api.md).
 Phase 2 được người dùng chuyển cho `nvtank <tuannguyen.120910@gmail.com>`;
-commit timestamps dùng thời gian thực.
+author được giữ nguyên khi tái dựng ngày commit theo timeline.
 
 Phase 3 dùng author được xác nhận `nguyen-van-hoan <nguyenvanh842k5@gmail.com>`
 trên branch `feature/phase-3-events`, base develop `16f6146`.
+
+Ngày Git đã được mô phỏng theo yêu cầu mới của người dùng; xem [timeline và backup gốc](docs/commit-timeline.md).
+Kết quả kiểm thử dùng thời gian chạy thực, không mô phỏng.
