@@ -13,6 +13,12 @@ if (
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   transpilePackages: ['@tixflow/shared'],
+  async headers() {
+    return ['/login', '/register', '/profile'].map((source) => ({
+      source,
+      headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' }],
+    }));
+  },
   async rewrites() {
     return [{ source: '/api/v1/:path*', destination: `${parsedApiUrl.origin}/api/v1/:path*` }];
   },

@@ -11,6 +11,7 @@ export default defineConfig({
     hookTimeout: 30_000,
     env: {
       NODE_ENV: 'test',
+      GOOGLE_CLIENT_ID: '',
       PAYMENT_PROVIDER: 'mock',
       TICKET_SIGNING_KEY: 'test-only-persistent-ticket-signing-key-for-isolated-database-2026',
       PAYMENT_RECONCILE_INTERVAL_MS: '0',

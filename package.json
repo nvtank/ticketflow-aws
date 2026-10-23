@@ -34,7 +34,8 @@
     "payos:webhook:register": "node scripts/register-payos-webhook.mjs",
     "test:e2e:checkin": "pnpm build && node scripts/run-browser-regression.mjs checkin",
     "test:e2e:waiting": "pnpm build && node scripts/run-browser-regression.mjs waiting",
-    "test:e2e:integration": "pnpm build && node scripts/run-browser-regression.mjs"
+    "test:e2e:integration": "pnpm build && node scripts/run-browser-regression.mjs",
+    "test:e2e:google": "pnpm build && node scripts/run-browser-regression.mjs google"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

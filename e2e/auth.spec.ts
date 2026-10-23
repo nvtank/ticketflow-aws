@@ -54,3 +54,16 @@ test('reports actual PostgreSQL and Redis readiness', async ({ page }) => {
   await expect(page.getByText('Đã kết nối', { exact: true })).toHaveCount(3);
   await expect(page.getByText('Chưa kết nối', { exact: true })).toHaveCount(0);
 });
+
+test('keeps Google disabled and does not load its SDK without configuration', async ({ page }) => {
+  let sdkRequests = 0;
+  page.on('request', (request) => {
+    if (request.url().startsWith('https://accounts.google.com/gsi/')) sdkRequests++;
+  });
+  const config = await page.request.get('/api/v1/auth/google/config');
+  expect(await config.json()).toEqual({ enabled: false });
+  await page.goto('/login');
+  await expect(page.getByRole('button', { name: 'Đăng nhập', exact: true })).toBeEnabled();
+  await expect(page.getByText('Hoặc tiếp tục bằng Google', { exact: true })).toHaveCount(0);
+  expect(sdkRequests).toBe(0);
+});

@@ -131,3 +131,11 @@ and CHECK 1–500. Existing WaitingRoomSession unique(eventId,userId) holds stab
 identity/activity timestamps; Redis owns lease status and expiry enforcement.
 Notification uses indexed (userId,readAt,createdAt) for owned paginated receipts;
 mark-read updates only unread owned rows, preserving the first read timestamp.
+
+## Google identities
+
+Migration `20261023050000_google_identity` makes User.passwordHash nullable for
+Google-only accounts and adds ExternalIdentity with unique(provider,subject) and
+unique(userId,provider). Identity creation and session issuance share one transaction.
+Existing passwords/users are preserved. Subject is authoritative; matching an email
+never silently attaches a Google identity. Deleting a user cascades its identities.

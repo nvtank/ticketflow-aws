@@ -1,5 +1,12 @@
+import type { GoogleIdentity } from './google/google-token-verifier';
 import { createHash, randomBytes } from 'node:crypto';
-import { ConflictException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import type { User, UserSession } from '../generated/prisma/client';
 import { DatabaseService } from '../database/database.service';
@@ -119,6 +126,128 @@ export class AuthService {
       return { user: current, ...(await this.newSession(tx, current.id)) };
     });
     return this.result(created.user, created.session, created.refresh);
+  }
+
+  async googleLogin(identity: GoogleIdentity): Promise<AuthResult> {
+    try {
+      const created = await this.database.$transaction(
+        async (tx) => {
+          await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`google:${identity.subject}`}, 0))::text`;
+          const linked = await tx.externalIdentity.findUnique({
+            where: { provider_subject: { provider: 'GOOGLE', subject: identity.subject } },
+          });
+          let user: User;
+          if (linked) {
+            await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id"=${linked.userId}::uuid FOR UPDATE`;
+            user = await tx.user.findUniqueOrThrow({ where: { id: linked.userId } });
+          } else {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`google-email:${identity.email}`}, 0))::text`;
+            if (await tx.user.findUnique({ where: { email: identity.email } }))
+              throw new ConflictException(
+                'Email đã có tài khoản. Hãy đăng nhập bằng phương thức hiện tại rồi liên kết Google trong hồ sơ.',
+              );
+            user = await tx.user.create({
+              data: {
+                email: identity.email,
+                name: identity.name,
+                passwordHash: null,
+                role: 'CUSTOMER',
+              },
+            });
+            await tx.externalIdentity.create({
+              data: { provider: 'GOOGLE', subject: identity.subject, userId: user.id },
+            });
+            await tx.auditLog.create({
+              data: {
+                actorId: user.id,
+                action: 'AUTH_GOOGLE_REGISTER',
+                entityType: 'User',
+                entityId: user.id,
+              },
+            });
+          }
+          if (!user.isActive) throw new UnauthorizedException('Tài khoản không khả dụng.');
+          const login = await this.newSession(tx, user.id);
+          await tx.auditLog.create({
+            data: {
+              actorId: user.id,
+              action: 'AUTH_GOOGLE_LOGIN',
+              entityType: 'UserSession',
+              entityId: login.session.id,
+            },
+          });
+          return { user, ...login };
+        },
+        { maxWait: 10000, timeout: 10000 },
+      );
+      return this.result(created.user, created.session, created.refresh);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+        throw new ConflictException(
+          'Email đã có tài khoản. Hãy đăng nhập trước khi liên kết Google.',
+        );
+      throw error;
+    }
+  }
+
+  async linkGoogle(userId: string, sessionId: string, identity: GoogleIdentity) {
+    try {
+      return await this.database.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`google:${identity.subject}`}, 0))::text`;
+        await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id"=${userId}::uuid FOR UPDATE`;
+        const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
+        const session = await tx.userSession.findFirst({
+          where: { id: sessionId, userId, revokedAt: null, expiresAt: { gt: new Date() } },
+        });
+        if (!user.isActive || !session)
+          throw new UnauthorizedException('Phiên đăng nhập không còn hiệu lực.');
+        if (Date.now() - session.createdAt.getTime() > 600000)
+          throw new ForbiddenException('Hãy đăng nhập lại trước khi liên kết Google.');
+        if (identity.email !== user.email)
+          throw new ConflictException(
+            'Vui lòng chọn tài khoản Google có cùng email với tài khoản TixFlow.',
+          );
+        const existing = await tx.externalIdentity.findUnique({
+          where: { provider_subject: { provider: 'GOOGLE', subject: identity.subject } },
+        });
+        if (existing && existing.userId !== userId)
+          throw new ConflictException('Google này đã liên kết với tài khoản khác.');
+        const own = await tx.externalIdentity.findUnique({
+          where: { userId_provider: { userId, provider: 'GOOGLE' } },
+        });
+        if (own && own.subject !== identity.subject)
+          throw new ConflictException('Tài khoản đã liên kết với một Google khác.');
+        if (!existing) {
+          const linked = await tx.externalIdentity.create({
+            data: { userId, provider: 'GOOGLE', subject: identity.subject },
+          });
+          await tx.auditLog.create({
+            data: {
+              actorId: userId,
+              action: 'AUTH_GOOGLE_LINKED',
+              entityType: 'ExternalIdentity',
+              entityId: linked.id,
+            },
+          });
+        }
+        return { linked: true };
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+        throw new ConflictException('Tài khoản Google đã được liên kết.');
+      throw error;
+    }
+  }
+
+  async methods(userId: string) {
+    const user = await this.database.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: {
+        passwordHash: true,
+        identities: { where: { provider: 'GOOGLE' }, select: { id: true } },
+      },
+    });
+    return { hasPassword: !!user.passwordHash, googleLinked: user.identities.length > 0 };
   }
 
   async refresh(value?: string): Promise<AuthResult> {

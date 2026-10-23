@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { GoogleAuthButton } from './google-auth-button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -156,6 +157,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         <LockKeyhole className="size-3.5" />
         Thông tin tài khoản được bảo vệ.
       </p>
+      <GoogleAuthButton />
       <p className="pt-3 text-center text-sm text-muted-foreground">
         {mode === 'register' ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
         <Link

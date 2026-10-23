@@ -80,6 +80,13 @@ export class AuthController {
     response.setHeader('Cache-Control', 'no-store');
   }
 
+  @Get('methods')
+  @ApiBearerAuth()
+  methods(@CurrentPrincipal() p: Principal, @Res({ passthrough: true }) res: Response) {
+    res.setHeader('Cache-Control', 'no-store');
+    return this.auth.methods(p.user.id);
+  }
+
   @Get('me')
   @ApiBearerAuth()
   me(@CurrentPrincipal() principal: Principal, @Res({ passthrough: true }) response: Response) {
