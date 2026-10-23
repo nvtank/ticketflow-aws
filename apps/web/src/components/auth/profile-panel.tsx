@@ -3,16 +3,17 @@
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useAuthState } from '@/stores/auth';
-import { apiRequest } from '@/lib/api-client';
+import { apiRequest, apiGet } from '@/lib/api-client';
 import { authUserSchema } from '@/lib/auth-session';
 import { LogoutButton } from './logout-button';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { GoogleAuthButton } from './google-auth-button';
 
 const profileSchema = z.object({
   name: z.string().trim().min(2, 'Họ tên cần ít nhất 2 ký tự.').max(100),
@@ -47,6 +48,12 @@ const passwordSchema = z
 
 export function ProfilePanel() {
   const user = useAuthState((state) => state.user);
+  const methods = useQuery({
+    queryKey: ['auth', 'methods'],
+    queryFn: () =>
+      apiGet('/auth/methods', z.object({ hasPassword: z.boolean(), googleLinked: z.boolean() })),
+    retry: false,
+  });
   const profile = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     values: { name: user?.name ?? '', phone: user?.phone ?? '' },
@@ -135,45 +142,80 @@ export function ProfilePanel() {
             </Button>
           </form>
         </Card>
-        <Card>
-          <h2 className="text-xl font-semibold">Đổi mật khẩu</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Sau khi đổi mật khẩu, bạn cần đăng nhập lại trên tất cả thiết bị.
-          </p>
-          <form
-            className="mt-6 space-y-5"
-            onSubmit={password.handleSubmit((input) => change.mutate(input))}
-            noValidate
-          >
-            {[
-              { key: 'currentPassword', label: 'Mật khẩu hiện tại', complete: 'current-password' },
-              { key: 'newPassword', label: 'Mật khẩu mới', complete: 'new-password' },
-              { key: 'confirmPassword', label: 'Xác nhận mật khẩu mới', complete: 'new-password' },
-            ].map(({ key, label, complete }) => {
-              const field = key as keyof z.infer<typeof passwordSchema>;
-              return (
-                <div key={key}>
-                  <label htmlFor={key} className="mb-2 block text-sm font-medium">
-                    {label}
-                  </label>
-                  <Input
-                    id={key}
-                    type="password"
-                    autoComplete={complete}
-                    {...password.register(field)}
-                    aria-invalid={!!password.formState.errors[field]}
-                    aria-describedby={`${key}-error`}
-                  />
-                  <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
-                    {password.formState.errors[field]?.message}
-                  </p>
-                </div>
-              );
-            })}
-            <Button disabled={change.isPending} type="submit">
-              {change.isPending ? 'Đang cập nhật…' : 'Đổi mật khẩu'}
-            </Button>
-          </form>
+        {methods.data?.hasPassword && (
+          <Card>
+            <h2 className="text-xl font-semibold">Đổi mật khẩu</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Sau khi đổi mật khẩu, bạn cần đăng nhập lại trên tất cả thiết bị.
+            </p>
+            <form
+              className="mt-6 space-y-5"
+              onSubmit={password.handleSubmit((input) => change.mutate(input))}
+              noValidate
+            >
+              {[
+                {
+                  key: 'currentPassword',
+                  label: 'Mật khẩu hiện tại',
+                  complete: 'current-password',
+                },
+                { key: 'newPassword', label: 'Mật khẩu mới', complete: 'new-password' },
+                {
+                  key: 'confirmPassword',
+                  label: 'Xác nhận mật khẩu mới',
+                  complete: 'new-password',
+                },
+              ].map(({ key, label, complete }) => {
+                const field = key as keyof z.infer<typeof passwordSchema>;
+                return (
+                  <div key={key}>
+                    <label htmlFor={key} className="mb-2 block text-sm font-medium">
+                      {label}
+                    </label>
+                    <Input
+                      id={key}
+                      type="password"
+                      autoComplete={complete}
+                      {...password.register(field)}
+                      aria-invalid={!!password.formState.errors[field]}
+                      aria-describedby={`${key}-error`}
+                    />
+                    <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
+                      {password.formState.errors[field]?.message}
+                    </p>
+                  </div>
+                );
+              })}
+              <Button disabled={change.isPending} type="submit">
+                {change.isPending ? 'Đang cập nhật…' : 'Đổi mật khẩu'}
+              </Button>
+            </form>
+          </Card>
+        )}
+        <Card className="space-y-4">
+          <h2 className="text-xl font-semibold">Phương thức đăng nhập</h2>
+          {methods.data ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {methods.data.googleLinked
+                  ? 'Đã liên kết Google. Bạn có thể dùng Google để đăng nhập.'
+                  : 'Bạn có thể liên kết Google cùng email sau khi đăng nhập gần đây.'}
+              </p>
+              {!methods.data.hasPassword && (
+                <p className="text-sm">Tài khoản dùng Google và chưa có mật khẩu riêng.</p>
+              )}
+              {!methods.data.googleLinked && <GoogleAuthButton intent="link" />}
+            </>
+          ) : (
+            <p
+              role={methods.isError ? 'alert' : 'status'}
+              className="text-sm text-muted-foreground"
+            >
+              {methods.isError
+                ? 'Chưa tải được phương thức đăng nhập.'
+                : 'Đang tải phương thức đăng nhập…'}
+            </p>
+          )}
         </Card>
       </div>
       <p className="mt-8 text-sm text-muted-foreground">
