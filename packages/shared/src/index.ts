@@ -172,9 +172,14 @@ export interface RealtimeServerEvents {
   'seat:released': (update: InventoryUpdate) => void;
   'seat:sold': (update: InventoryUpdate) => void;
   'inventory:updated': (update: InventoryUpdate) => void;
+  'checkin:updated': (update: CheckInUpdate) => void;
   'order:updated': (update: { orderId: string; eventId: string; status: OrderStatus }) => void;
 }
 export interface RealtimeClientEvents {
+  'staff:event:join': (
+    input: { eventId: string },
+    acknowledge: (result: EventRoomAck) => void,
+  ) => void;
   'event:join': (input: { eventId: string }, acknowledge: (result: EventRoomAck) => void) => void;
 }
 
@@ -202,4 +207,80 @@ export interface TicketView {
   createdAt: string;
   event: { title: string; slug: string; startsAt: string; venueName: string; address: string };
   qrCredential: string | null;
+}
+
+export interface CheckInUpdate {
+  eventId: string;
+  revision: number;
+  occurredAt: string;
+}
+export type AdmissionOutcome =
+  | 'VALID'
+  | 'ALREADY_USED'
+  | 'WRONG_EVENT'
+  | 'CANCELLED'
+  | 'INVALID'
+  | 'EVENT_UNAVAILABLE'
+  | 'CHECKED_IN';
+export interface AdmissionResult {
+  outcome: AdmissionOutcome;
+  message: string;
+  ticket: {
+    id: string;
+    code: string;
+    seatCode: string;
+    section: string;
+    status: TicketStatus;
+    checkedInAt: string | null;
+  } | null;
+}
+export interface StaffEvent {
+  id: string;
+  title: string;
+  startsAt: string;
+  status: EventStatus;
+  venueName: string;
+  totalTickets: number;
+  checkedIn: number;
+}
+export interface AttendanceStats {
+  eventId: string;
+  revision: number;
+  serverTime: string;
+  totalTickets: number;
+  checkedIn: number;
+  remaining: number;
+  cancelled: number;
+  hourly: { label: string; count: number }[];
+}
+export interface AnalyticsReport {
+  from: string;
+  to: string;
+  timezone: string;
+  totalEvents: number;
+  paidOrders: number;
+  revenueVnd: number;
+  soldTickets: number;
+  availableSeats: number;
+  heldSeats: number;
+  soldSeats: number;
+  capacity: number;
+  occupancy: number;
+  checkIns: number;
+  revenueByDay: { date: string; revenueVnd: number; orders: number }[];
+  sections: {
+    eventId: string;
+    eventTitle: string;
+    section: string;
+    sold: number;
+    available: number;
+    checkedIn: number;
+  }[];
+  recentOrders: {
+    id: string;
+    eventTitle: string;
+    totalVnd: number;
+    createdAt: string;
+    status: OrderStatus;
+  }[];
 }

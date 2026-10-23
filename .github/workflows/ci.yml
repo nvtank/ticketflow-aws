@@ -40,6 +40,7 @@ jobs:
       - run: pnpm exec playwright test --config playwright.events.config.ts
       - run: pnpm exec playwright test --config playwright.booking.config.ts
       - run: pnpm exec playwright test --config playwright.payments.config.ts
+      - run: pnpm exec playwright test --config playwright.checkin.config.ts
       - run: pnpm test:infra:down
         if: always()
       - uses: actions/upload-artifact@v7

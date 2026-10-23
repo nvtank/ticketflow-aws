@@ -1,3 +1,6 @@
+import { AnalyticsModule } from './analytics/analytics.module';
+import { AdminModule } from './admin/admin.module';
+import { CheckInModule } from './check-in/check-in.module';
 import { PaymentsModule } from './payments/payments.module';
 import { BookingModule } from './booking/booking.module';
 import { RealtimeModule } from './realtime/realtime.module';
@@ -5,7 +8,7 @@ import { EventsModule } from './events/events.module';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { MetricsService } from './common/http/metrics.service';
+import { MetricsModule } from './common/http/metrics.service';
 import { ConfigurationModule } from './config/configuration.module';
 import { HealthModule } from './health/health.module';
 import { MonitoringController } from './monitoring/monitoring.controller';
@@ -18,6 +21,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
 @Module({
   imports: [
     ConfigurationModule,
+    MetricsModule,
     HealthModule,
     DatabaseModule,
     AuthModule,
@@ -27,11 +31,13 @@ import { OrganizationsModule } from './organizations/organizations.module';
     RealtimeModule,
     BookingModule,
     PaymentsModule,
+    CheckInModule,
+    AnalyticsModule,
+    AdminModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
   ],
   controllers: [MonitoringController],
   providers: [
-    MetricsService,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
   ],

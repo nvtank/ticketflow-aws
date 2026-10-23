@@ -1,4 +1,4 @@
-# API — Phase 5
+# API — Phase 6
 
 Base http://localhost:4000/api/v1; Swagger development/test tại
 http://localhost:4000/api/docs. Default yêu cầu Bearer JWT; chỉ route Public bỏ qua
@@ -193,3 +193,24 @@ can retain valid tickets while a distinct extra transfer requires review; otherw
 late/mismatched settlements produce no tickets. The browser's success/failed URL
 and its parameters never authorize ticket issuance. See [payments.md](payments.md)
 for setup, exact-settlement limits and actual external verification evidence.
+
+## Phase 6 — Staff, analytics and admin
+
+- STAFF: GET `/check-in/events`, GET `/check-in/events/:id/stats`; assignment required.
+- POST `/check-in/verify` (201) and `/check-in/confirm` (201), body
+  `{eventId,credential}`. Verify returns explicit outcome without consuming a ticket.
+  Confirm rechecks assignment/credential/state inside transaction; used → 409,
+  wrong/cancelled/invalid → 422, unassigned → 403. Random manual ticket codes or
+  signed QR accepted; no client-declared seat rights. 240 requests/IP/min per action.
+- ORGANIZER: GET `/organizer/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD&eventId=&organizationId=`.
+  Membership scope, inclusive Vietnam dates, max 366 days. Revenue/tickets use PAID
+  orders in the period; inventory/check-in are current lifetime totals. No duplicate
+  revenue from retries/extra transfers. Ten recent orders, up to 100 section groups.
+- ADMIN: GET `/admin/dashboard`, `/admin/monitoring`, `/admin/users?q=&role=&page=`,
+  `/admin/users/:id`, `/admin/organizations?status=&page=`, organization `/:id/history`.
+- PATCH `/admin/users/:id/access` body `{isActive,reason}`; sessions revoked on lock,
+  all ADMIN targets protected. PATCH `/admin/organizations/:id/review` body
+  `{decision:APPROVED|REJECTED,reason}`, pending-only, atomic audit. Reasons 10–500 chars.
+- Socket `staff:event:join` reauthenticates STAFF assignment, room `staff-event:{id}`.
+  `checkin:updated` contains eventId/revision/occurredAt only after commit; REST resync
+  on reconnect/poll. Revocation leaves staff room; account lock disconnects sockets.

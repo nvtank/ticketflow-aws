@@ -50,9 +50,17 @@ export function DashboardShell({
         {[
           { href: details.base, label: 'Tổng quan', icon: LayoutDashboard },
           ...(role === 'ORGANIZER'
-            ? [{ href: '/organizer/events', label: 'Quản lý sự kiện', icon: Ticket }]
+            ? [
+                { href: '/organizer/events', label: 'Quản lý sự kiện', icon: Ticket },
+                { href: '/organizer/analytics', label: 'Phân tích bán vé', icon: Activity },
+              ]
             : role === 'ADMIN'
-              ? [{ href: '/admin/events', label: 'Phê duyệt sự kiện', icon: Ticket }]
+              ? [
+                  { href: '/admin/events', label: 'Phê duyệt sự kiện', icon: Ticket },
+                  { href: '/admin/users', label: 'Người dùng', icon: Users },
+                  { href: '/admin/organizations', label: 'Tổ chức', icon: ShieldCheck },
+                  { href: '/admin/monitoring', label: 'Giám sát', icon: Activity },
+                ]
               : []),
           { href: '/profile', label: 'Hồ sơ của tôi', icon: Users },
           { href: '/system', label: 'Trạng thái hệ thống', icon: Activity },

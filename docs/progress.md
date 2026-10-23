@@ -615,3 +615,63 @@ Danh sách sau commit xuất tại `test-results/phase-5-commits.txt` (ignored).
 
 Phase 5 artifacts local: `.local/phase-5-*.log`, screenshots `test-results/phase-5-verified/`.
 Sau E2E, `.next` đã được chép về thư mục workspace thường; không còn phụ thuộc symlink `/tmp`.
+
+## Phase 6 — Check-in & Analytics
+
+Owner authorized: **hoangphatdev <latruonghoangphat@gmail.com>**. Branch
+`feature/phase-6-checkin`, base `113c52b`. PR #9 Phase 5 đã merge trên GitHub.
+17 meaningful commits including final documentation; simulated dates 15–18/10/2026.
+Actual validation: 23/10/2026. [Breakdown](phase-6-plan.md).
+
+Implemented: active assigned STAFF-only verification; atomic admission with event/
+user/ticket locks, one CheckIn record, timestamp/staff/audit/revision; signed QR/hash
+or random manual code; used/cancelled/wrong-event/invalid outcomes. Private realtime
+attendance hints/revocation and REST recovery. Mobile camera UI plus manual fallback.
+Organizer scoped paid revenue, Vietnam daily dates, inventory/sections/attendance
+and recent orders with Recharts. ADMIN KPIs, measured process monitoring, user
+filter/access lock/unlock (session revocation, ADMIN protection), pending organization
+review with atomic audited decisions. No fake business/queue metrics.
+
+Evidence: API/Next production builds PASS, strict typecheck PASS. Real DB/Redis
+integration 8/8 (43.46s), including 20/100 simultaneous confirmations: exactly one
+201, all others 409; one audit/check-in. Wrong role/event/QR/cancelled/revoked,
+Vietnam revenue boundary, organization scope, account lock/unlock and concurrent
+org review also checked. Check-in E2E 2/2 desktop/mobile (1.4m) covers customer
+payment -> QR -> staff manual verification/admission -> duplicate rejection ->
+organizer attendance increases. Full unit run: 92 pass plus one decoder test failed
+because MultiFormatReader required initialization; corrected test to QRCodeReader
+(the browser scanner's reader) and targeted rerun passed 1/1 (11.24s). Phase 7 will
+run full regression including the corrected test. Lint imports corrected; final
+lint/format results checked before delivery.
+
+Limits: physical mobile camera not exercised; actual QR image rendering/decoding
+was tested. No automatic gate time window; assigned STAFF can admit PUBLISHED events
+for local demo. No automatic refunds, durable socket outbox or production load claim.
+Existing pg@8 generator warning remains. Phase 7 waiting room/quality is next and
+explicitly requested in the same session. No AWS resources.
+
+16 pre-delivery commits (final commit hash obtained from Git after commit):
+
+```text
+1b6bc3c docs: plan phase six check-in and analytics
+ac96580 chore(web): install QR scanner and analytics charts
+b9439a7 feat(db): index attendance and paid order reporting
+d072847 feat(shared): define admission reporting and realtime contracts
+cf034bc feat(checkin): define validated credential and admission policies
+72a4b6b feat(checkin): verify assigned staff and confirm admission atomically
+282fe16 feat(staff): expose assigned events and consistent attendance stats
+a756082 feat(analytics): aggregate scoped sales and Vietnam daily revenue
+71adc7d feat(admin): aggregate real metrics and enforce account review rules
+dde6949 feat(api): wire check-in analytics and administrator endpoints
+dccef63 feat(realtime): publish private attendance hints and revoke staff rooms
+56b8b29 feat(web): implement mobile staff scanning and manual admission
+51bc41a feat(web): visualize organizer revenue inventory and attendance
+be537f6 feat(web): implement admin dashboard account and organization review
+01842dc test(checkin): verify admission dates money and real QR decoding
+a412138 test(checkin): prove concurrent admission and customer to staff flow
+
+```
+
+Full list: `git log --reverse --format='%h %s' 113c52b..feature/phase-6-checkin`;
+count: `git rev-list --count 113c52b..feature/phase-6-checkin`.
+Artifacts/logs: `.local/phase-6-*.log`, `test-results/phase-6-commits.txt` (ignored).
