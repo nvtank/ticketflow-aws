@@ -28,8 +28,15 @@ export function useAttendance(eventId: string) {
       const hint = z.object({ eventId: z.uuid(), revision: z.number().int() }).safeParse(raw);
       if (hint.success && hint.data.eventId === eventId) resync();
     });
-    socket.on('connect_error', () => {
-      if (!refreshing) {
+    socket.on('connect_error', (error) => {
+      const data: unknown = 'data' in error ? error.data : null;
+      if (
+        typeof data === 'object' &&
+        data !== null &&
+        'code' in data &&
+        data.code === 'UNAUTHENTICATED' &&
+        !refreshing
+      ) {
         refreshing = true;
         void refreshSession()
           .then(() => {

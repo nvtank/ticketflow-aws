@@ -1,5 +1,15 @@
-import { ArrayMaxSize, ArrayMinSize, ArrayUnique, IsArray, IsUUID } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  ArrayUnique,
+  IsArray,
+  IsUUID,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 export class CreateHoldDto {
+  @IsOptional() @IsString() @MaxLength(256) admissionToken?: string;
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(10)

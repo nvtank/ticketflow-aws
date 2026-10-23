@@ -19,6 +19,8 @@ export const eventDetailSchema = eventListSchema.shape.items.element.extend({
   galleryUrls: z.array(z.url()),
   maxTicketsPerOrder: z.number().int(),
   inventoryRevision: z.number().int(),
+  waitingRoomEnabled: z.boolean(),
+  waitingRoomCapacity: z.number().int(),
   rejectionReason: z.string().nullable(),
   organization: z.object({ id: z.string(), name: z.string() }),
   venue: z.object({ id: z.string(), name: z.string(), city: z.string(), address: z.string() }),

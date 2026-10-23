@@ -123,3 +123,11 @@ locks event KEY SHARE, staff user SHARE, then ticket FOR UPDATE. Assignment remo
 and event changes take event UPDATE locks; account locks take user UPDATE locks.
 VALID -> USED, unique CheckIn(ticketId), staff/time/audit/revision commit together.
 A second concurrent confirm sees USED and returns 409. Verify does not mutate.
+
+## Phase 7
+
+Migration `20261023040000_waiting_capacity` adds Event.waitingRoomCapacity default20
+and CHECK 1–500. Existing WaitingRoomSession unique(eventId,userId) holds stable
+identity/activity timestamps; Redis owns lease status and expiry enforcement.
+Notification uses indexed (userId,readAt,createdAt) for owned paginated receipts;
+mark-read updates only unread owned rows, preserving the first read timestamp.

@@ -105,6 +105,8 @@ export interface EventDetail extends EventSummary {
   ticketPolicy: string;
   galleryUrls: string[];
   maxTicketsPerOrder: number;
+  waitingRoomEnabled: boolean;
+  waitingRoomCapacity: number;
   inventoryRevision: number;
   rejectionReason: string | null;
   organization: { id: string; name: string };
@@ -283,4 +285,17 @@ export interface AnalyticsReport {
     createdAt: string;
     status: OrderStatus;
   }[];
+}
+
+export interface WaitingRoomStatus {
+  eventId: string;
+  state: 'DISABLED' | 'NOT_JOINED' | 'WAITING' | 'ADMITTED';
+  position: number;
+  peopleAhead: number;
+  queued: number;
+  active: number;
+  capacity: number;
+  expiresAt: string | null;
+  serverTime: string;
+  admissionToken: string | null;
 }
