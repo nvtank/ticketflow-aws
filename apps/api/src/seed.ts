@@ -209,9 +209,15 @@ async function seed(): Promise<void> {
           create: { eventId: id(201), userId: id(3) },
         });
         if (!(await tx.order.findUnique({ where: { id: id(700) } }))) {
+          const requested = await tx.seat.findMany({
+            where: { eventId: id(201), code: { in: ['A01', 'A02'] } },
+            select: { id: true },
+            orderBy: { id: 'asc' },
+          });
           const hold = await tx.seatHold.create({
             data: {
               id: id(701),
+              requestedSeatIds: requested.map((seat) => seat.id),
               userId: id(4),
               eventId: id(201),
               expiresAt: new Date(now.getTime() - 300_000),

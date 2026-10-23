@@ -113,7 +113,8 @@ describe('Real Nest HTTP foundation (no database or Redis mocks)', () => {
   it('publishes actual OpenAPI paths', async () => {
     const result = await request(app.getHttpServer()).get('/api/docs-json').expect(200);
     expect(result.body.paths).toHaveProperty('/api/v1/health');
-    expect(result.body.paths).not.toHaveProperty('/api/v1/orders');
+    expect(result.body.paths).toHaveProperty('/api/v1/orders');
+    expect(result.body.paths).not.toHaveProperty('/api/v1/payments');
   });
 
   it('enforces rate limits with HTTP 429', async () => {

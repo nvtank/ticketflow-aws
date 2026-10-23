@@ -13,7 +13,7 @@ flowchart LR
 ```
 
 Implemented modules: configuration, health, monitoring, database, auth, users,
-organizations, events. Guards default-deny and enforce JWT sessions/roles. Organization
+organizations, events, booking/orders and realtime. Guards default-deny and enforce JWT sessions/roles. Organization
 service checks membership with explicit ADMIN bypass. Controllers handle DTO/HTTP;
 services own transactions. Frontend gates provide loading/error/denial UX.
 
@@ -30,8 +30,9 @@ refresh fails closed and may require login again.
 
 Helmet, CORS whitelist, validation, per-process throttle, request IDs, sanitized
 logs/errors and Swagger are configured. Metrics/Swagger remain disabled in production.
-Health queries actual PostgreSQL/Redis with timeouts; metrics count HTTP only.
-Redis has no auth/session business role yet.
+Health queries actual PostgreSQL/Redis with timeouts; local metrics measure HTTP,
+booking outcomes, valid held seats and live Socket.IO connections. Redis provides
+the optional Socket.IO adapter; PostgreSQL owns authentication and reservations.
 
 PostgreSQL 17/Redis 7.4 run in Docker, loopback ports, persistent dev volumes. Test
 stack uses 55432/56379 and PostgreSQL tmpfs. Domain schema prepares later phases;
@@ -51,15 +52,11 @@ staff assignments and admin review/history APIs. URL filters, pagination, valida
 confirm dialogs and server errors are handled without mocked business responses.
 Image URLs render directly in browsers without server image fetching/optimization.
 
-Read snapshots include inventory revision for the upcoming realtime phase. There
-are no Socket.IO broadcasts or reservation endpoints yet. API/database remain the
+Read snapshots include inventory revision for the upcoming realtime phase. Phase 4 now implements Socket.IO broadcasts and reservation endpoints. API/database remain the
 source of truth. Detailed analytics and admin system dashboards are still planned.
 
 ## Remaining phases
 
-- Phase 4: sorted PostgreSQL row locks/conditional updates, atomic holds, server TTL,
-  reconciliation and Socket.IO after commit. Redis never decides ownership. REST
-  snapshots reconcile missed/stale revisions.
 - Phase 5: PaymentProvider, signed local mock callbacks, atomic/idempotent sale/order/
   ticket finalization, opaque QR. Late payment requires refund, never reclaims sold seats.
 - Phase 6: staff-event authorization, atomic VALID → USED check-in and aggregates.
@@ -71,3 +68,26 @@ need distinct adapters and retry/idempotency semantics.
 
 Future adapters may target Cognito, RDS/Aurora, ElastiCache, S3, SQS, ECS, CloudWatch.
 No AWS resources are provisioned and no AWS SDK is required for local execution.
+
+## Booking and realtime (Phase 4)
+
+BookingModule contains DTO/policy/lock helpers, atomic hold service, owner snapshots,
+release/reconciliation and order creation. InventoryPublisher separates domain
+transactions from Socket.IO. The global RealtimeModule authenticates rooms and
+optionally uses Redis Pub/Sub across instances. Domain services emit only after
+commit; delivery failure does not undo committed ownership. Redis/Socket payloads
+never authorize a purchase.
+
+Frontend selection is transient Zustand state, distinct from PostgreSQL holds.
+Confirmation, idempotent retries, server-based countdown and reload snapshots keep
+ownership explicit. Map colors reflect private effective states; stale REST and
+out-of-order event revisions cannot replace newer snapshots. Periodic REST sync
+covers missed emissions and reconnect. Checkout is a pending order, not payment.
+
+Local scheduler runs in the API process (no BullMQ worker needed yet); each scan is
+idempotent across instances and PostgreSQL remains authoritative. Startup with the
+Redis adapter configured requires Redis; default single-instance mode keeps
+readiness diagnostics available when dependencies fail. No AWS resources exist.
+
+Documentation records actual execution dates. Git author/committer dates have been
+explicitly reconstructed for the user's project timeline; see commit-timeline.md.
