@@ -13,7 +13,7 @@ flowchart LR
 ```
 
 Implemented modules: configuration, health, monitoring, database, auth, users,
-organizations. Guards default-deny and enforce JWT sessions/roles. Organization
+organizations, events. Guards default-deny and enforce JWT sessions/roles. Organization
 service checks membership with explicit ADMIN bypass. Controllers handle DTO/HTTP;
 services own transactions. Frontend gates provide loading/error/denial UX.
 
@@ -37,10 +37,26 @@ PostgreSQL 17/Redis 7.4 run in Docker, loopback ports, persistent dev volumes. T
 stack uses 55432/56379 and PostgreSQL tmpfs. Domain schema prepares later phases;
 seed only runs development/test. No business dashboards are hardcoded.
 
+## Event management (Phase 3)
+
+EventsModule contains separate public/organizer/admin controllers, validated DTOs,
+lifecycle policy, draft/grid/review/staff services and shared record projection.
+Organizer writes require membership in an approved organization. Review belongs to
+ADMIN; public reads require published events and approved organizations. Rows are
+locked during lifecycle changes, preventing concurrent grid edits from invalidating
+a submitted event. Audit is stored inside the same transaction.
+
+Frontend uses real catalog, organizer aggregates, editable draft forms, seat grid,
+staff assignments and admin review/history APIs. URL filters, pagination, validation,
+confirm dialogs and server errors are handled without mocked business responses.
+Image URLs render directly in browsers without server image fetching/optimization.
+
+Read snapshots include inventory revision for the upcoming realtime phase. There
+are no Socket.IO broadcasts or reservation endpoints yet. API/database remain the
+source of truth. Detailed analytics and admin system dashboards are still planned.
+
 ## Remaining phases
 
-- Phase 3: event CRUD, venue/section/ticket types, grid generator, staff assignment,
-  admin approval/audit. Scope organizer writes to membership.
 - Phase 4: sorted PostgreSQL row locks/conditional updates, atomic holds, server TTL,
   reconciliation and Socket.IO after commit. Redis never decides ownership. REST
   snapshots reconcile missed/stale revisions.

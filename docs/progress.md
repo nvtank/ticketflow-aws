@@ -1,6 +1,6 @@
 # Tiến độ TixFlow
 
-Cập nhật: 22/10/2026, múi giờ Asia/Ho_Chi_Minh. Timeline 20/09–22/10 trong đề bài là
+Cập nhật: 23/10/2026, múi giờ Asia/Ho_Chi_Minh. Timeline 20/09–22/10 trong đề bài là
 kế hoạch; lịch sử Git dùng thời điểm thực tế, không backdate.
 
 ## Phase 1 — Project Setup & Design System
@@ -12,7 +12,7 @@ Phụ trách: `hoangphatdev`. Người dùng đã xác nhận author
 `hoangphatdev <latruonghoangphat@gmail.com>`. Tổng cộng 17 commit có nội dung thực
 khi bao gồm commit tài liệu cuối. Branch: `feature/phase-1-foundation`.
 `main`/`develop` giữ baseline kế hoạch `4d7bee4`. Cả ba branch đã push;
-[PR #2](https://github.com/nvtank/ticketflow-aws/pull/2) mở vào develop, chưa merge.
+[PR #2](https://github.com/nvtank/ticketflow-aws/pull/2) đã merge vào develop (cập nhật Phase 3).
 Phase 1 có commit cuối thực tế `88a6bfa`.
 
 ### Đã triển khai
@@ -111,7 +111,8 @@ hash thực tế được báo trong kết quả bàn giao và `git log` sau com
 
 Phụ trách được người dùng chuyển từ nguyen-van-hoan sang **nvtank**, author đã xác
 nhận `nvtank <tuannguyen.120910@gmail.com>`. Branch `feature/phase-2-auth` dựa trên
-Phase 1 `88a6bfa` trong lúc PR #2 chờ review. Phase 2 chưa push/PR/merge. Kế hoạch
+Phase 1 `88a6bfa` trong lúc PR #2 chờ review. Cập nhật Phase 3: Phase 2 đã push và
+[PR #4](https://github.com/nvtank/ticketflow-aws/pull/4) đã merge vào develop tại `16f6146`. Kế hoạch
 17 atomic commits; dùng timestamp thực tế. Xem [phase-2-plan.md](phase-2-plan.md).
 
 ### Đã triển khai
@@ -215,3 +216,122 @@ e25c2ce feat(auth): enforce backend roles and organization membership
 Commit bàn giao cuối chứa README/API/database/progress và chỉnh nhãn bản local;
 hash của chính commit đó lấy bằng `git log -1` sau khi commit. Không tự ghi hash
 của một commit chưa tồn tại.
+
+## Phase 3 — Event Management
+
+Phụ trách/author theo xác nhận mới của người dùng:
+**nguyen-van-hoan <nguyenvanh842k5@gmail.com>**. Branch `feature/phase-3-events`,
+base develop `16f61469c6ea2943451f179207eef89461db96ed`. Xem
+[commit breakdown](phase-3-plan.md). Dùng thời gian thực, không gán author khác.
+
+### Đã triển khai
+
+- Migration gallery URLs/indexes áp dụng trên PostgreSQL development và test.
+- Organizer tạo/sửa/xóa nháp thuộc tổ chức, nhập địa điểm/ảnh/chính sách/lịch bán,
+  lọc/phân trang trạng thái, gửi duyệt và sửa bản bị từ chối.
+- Generator 1–8 khu, giá integer VND, 1–26 hàng × 1–40 cột/khu, tối đa 2.000 ghế.
+  Tạo lại nguyên tử; khóa khi có đơn hàng/lịch sử giữ ghế. Không bật/tắt SOLD/HELD.
+- Gán/gỡ STAFF đang hoạt động theo từng sự kiện; không cấp quyền mọi sự kiện.
+- ADMIN xem hàng chờ/chi tiết, duyệt hoặc từ chối có lý do, xem lịch sử audit.
+  Event row lock tuần tự hóa các quyết định và thay đổi grid/submit cạnh tranh.
+- Danh mục công khai chỉ lấy PUBLISHED từ tổ chức đã duyệt; tìm tên, lọc danh mục,
+  địa điểm/ngày/giá, sắp xếp, phân trang và đồng bộ URL. Trang chi tiết có giá/tồn ghế.
+- Snapshot public có revision/serverTime, không lộ user/hold IDs; hold hết hạn được
+  phản ánh khả dụng. Chưa có endpoint giữ ghế hay Socket.IO trong phase này.
+- KPI Organizer lấy từ DB theo membership: sự kiện, đang bán, SOLD inventory,
+  doanh thu PAID và tỷ lệ lấp đầy. Giao diện có skeleton/error/retry/empty/toast/modal.
+- Swagger schemas được sinh bằng Nest CLI plugin; DTO/guards/audit và REST thật.
+- Unit, integration PostgreSQL/Redis và E2E browser cho vòng đời sự kiện; CI thêm suite events.
+
+### Kết quả kiểm tra thực tế
+
+**Phase 3 hoàn tất.** Các kiểm tra cuối ngày 23/10/2026:
+
+| Kiểm tra                                              | Kết quả                                          |
+| ----------------------------------------------------- | ------------------------------------------------ |
+| Lint / typecheck / Prettier                           | PASS toàn repository                             |
+| Production build                                      | PASS shared/Nest/Next, 15 app routes + not-found |
+| Unit/HTTP (22/10)                                     | PASS 46/46, 4 files, 158.39s                     |
+| PostgreSQL/Redis integration (22/10)                  | PASS 36/36, 14 auth + 22 events, 138.72s         |
+| Event integration sau bổ sung rollback/literal search | PASS 22/22, 89.95s                               |
+| Event E2E (23/10)                                     | PASS 2/2 desktop/mobile, 1.3m                    |
+| Auth E2E (23/10)                                      | PASS 4/4 desktop/mobile, 58.2s                   |
+| Foundation E2E (23/10)                                | PASS 20/20 desktop/mobile, 1.1m                  |
+| Test DB migrations sau khởi động lại (23/10)          | PASS cả hai migrations                           |
+| Development/test PostgreSQL + Redis                   | Healthy; readiness E2E xác nhận kết nối          |
+
+Thời gian trên gồm import/startup, không phải benchmark. Không mock REST responses
+hoặc database/Redis trong integration/E2E. Foundation suite cố ý dùng các dependency
+ports đóng để kiểm tra error UX; các log API lỗi của suite đó là tình huống kiểm thử.
+Ảnh E2E thật lưu tại `test-results/phase-3-verified`, console logs tại `.local/*-e2e.log`
+(Git ignore). Không ghi credentials/token vào báo cáo.
+
+Các integration tests mới xác minh: private drafts, RBAC/cross-organization,
+validation, venue isolation, grid 200 ghế, rollback, seat toggle/revision,
+active staff/uniqueness, submit freeze, rejection/correction, concurrent review
+(one 200/one 409), public price filters/pagination, privacy, expired holds,
+sold inventory, real aggregates, safe delete/audit và grid/submit race.
+
+### Giới hạn và Phase 4
+
+- CRUD chỉ cho DRAFT/REJECTED; pending/published bị khóa. Chưa có hủy/kết thúc sự kiện
+  và chính sách thay đổi sự kiện đã bán. PATCH nội dung yêu cầu bộ trường đầy đủ.
+- Ảnh dùng URL, chưa có upload. Venue cũ không còn tham chiếu được giữ lại, chưa cleanup.
+- Biểu đồ doanh thu, đơn hàng mới, analytics chi tiết và tổng quan toàn hệ thống Admin
+  chưa thuộc lần bàn giao này; Phase 6 sẽ bổ sung. STAFF workspace chưa có check-in.
+- Public availability là snapshot. Booking/hold TTL/reconciliation/realtime/payment/QR
+  và waiting room chưa triển khai. Chưa chạy 20/100 concurrent seat holds hoặc load test.
+- Phase 4 tiếp theo: reservation atomic theo sorted seat IDs, TTL 300s/ownership,
+  release/reconciliation, Socket.IO sau commit, resync/revision và concurrency tests thật.
+- Redis hiện phục vụ readiness; chưa dùng làm cache hoặc reservation authority.
+- Chưa xác nhận CI remote cho Phase 3; kết quả tại đây là kiểm tra local.
+
+Lỗi môi trường đã xác minh: Node copyfile ghi vào ổ Windows `/mnt/d` trả EPERM
+(kể cả build sạch); read/write thường vẫn được. Chuyển `.next` sang filesystem
+Linux trong `/tmp` qua symlink đã build thành công. Kết quả Playwright cũng dùng
+`/tmp` vì trace/report copyfile gặp cùng lỗi; không sửa source framework.
+E2E đầu phát hiện label bao quanh select bị ghép text của options vào accessible name;
+đã tách label bằng htmlFor/id và chạy lại. Không che giấu lần kiểm tra thất bại.
+
+Phiên làm việc 23/10 mất `/tmp` và test containers dừng; đã khôi phục Node 24.22.1
+(kiểm SHA256), pnpm 10.34.1, Chrome headless chính thức (kiểm ZIP CRC), các thư viện
+browser và áp dụng lại migrations DB test. Archives cache nằm trong `.local` bị Git
+ignore. Sau E2E đã chép build về `.next` thường để tránh symlink treo khi `/tmp` mất.
+
+Driver pg/Prisma hiện phát cảnh báo query concurrency sẽ thay đổi ở pg 9; tests
+hiện tại với phiên bản đã khóa vẫn pass. Cần theo dõi adapter trước khi nâng major.
+
+### Lịch sử commit Phase 3
+
+16 commit đã tồn tại trước commit bàn giao cuối:
+
+```text
+29861f0 docs: record phase three event management plan
+8963913 feat(shared): define event lifecycle and inventory contracts
+fefdb13 feat(db): store event galleries and catalog indexes
+a58b3c4 feat(events): validate event schedules and seat grid configuration
+601447b feat(events): manage organization scoped drafts and safe deletion
+5fbb5cc feat(seats): generate atomic grids and protect sold inventory
+d9ba9fe feat(events): serialize submissions and audited review decisions
+d9867d7 feat(events): expose filtered published catalog and inventory
+d3b5059 feat(organizer): expose event management and staff assignments
+75511ce feat(admin): wire event review APIs and Swagger schemas
+6ee8ebe feat(web): browse real events with URL filters and details
+d6406bf feat(web): show organizer event lists and real sales overview
+9a11d51 feat(web): create and edit event drafts with validated forms
+0992f23 feat(web): manage event seat grids staff and audit history
+acd5f99 feat(web): review and publish events in admin workspace
+75cfcd8 test(events): verify lifecycle ownership inventory and browser workflows
+```
+
+Commit bàn giao cuối dùng message `docs: document phase three delivery and validation`.
+Lấy toàn bộ lịch sử và số lượng thực tế (bao gồm chính commit tài liệu này):
+
+```sh
+git log --reverse --format='%h %s' 16f6146..feature/phase-3-events
+git rev-list --count 16f6146..feature/phase-3-events
+```
+
+Danh sách hash/message cuối được xuất từ Git tại `test-results/phase-3-commits.txt`
+sau commit bàn giao, không tự tạo hash cho commit chưa tồn tại. Phase 3 chờ review
+qua PR vào develop; không tự merge khi chưa review.
