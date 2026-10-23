@@ -27,7 +27,8 @@
     "test:infra:down": "docker compose -f infrastructure/docker-compose.test.yml down",
     "test:db:prepare": "pnpm --filter @tixflow/api test:db:prepare",
     "test:integration": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api test:integration",
-    "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts"
+    "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts",
+    "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
