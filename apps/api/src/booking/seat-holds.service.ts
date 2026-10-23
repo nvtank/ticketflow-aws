@@ -1,3 +1,4 @@
+import { WaitingRoomService } from '../waiting-room/waiting-room.service';
 import { Prisma } from '../generated/prisma/client';
 import {
   ConflictException,
@@ -25,11 +26,17 @@ export class SeatHoldsService {
     @Inject(DatabaseService) private readonly db: DatabaseService,
     @Inject(InventoryPublisher) private readonly publisher: InventoryPublisher,
     @Inject(BookingMetrics) private readonly metrics: BookingMetrics,
+    @Inject(WaitingRoomService) private readonly waiting: WaitingRoomService,
   ) {}
   async create(eventId: string, userId: string, input: CreateHoldDto) {
     eventId = eventId.toLowerCase();
     input = { ...input, idempotencyKey: input.idempotencyKey.toLowerCase() };
     try {
+      const admissionExpiresAt = await this.waiting.authorize(
+        eventId,
+        userId,
+        input.admissionToken,
+      );
       const result = await this.db.$transaction(
         async (tx) => {
           const event = await lockBookingEvent(tx, eventId);
@@ -49,7 +56,7 @@ export class SeatHoldsService {
           }
           await lockSeats(tx, eventId, ids);
           const now = await databaseNow(tx);
-          assertSale(event, now);
+          assertSale(event, now, !!admissionExpiresAt && admissionExpiresAt > now);
           const active = await tx.seatHold.count({
             where: {
               eventId,

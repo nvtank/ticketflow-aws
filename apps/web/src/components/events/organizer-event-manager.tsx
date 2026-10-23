@@ -14,6 +14,7 @@ import { QueryNotice } from './event-detail';
 import { EventEditor } from './event-editor';
 import { SeatGridEditor } from './seat-grid-editor';
 import { EventStaffEditor } from './event-staff-editor';
+import { WaitingSettings } from './waiting-settings';
 import { EventHistory } from './event-history';
 export function OrganizerEventManager({ id }: { id: string }) {
   const cache = useQueryClient(),
@@ -93,6 +94,10 @@ export function OrganizerEventManager({ id }: { id: string }) {
         </p>
       )}
       <SeatGridEditor key={event.id} event={event} />
+      <WaitingSettings
+        key={`${id}:${event.waitingRoomEnabled}:${event.waitingRoomCapacity}`}
+        event={event}
+      />
       <EventStaffEditor id={id} />
       <EventHistory id={id} />
       {['DRAFT', 'REJECTED'].includes(event.status) && (

@@ -177,6 +177,7 @@ model Event {
   coverUrl           String?
   ticketPolicy       String
   rejectionReason    String?
+  waitingRoomCapacity Int                    @default(20)
   waitingRoomEnabled Boolean                @default(false)
   maxTicketsPerOrder Int                    @default(4)
   checkInRevision    Int                    @default(0)

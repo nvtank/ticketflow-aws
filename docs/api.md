@@ -214,3 +214,28 @@ for setup, exact-settlement limits and actual external verification evidence.
 - Socket `staff:event:join` reauthenticates STAFF assignment, room `staff-event:{id}`.
   `checkin:updated` contains eventId/revision/occurredAt only after commit; REST resync
   on reconnect/poll. Revocation leaves staff room; account lock disconnects sockets.
+
+## Phase 7: waiting room and notifications
+
+All endpoints require JWT. CUSTOMER uses:
+
+| Method | Path                                   | Result                                           |
+| ------ | -------------------------------------- | ------------------------------------------------ |
+| POST   | `/events/:id/waiting-room/join`        | 201 stable session/status/admission              |
+| GET    | `/events/:id/waiting-room`             | 200 current status; does not join                |
+| DELETE | `/events/:id/waiting-room`             | 200 own lease removed; next promoted             |
+| PATCH  | `/events/:id/waiting-room/settings`    | 200 Organizer membership/ADMIN only              |
+| GET    | `/notifications/me?page=1&pageSize=20` | 200 owned items/unread/pagination                |
+| PATCH  | `/notifications/:id/read`              | 200 owned, idempotent mark read; other owner 404 |
+
+Settings body: `{ "enabled": true, "capacity": 20 }`, capacity integer 1–500.
+Room state: DISABLED/NOT_JOINED/WAITING/ADMITTED, position, peopleAhead, queued,
+active, capacity, expiresAt, serverTime, admissionToken (only admitted). Refresh
+preserves nonce and expiry. Gate endpoints have 240 requests/minute limit per IP.
+No client user IDs are accepted. Missing/stolen token 403, expired lease 409,
+Redis failure 503. `POST /events/:id/holds` accepts optional `admissionToken`,
+required when the room is enabled. Confirmed owned holds can create orders without
+renewing admission. Public/managed event detail includes waitingRoomEnabled/Capacity.
+
+Settings enabled/capacity and optional inbox page/pageSize are explicit Swagger
+properties, verified against the running local `/api/docs-json` document.

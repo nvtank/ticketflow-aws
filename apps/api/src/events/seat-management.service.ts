@@ -13,11 +13,11 @@ export class SeatManagementService {
       const event = await lockEvent(tx, id);
       await requireMember(tx, event.organizationId, userId);
       assertEditable(event.status);
-      const [orders, holds, occupied] = await Promise.all([
-        tx.order.count({ where: { eventId: id } }),
-        tx.seatHold.count({ where: { eventId: id } }),
-        tx.seat.count({ where: { eventId: id, status: { in: ['SOLD', 'HELD'] } } }),
-      ]);
+      const orders = await tx.order.count({ where: { eventId: id } });
+      const holds = await tx.seatHold.count({ where: { eventId: id } });
+      const occupied = await tx.seat.count({
+        where: { eventId: id, status: { in: ['SOLD', 'HELD'] } },
+      });
       if (orders || holds || occupied)
         throw new ConflictException(
           'Sơ đồ đã có đơn hàng hoặc lịch sử giữ ghế, không thể tạo lại.',

@@ -110,3 +110,18 @@ supported; partial transfers and refunds need manual review. Check-in remains Ph
 A real PayOS channel link was created, read with SDK signature verification and
 cancelled on 23/10/2026, without money transfer. Public webhook registration and a
 real bank settlement were not performed; see payments.md and progress.md.
+
+## Check-in, reporting and waiting (Phases 6–7)
+
+CheckInModule uses event/user/ticket locks, active staff assignment and unique
+CheckIn.ticketId to atomically consume a VALID ticket. Private attendance rooms
+invalidate authoritative REST statistics. Analytics aggregates scoped paid revenue
+and Vietnam day boundaries. Admin metrics report actual DB/process values.
+
+WaitingRoomModule is an admission adapter, separate from PostgreSQL seat ownership.
+An atomic Redis Lua operation allocates bounded FIFO leases with Redis server time;
+HMAC nonce credentials are verified with user/session ownership. Gate I/O happens
+before a booking transaction and the database deadline is rechecked inside it.
+Notifications exposes already persisted payment receipts by owner. No AWS SDK,
+worker, external email service or durable outbox is introduced. Operational limits
+and recovery are described in [waiting-room.md](waiting-room.md).

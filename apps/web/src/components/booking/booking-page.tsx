@@ -1,4 +1,5 @@
 'use client';
+import { WaitingGate } from './waiting-gate';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -31,11 +32,18 @@ function BookingEvent({ slug }: { slug: string }) {
     queryFn: () =>
       apiGet(`/events/${encodeURIComponent(slug)}`, eventDetailSchema, { anonymous: true }),
     retry: false,
+    refetchInterval: 15000,
   });
   return (
     <div className="container py-8">
       {event.data ? (
-        <BookingFlow key={event.data.id} event={event.data} />
+        event.data.waitingRoomEnabled ? (
+          <WaitingGate key={event.data.id} eventId={event.data.id}>
+            {(token) => <BookingFlow event={event.data!} admissionToken={token} />}
+          </WaitingGate>
+        ) : (
+          <BookingFlow key={event.data.id} event={event.data} />
+        )
       ) : (
         <QueryNotice
           pending={event.isPending}
@@ -46,7 +54,7 @@ function BookingEvent({ slug }: { slug: string }) {
     </div>
   );
 }
-function BookingFlow({ event }: { event: EventDetail }) {
+function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionToken?: string }) {
   const cache = useQueryClient(),
     router = useRouter(),
     connection = useBookingRealtime(event.id),
@@ -85,6 +93,7 @@ function BookingFlow({ event }: { event: EventDetail }) {
         requestKey.current = { fingerprint, key: crypto.randomUUID() };
       return apiRequest('POST', `/events/${event.id}/holds`, holdSchema, {
         seatIds,
+        admissionToken,
         idempotencyKey: requestKey.current.key,
       });
     },
