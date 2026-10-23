@@ -7,9 +7,7 @@ test('home has Vietnamese navigation and no invented event inventory', async ({
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Đừng chỉ nghe kể.');
-  await expect(
-    page.getByRole('heading', { name: 'Những sự kiện mới đang được chuẩn bị' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Chưa thể tải dữ liệu' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
   await expect(page.getByRole('main')).toHaveCount(1);
   expect(pageErrors).toEqual([]);
@@ -40,11 +38,13 @@ test('health page reports actual missing dependencies and can refresh', async ({
 });
 
 for (const route of ['/organizer', '/staff', '/admin']) {
-  test(`${route} identifies the preview without private data`, async ({ page }) => {
+  test(`${route} redirects anonymous visitors to login`, async ({ page }) => {
     await page.goto(route);
-    await expect(page.getByText('Bản xem trước · Phase 1', { exact: true })).toBeVisible();
-    await expect(page.getByText('Đây là bản xem trước bố cục', { exact: false })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    await expect(page).toHaveURL(
+      (url) => url.pathname === '/login' && url.searchParams.get('next') === route,
+    );
+    await expect(page.getByRole('button', { name: 'Đăng nhập', exact: true })).toBeVisible();
+    await expect(page.getByText('Tài khoản được xác minh', { exact: true })).toHaveCount(0);
   });
 }
 
@@ -61,6 +61,27 @@ test('unimplemented routes return a real 404', async ({ page }) => {
   const response = await page.goto('/route-does-not-exist');
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { name: 'Có vẻ bạn đã lạc nhịp.' })).toBeVisible();
+});
+
+test('authentication forms validate locally and show a real API failure honestly', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/register');
+  await page.getByLabel('Họ và tên', { exact: true }).fill('A');
+  await page.getByLabel('Email', { exact: true }).fill('invalid-email');
+  await page.getByLabel('Mật khẩu', { exact: true }).fill('short');
+  await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
+  await expect(page.getByText('Email không hợp lệ.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Mật khẩu cần ít nhất 12 ký tự.', { exact: true })).toBeVisible();
+  await page.goto('/login');
+  await page.getByLabel('Email', { exact: true }).fill('customer@example.com');
+  await page.getByLabel('Mật khẩu', { exact: true }).fill('Example-password!2026');
+  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
+  await expect(page.getByRole('main').getByRole('alert')).toContainText(
+    'Dịch vụ tạm thời không khả dụng.',
+  );
+  await expect(page).toHaveURL(/\/login$/);
+  await page.screenshot({ path: testInfo.outputPath('login-error.png'), fullPage: true });
 });
 
 test('navigation adapts to viewport and mobile dialog manages focus', async ({

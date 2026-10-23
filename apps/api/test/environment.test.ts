@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseEnvironment } from '../src/config/environment';
 
 const local = {
+  JWT_SECRET: 'test-only-environment-secret-at-least-forty-eight-characters-long',
   DATABASE_URL: 'postgresql://local:local@localhost:5432/tixflow',
   REDIS_URL: 'redis://localhost:6379',
 };
@@ -18,10 +19,18 @@ describe('Environment validation', () => {
 
   it('rejects missing database configuration without disclosing inputs', () => {
     expect(() =>
-      parseEnvironment({ DATABASE_URL: 'invalid-password-secret', REDIS_URL: local.REDIS_URL }),
+      parseEnvironment({
+        ...local,
+        DATABASE_URL: 'invalid-password-secret',
+        REDIS_URL: local.REDIS_URL,
+      }),
     ).toThrow('Invalid environment fields: DATABASE_URL');
     expect(() =>
-      parseEnvironment({ DATABASE_URL: 'invalid-password-secret', REDIS_URL: local.REDIS_URL }),
+      parseEnvironment({
+        ...local,
+        DATABASE_URL: 'invalid-password-secret',
+        REDIS_URL: local.REDIS_URL,
+      }),
     ).not.toThrow('invalid-password-secret');
   });
 

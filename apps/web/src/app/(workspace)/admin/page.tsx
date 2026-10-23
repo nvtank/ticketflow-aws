@@ -1,8 +1,4 @@
-import type { Metadata } from 'next';
-import { UserRole } from '@tixflow/shared';
-import { DashboardOverview } from '@/components/dashboard-overview';
-
-export const metadata: Metadata = { title: 'Quản trị hệ thống' };
-export default function AdminPage() {
-  return <DashboardOverview role={UserRole.ADMIN} />;
+import { AdminEventQueue } from '@/components/events/admin-event-review';
+export default function Page() {
+  return <AdminEventQueue />;
 }
