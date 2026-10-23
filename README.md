@@ -1,7 +1,7 @@
 # TixFlow — Real-time Event Ticketing Platform
 
-Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–4: nền tảng,
-authentication, event management và booking/realtime.** Chưa hoàn thành luồng bán vé. Không dùng
+Nền tảng bán vé local, phát triển theo 7 phase. **Đã triển khai Phase 1–5: authentication, event management, booking/realtime,
+thanh toán PayOS và vé QR.** Staff check-in, analytics chi tiết và waiting room còn ở các phase sau. Không dùng
 AWS hoặc yêu cầu AWS credentials.
 
 ## Cài đặt và chạy
@@ -99,8 +99,7 @@ Dashboard Organizer hiện có KPI tổng hợp thực; biểu đồ doanh thu/�
 analytics chi tiết thuộc Phase 6. Trang Admin Phase 3 tập trung duyệt sự kiện.
 Ảnh dùng URL http/https; chưa có upload/lưu trữ file.
 
-Đã có chọn/giữ ghế và tạo đơn chờ thanh toán. Thanh toán, phát hành QR và check-in
-còn ở các phase tiếp theo. Không hiển thị Google Login hoặc reset
+Đã có chọn/giữ ghế, thanh toán PayOS và phát hành QR. Check-in thuộc Phase 6. Không hiển thị Google Login hoặc reset
 password khi chưa có OAuth/email delivery thực.
 
 ### Demo booking và realtime Phase 4
@@ -113,7 +112,7 @@ password khi chưa có OAuth/email delivery thực.
    tạo đơn hàng không gia hạn. Khi hết hạn người khác có thể giữ ngay dù cleanup chưa chạy.
 4. Tiếp tục đến đơn hàng: giá tính từ server, chỉ chủ hold được tạo/xem/hủy. Hủy đơn hoặc
    hold trả ghế chưa bán. Lịch sử đơn thật nằm ở `/profile`.
-5. Checkout chưa có thanh toán; không có endpoint tự phát hành vé. Payment thuộc Phase 5.
+5. Checkout có thanh toán PayOS; backend xác minh mới phát hành vé. Xem demo Phase 5 bên dưới.
 
 Socket.IO kết nối trực tiếp API port 4000 (WebSocket only). Có thể đặt
 `NEXT_PUBLIC_REALTIME_URL` trước build nếu dùng origin khác; CORS/Origin whitelist
@@ -124,6 +123,27 @@ mỗi 10 giây. Payload WebSocket chỉ là gợi ý invalidate theo revision.
 `SOCKET_REDIS_ADAPTER=true` bật Redis Pub/Sub để room updates đi giữa nhiều API instance;
 đã integration-test qua hai instance thật. PostgreSQL luôn quyết định quyền giữ ghế.
 Chưa có durable outbox hoặc benchmark tải; không suy ra năng lực production từ 100 requests.
+
+### Demo PayOS và vé QR Phase 5
+
+Phụ trách theo yêu cầu mới: `hoangphatdev <latruonghoangphat@gmail.com>`.
+Cấu hình `PAYMENT_PROVIDER=payos`, ba biến PAYOS_* và persistent TICKET_SIGNING_KEY
+trong `.env` local, rồi khởi động lại API. `env:setup -- --upgrade` thêm các biến còn
+thiếu và không in/ghi đè secrets. Chỉ lưu cấu hình mẫu không chứa credentials trong Git.
+
+1. Customer giữ ghế, mở đơn và bấm **Thanh toán qua PayOS**.
+2. Link dùng số tiền server và deadline hold ban đầu. Backend xác minh webhook có
+   chữ ký hoặc truy vấn PayOS trực tiếp; tham số URL thành công không tạo vé.
+3. Đơn PAID phát hành đúng số vé tại `/my-tickets`; mở từng vé để xem QR.
+4. Tiền đến muộn/sai hoặc ghế đã đổi chủ → REFUND_REQUIRED, không phát hành vé;
+   đây là đánh dấu cần xử lý, chưa phải đã hoàn tiền.
+5. Khi có URL HTTPS công khai, đăng ký webhook theo [hướng dẫn PayOS](docs/payments.md).
+   Hiện chưa đăng ký URL công khai. Đã kiểm tra PayOS thật tạo/đọc/hủy link, không
+   chuyển tiền; chưa kiểm chứng chuyển khoản ngân hàng và webhook công khai.
+
+`PAYMENT_PROVIDER=mock` chỉ hoạt động development/test, có success/failure/cancel,
+chậm 10 giây và callback trùng qua cùng transaction nghiệp vụ. Production từ chối
+mock. E2E dùng mock local; không giả danh kết quả chuyển tiền PayOS thật.
 
 ## Kiểm thử
 
@@ -140,6 +160,7 @@ pnpm test:e2e
 pnpm test:e2e:auth
 pnpm test:e2e:events
 pnpm test:e2e:booking
+pnpm test:e2e:payments
 pnpm test:infra:down
 ```
 
@@ -171,6 +192,7 @@ apps/
       organizations/       # Membership-scoped reads
       events/              # Public catalog, organizer CRUD/grid/staff, admin review/audit
       booking/ orders/     # Atomic holds, reconciliation and server-priced orders
+      payments/ tickets/   # PayOS, verified finalization, signed owned QR tickets
       realtime/            # JWT room gateway, optional Redis adapter
       database/            # Prisma PostgreSQL lifecycle
       common/http/         # Request IDs, logs, errors, measured metrics
@@ -203,8 +225,8 @@ và route protection. Access token chỉ ở memory, không lưu browser storage
 Phase 2 đã merge qua [PR #4](https://github.com/nvtank/ticketflow-aws/pull/4).
 Phase 3: event CRUD theo tổ chức, seat generator, staff assignment, admin approval,
 public catalog/details và KPI Organizer thực. Phase 4: atomic booking, TTL cleanup,
-server-priced checkout orders và realtime. Phase 5–7 bổ sung payment, QR, check-in,
-analytics và waiting room. Không
+server-priced checkout orders và realtime. Phase 5 bổ sung PayOS, payment integrity
+và QR tickets. Phase 6–7 còn check-in, analytics và waiting room. Không
 có KPI hardcode hoặc tuyên bố tải chưa đo. Chưa tạo worker khi chưa cần jobs.
 
 Xem [tiến độ và kết quả thực tế](docs/progress.md), [Phase 3 plan](docs/phase-3-plan.md),
@@ -217,3 +239,5 @@ trên branch `feature/phase-3-events`, base develop `16f6146`.
 
 Ngày Git đã được mô phỏng theo yêu cầu mới của người dùng; xem [timeline và backup gốc](docs/commit-timeline.md).
 Kết quả kiểm thử dùng thời gian chạy thực, không mô phỏng.
+
+Phase 5: [kế hoạch 17 commits](docs/phase-5-plan.md), [cấu hình PayOS và giới hạn](docs/payments.md).

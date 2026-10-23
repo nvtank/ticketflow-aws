@@ -57,8 +57,7 @@ source of truth. Detailed analytics and admin system dashboards are still planne
 
 ## Remaining phases
 
-- Phase 5: PaymentProvider, signed local mock callbacks, atomic/idempotent sale/order/
-  ticket finalization, opaque QR. Late payment requires refund, never reclaims sold seats.
+- Phase 5 is implemented below; real bank transfer/public webhook delivery remains unverified.
 - Phase 6: staff-event authorization, atomic VALID → USED check-in and aggregates.
 - Phase 7: Redis Lua admission prototype, concurrency/E2E coverage, measured load.
 
@@ -91,3 +90,23 @@ readiness diagnostics available when dependencies fail. No AWS resources exist.
 
 Documentation records actual execution dates. Git author/committer dates have been
 explicitly reconstructed for the user's project timeline; see commit-timeline.md.
+
+## Payment and ticketing (Phase 5)
+
+PaymentsModule owns provider/session/finalization/reconciliation/controller layers.
+PaymentProvider selects official PayOS SDK, local mock or disabled adapter. Channel
+secrets are backend-only. SDK network calls run after reservation preparation commits;
+settlement transactions follow the existing inventory lock order and emit after commit.
+Concurrent callback deduplication uses an advisory event lock plus unique webhook
+reference, then order/payment/seat checks. Refund review never reclaims another hold
+or sale; distinct extra transfers preserve already valid tickets.
+
+TicketsService checks order ownership and reproduces a signed opaque credential
+only when its stored hash/version matches and ticket is VALID. No browser totals,
+return flags or QR-declared rights are trusted. REST owner status polling and a
+local periodic provider reconciliation supplement webhooks. Exact settlement is
+supported; partial transfers and refunds need manual review. Check-in remains Phase 6.
+
+A real PayOS channel link was created, read with SDK signature verification and
+cancelled on 23/10/2026, without money transfer. Public webhook registration and a
+real bank settlement were not performed; see payments.md and progress.md.

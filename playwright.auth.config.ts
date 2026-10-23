@@ -12,6 +12,10 @@ export default defineConfig({
       timeout: 60_000,
       env: {
         NODE_ENV: 'test',
+        PAYMENT_PROVIDER: 'mock',
+        TICKET_SIGNING_KEY: 'test-only-persistent-ticket-signing-key-for-isolated-database-2026',
+        PAYMENT_RETURN_ORIGIN: 'http://127.0.0.1:3000',
+        PAYMENT_RECONCILE_INTERVAL_MS: '0',
         DATABASE_URL:
           process.env.TEST_DATABASE_URL ??
           'postgresql://tixflow_test:tixflow_test_only@127.0.0.1:55432/tixflow_test',

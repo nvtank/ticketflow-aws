@@ -177,3 +177,29 @@ export interface RealtimeServerEvents {
 export interface RealtimeClientEvents {
   'event:join': (input: { eventId: string }, acknowledge: (result: EventRoomAck) => void) => void;
 }
+
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'REFUND_REQUIRED';
+export interface PaymentView {
+  id: string;
+  orderId: string;
+  provider: 'payos' | 'mock';
+  status: PaymentStatus;
+  orderStatus: OrderStatus;
+  amountVnd: number;
+  checkoutUrl: string | null;
+  expiresAt: string;
+  serverTime: string;
+}
+export interface TicketView {
+  id: string;
+  code: string;
+  status: TicketStatus;
+  eventId: string;
+  orderId: string;
+  seatCode: string;
+  section: string;
+  priceVnd: number;
+  createdAt: string;
+  event: { title: string; slug: string; startsAt: string; venueName: string; address: string };
+  qrCredential: string | null;
+}

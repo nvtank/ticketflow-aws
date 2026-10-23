@@ -1,4 +1,4 @@
-# API — Phase 4
+# API — Phase 5
 
 Base http://localhost:4000/api/v1; Swagger development/test tại
 http://localhost:4000/api/docs. Default yêu cầu Bearer JWT; chỉ route Public bỏ qua
@@ -94,8 +94,8 @@ serverTime, seats. Expired/released HELD entries are projected as AVAILABLE;
 SOLD remains SOLD. This is read-side availability, not a reservation endpoint.
 Private organizer snapshots expose configuration status; no hold identities.
 
-Payment, ticket issuance, check-in and detailed analytics APIs remain for later
-phases. Staff assignment alone does not implement check-in.
+Payment and ticket issuance are implemented in Phase 5 below. Check-in and detailed
+analytics remain later phases. Staff assignment alone does not implement check-in.
 
 ## Reservations and checkout
 
@@ -158,3 +158,38 @@ Metrics add actual current-process hold successes/failures, socket connection co
 adapter configuration and validHeldSeats queried from the shared DB. DB outage
 returns null for validHeldSeats, not a fabricated zero. Production metrics remain
 forbidden. No queue/payment/check-in counters are invented.
+
+## Payments and tickets (Phase 5)
+
+| Method | Path                     | Authentication / behavior                                                     |
+| ------ | ------------------------ | ----------------------------------------------------------------------------- |
+| GET    | `/payments/config`       | Public; provider name and availability only                                   |
+| POST   | `/payments/create`       | CUSTOMER owner; `{orderId,idempotencyKey}` UUIDs; 201, server amount/deadline |
+| GET    | `/payments/:id/status`   | CUSTOMER owner; SDK provider reconciliation with DB claim throttle            |
+| POST   | `/payments/webhook`      | Public HTTP route, mandatory provider signature; 200 after committed handling |
+| POST   | `/payments/:id/simulate` | Owner, development/test and mock provider only; 404 otherwise                 |
+| GET    | `/tickets/me`            | CUSTOMER; paginated owned tickets, Cache-Control no-store                     |
+| GET    | `/tickets/:id`           | CUSTOMER owner; signed QR only when VALID/hash/version match; no-store        |
+
+Payment create is limited to 20/IP/min. Same order reuses the same external request;
+a retry UUID bound to another order or a provider switch returns 409. Money supplied
+by the client is rejected by DTO whitelisting. Signature/malformed webhook errors
+return 400; a processed event reference with changed normalized content returns 409. Unknown signed provider samples are acknowledged without creating a sale.
+Provider transport/signature failures on status/create return sanitized 502; UI
+never treats that as paid. All payment/ticket owner checks are backend enforced.
+
+Payment view: id, orderId, provider, status, orderStatus, amountVnd, checkoutUrl,
+expiresAt, serverTime. BigInt provider order codes and channel secrets are not exposed.
+Ticket view: id/code/status, event/order IDs, seat/section/price, event time/venue,
+qrCredential (nullable). Credentials contain no PII and are not logged.
+
+Mock outcome enum: success, failed, cancelled, delayed, duplicate. Delayed state is
+stored in DB and becomes eligible after 10 seconds, not an in-memory success timer.
+Requests reconcile the same finalization service. PayOS runtime cannot use this API
+as a payment-success shortcut, even for an authenticated owner.
+
+REFUND_REQUIRED means manual financial review, not a completed refund. A paid order
+can retain valid tickets while a distinct extra transfer requires review; otherwise
+late/mismatched settlements produce no tickets. The browser's success/failed URL
+and its parameters never authorize ticket issuance. See [payments.md](payments.md)
+for setup, exact-settlement limits and actual external verification evidence.
