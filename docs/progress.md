@@ -478,3 +478,140 @@ git rev-list --count ff4c12b..feature/phase-4-booking-realtime
 
 Danh sách sau commit được xuất vào `test-results/phase-4-commits.txt` (ignored).
 PR Phase 4 hướng vào develop, không tự merge.
+
+## Phase 5 — PayOS Payment & Ticketing
+
+Người dùng chuyển Phase 5 cho **hoangphatdev <latruonghoangphat@gmail.com>**, thay
+phân công nguyen-van-hoan trong kế hoạch ban đầu. Branch `feature/phase-5-payments`
+based on Phase 4 `d94dd7c`; PR #7 Phase 4 đã được merge trên GitHub trong lúc làm
+Phase 5, merge `9ff5564`. PR Phase 5 hướng develop, không tự merge.
+
+Kế hoạch 17 commit có nội dung thực: [phase-5-plan.md](phase-5-plan.md).
+Ngày author/committer mô phỏng 11–14/10/2026 theo chính sách người dùng đã duyệt.
+Các lần kiểm thử dưới đây chạy thực ngày **23/10/2026**, không mô phỏng kết quả.
+
+### Đã triển khai
+
+- Official @payos/node 2.0.5; kiểm tra API thực tế và signatures trong SDK cài đặt.
+  PayOS là provider cấu hình local theo yêu cầu mới. Ba channel credentials người
+  dùng cung cấp chỉ ở `.env` ignored, không có trong source/PR/log.
+- Hai migration payment sessions/settlement references đã áp dụng trên development
+  và test PostgreSQL. Mã provider order safe integer duy nhất, key retry duy nhất,
+  expiry gốc, URL checkout, thời điểm đối soát, tham chiếu settlement và webhook audit.
+- Tạo/recover cùng phiên external từ order có giá server; khóa theo Phase 4, commit
+  trước gọi network. Key không chuyển sang order khác; không đổi provider khi đã
+  có attempt cho order. Create timeout không sinh mã external mới tùy tiện.
+- Webhook PayOS xác minh signature đầy đủ, giữ các field signed bổ sung. Không tin
+  unsigned success flags. SDK status request xác minh signed response. Return URL
+  không đổi đơn thành PAID; local polling/periodic reconciliation bổ sung webhook.
+- Finalization atomically kiểm tra amount/currency/link/order/hold/expiry/seat ownership,
+  đổi SOLD, phát hành đúng một vé/item, PAID/SUCCEEDED, audit/notification/revision.
+  Callback trùng/concurrent không sinh vé trùng. Socket hints chỉ phát sau commit.
+- Late payment/sai tiền/currency/hủy/reclaim chuyển REFUND_REQUIRED và không bán
+  ghế của hold/order mới. Tiền chuyển thêm sau đơn PAID được đánh dấu đối soát,
+  giữ nguyên vé hợp lệ; matching status/webhook references không bị tính tiền thêm.
+- QR signed opaque token + DB hash/version; API owner-only/no-store, UI QR cho VALID,
+  USED/CANCELLED/historical không tạo QR hợp lệ giả. Seed nâng cấp đúng hai vé demo
+  cũ khi có key; env setup sinh persistent signing key, không overwrite secrets.
+- Checkout PayOS, success/failed page dựa kết quả backend, danh sách/chi tiết vé QR,
+  navigation/profile links, trạng thái lỗi/chờ, responsive desktop/mobile.
+- Mock provider chỉ development/test: success/failure/cancel, delayed 10 giây lưu DB,
+  duplicate callback. Cùng transaction thật, không dùng mock thay nghiệp vụ.
+- Công cụ đăng ký webhook HTTPS qua SDK có kiểm tra URL và lỗi không in secrets;
+  chưa chạy đăng ký thật vì người dùng chưa có public URL. Không tạo AWS/tunnel.
+
+**Phase 5 local hoàn tất; không phải toàn bộ MVP.** Tổng cộng 17 commit khi gồm
+commit tài liệu cuối.
+
+### Kết quả thực tế
+
+| Kiểm tra              | Kết quả                                                                    |
+| --------------------- | -------------------------------------------------------------------------- |
+| Migrations            | 2 migration mới áp dụng thành công trên PostgreSQL development và test     |
+| Seed                  | PASS trên development; giữ mật khẩu/SOLD inventory, nâng QR demo           |
+| Unit/HTTP             | 83/83, 7 files, 153.09s                                                    |
+| Subset sau hardening  | 26/26 SDK/QR/OpenAPI, 2 files, 55.78s                                      |
+| Integration cuối      | 76/76, 5 files, 185.59s                                                    |
+| Payment E2E           | 4/4 desktop/mobile, 1.1 phút                                               |
+| Foundation E2E        | 20/20 desktop/mobile, 1.2 phút                                             |
+| Auth E2E              | 4/4 desktop/mobile, 1.0 phút                                               |
+| Event E2E             | 2/2 desktop/mobile, 1.3 phút                                               |
+| Booking E2E           | 2/2 desktop/mobile, 1.3 phút                                               |
+| Typecheck             | PASS shared/API source + tests/web/root configs                            |
+| Lint/format           | PASS toàn repository, 0 lint warnings/errors                               |
+| Production build      | PASS shared/API/Next; 22 application routes                                |
+| Private settings scan | Không tìm thấy giá trị payment/signing keys trong tracked/candidate source |
+| Webhook helper        | Node syntax check; chưa đăng ký public URL                                 |
+
+Tổng E2E 32/32: foundation 20, auth 4, event 2, booking 2, payment 4.
+76 integration cases gồm auth 14, event 22, booking 14, realtime 5, payment 21.
+Payment dùng PayOS SDK verifier thật với chữ ký HMAC độc lập/key test; PostgreSQL/
+Redis thật, không mock transaction. Kiểm tra 20 callback cùng lúc, altered reference,
+wrong signature/amount/currency/link, expiry/reclaim, ghế đã SOLD cho người mới,
+cancellation race, unique-ticket failure rollback và retry, extra transfer review,
+owned/no-store QR, 8 create retries, đổi provider, key-bound order và mock delayed.
+
+E2E dùng provider mock được cấu hình rõ trên test API, không giả kết quả ngân hàng.
+Lượt đầu có một ca bị auth rate limit (4 đăng ký/phút với giới hạn 3). Fixture đã
+đổi ca thất bại sang login tài khoản demo; giữ nguyên throttling và chạy lại 4/4.
+Success URL giả vẫn pending; callback trùng tạo vé đúng, QR tồn tại sau reload,
+viewport mobile không tràn; payment failure không hiện paid/ticket CTA.
+
+### PayOS thật đã kiểm tra
+
+Ngày 23/10/2026: API local xác thực customer, giữ ghế và tạo order đúng giá; PayOS
+thật tạo link, SDK signed GET trả PENDING và amount khớp; hủy link qua SDK, backend
+reconcile xác nhận payment/order CANCELLED và trả ghế. **Không chuyển tiền.**
+Evidence tại `.local/phase-5-payos-live-evidence.json` (ignored); không có credentials.
+User chưa có URL HTTPS public nên **chưa đăng ký/kiểm thử live webhook hoặc chuyển
+khoản ngân hàng thành công**. Hướng dẫn tại [payments.md](payments.md).
+
+### Giới hạn và Phase 6
+
+- Chưa tự hoàn tiền; REFUND_REQUIRED là yêu cầu xử lý thủ công. Partial/overpayments
+  cần review; không hỗ trợ tự cộng dồn nhiều partial transfers để phát hành vé.
+- Chưa xác minh một real bank transfer → public webhook → vé. Không gọi đây là
+  bằng chứng tích hợp ngân hàng production đầy đủ. Không có benchmark 1.000 users.
+- Chưa có durable outbox/email/queue worker; in-app receipt notification được lưu
+  cùng transaction. Socket mất hint được REST/reconnect phục hồi.
+- Cảnh báo pg@8 ở generator Phase 3 vẫn được ghi nhận; không thuộc payment locks.
+- Phase 6 tiếp theo: staff event assignment authorization, scanner/manual credential,
+  nguyên tử VALID → USED, duplicate/concurrent check-in, analytics theo DB.
+- Kết quả CI GitHub chỉ xác nhận sau khi workflow remote chạy.
+
+### Commit Phase 5
+
+16 commit đã tồn tại trước commit tài liệu cuối:
+
+```text
+0f15eda docs: plan phase five PayOS payment and ticket delivery
+8e6826a chore(payments): install official PayOS SDK and QR renderer
+2366b8a feat(db): persist payment sessions and verifiable ticket credentials
+dbecee6 feat(config): validate private PayOS and ticket signing settings
+c34ffba feat(shared): define verified payment and ticket contracts
+5232b15 feat(payments): implement signature verified PayOS provider adapter
+e4973e1 feat(payments): prepare idempotent server priced payment sessions
+997cdc2 feat(tickets): sign opaque QR credentials and authorize ticket reads
+6d0661f feat(payments): finalize verified settlements and issue tickets atomically
+c3f2a4a feat(payments): expose verified callbacks and isolated local simulation
+35e7c37 feat(seed): prepare verifiable demo QR and persistent signing keys
+47dae5a feat(web): connect checkout to provider verified payment results
+31deb74 feat(web): display owned QR tickets and account navigation
+84b2b2e fix(payments): track settlement references and verify signed payment policies
+2675ee2 test(payments): prove callback retries late settlement and ticket rollback
+d5d70b3 test(web): verify payment tickets and local PayOS integration tooling
+
+```
+
+Commit thứ 17 ghi tài liệu và bằng chứng kiểm tra. Lấy toàn bộ hash/messages/số lượng
+sau commit từ Git, không tự tạo hash:
+
+```sh
+git log --reverse --format='%h %s' d94dd7c..feature/phase-5-payments
+git rev-list --count d94dd7c..feature/phase-5-payments
+```
+
+Danh sách sau commit xuất tại `test-results/phase-5-commits.txt` (ignored).
+
+Phase 5 artifacts local: `.local/phase-5-*.log`, screenshots `test-results/phase-5-verified/`.
+Sau E2E, `.next` đã được chép về thư mục workspace thường; không còn phụ thuộc symlink `/tmp`.

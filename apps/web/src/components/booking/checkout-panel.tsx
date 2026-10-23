@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { PaymentAction } from './payment-action';
 import { HoldCountdown } from './hold-countdown';
 export function CheckoutPanel({ id }: { id: string }) {
   return (
@@ -102,9 +103,9 @@ function CheckoutOrder({ id }: { id: string }) {
             onExpired={refresh}
           />
           <p className="my-5 text-sm leading-7 text-muted-foreground">
-            Đơn hàng đã được tạo. Thanh toán trực tuyến hiện chưa khả dụng. Thời gian giữ chỗ giữ
-            nguyên từ lúc xác nhận ghế; khi hết hạn, ghế sẽ được trả lại.
+            Thời gian giữ chỗ giữ nguyên từ lúc xác nhận ghế; khi hết hạn, ghế sẽ được trả lại.
           </p>
+          <PaymentAction orderId={order.id} />
           <Button variant="outline" onClick={() => setConfirm(true)}>
             Hủy đơn hàng
           </Button>
@@ -114,6 +115,11 @@ function CheckoutOrder({ id }: { id: string }) {
           <p className="text-sm">
             Trạng thái đã được máy chủ xác nhận: <strong>{orderStatusLabel[order.status]}</strong>.
           </p>
+          {order.status === 'PAID' && (
+            <Button asChild className="mt-5 mr-3">
+              <Link href="/my-tickets">Xem vé của tôi</Link>
+            </Button>
+          )}
           <Button asChild className="mt-5">
             <Link href={`/events/${order.event.slug}/booking`}>Quay lại chọn ghế</Link>
           </Button>

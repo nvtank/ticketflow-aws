@@ -1,0 +1,1 @@
+ALTER TABLE "Payment" ADD COLUMN "settledReferences" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];

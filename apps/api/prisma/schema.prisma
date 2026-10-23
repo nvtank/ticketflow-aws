@@ -313,12 +313,22 @@ model Payment {
   order             Order         @relation(fields: [orderId], references: [id], onDelete: Restrict)
   provider          String        @db.VarChar(30)
   providerReference String        @unique @db.VarChar(150)
+  settledReferences String[]      @default([])
+  providerOrderCode BigInt?       @unique
+  idempotencyKey    String?       @unique @db.Uuid
+  checkoutUrl       String?
+  expiresAt         DateTime?     @db.Timestamptz(3)
+  reconciledAt      DateTime?     @db.Timestamptz(3)
+  mockOutcome       String?       @db.VarChar(20)
+  mockDueAt         DateTime?     @db.Timestamptz(3)
   status            PaymentStatus @default(PENDING)
   amountVnd         Int
   createdAt         DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
 
+  @@unique([orderId, provider])
   @@index([orderId, status])
+  @@index([status, reconciledAt])
 }
 
 model Ticket {
@@ -330,6 +340,7 @@ model Ticket {
   seat        Seat         @relation(fields: [seatId, eventId], references: [id, eventId], onDelete: Restrict)
   code        String       @unique @db.VarChar(50)
   qrTokenHash String       @unique @db.Char(64)
+  qrVersion   Int          @default(0)
   status      TicketStatus @default(VALID)
   createdAt   DateTime     @default(now()) @db.Timestamptz(3)
   checkIn     CheckIn?
@@ -391,6 +402,8 @@ model WebhookEvent {
   provider        String    @db.VarChar(30)
   providerEventId String    @db.VarChar(150)
   payloadHash     String    @db.Char(64)
+  outcome         String?   @db.VarChar(40)
+  paymentId       String?   @db.Uuid
   processedAt     DateTime? @db.Timestamptz(3)
   createdAt       DateTime  @default(now()) @db.Timestamptz(3)
 

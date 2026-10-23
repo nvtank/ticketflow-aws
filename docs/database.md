@@ -1,4 +1,4 @@
-# Database — Phase 4
+# Database — Phase 5
 
 PostgreSQL 17 / Prisma 7.10.1 với PrismaPg adapter. Schema tại
 `apps/api/prisma/schema.prisma`; migration đầu tại
@@ -96,3 +96,21 @@ Real integration coverage includes 100 different authenticated customers racing 
 HTTP, overlapping opposite-order groups, rollback, early sale end, key races,
 ownership, reload recovery, order retry/pricing and SOLD cleanup safety. This is
 correctness evidence, not a throughput/capacity benchmark.
+
+## Phase 5 payment sessions and credentials
+
+Migrations 20261023010000_payment_sessions and 20261023020000_payment_settlement_refs
+were applied to development/test PostgreSQL. Payment stores a unique safe-integer
+providerOrderCode, unique retry UUID, checkout URL, original expiry/reconciliation
+clock, mock-only due/outcome and settled transfer references. No channel secrets or
+raw ticket credentials are stored in database rows. Unique(orderId, provider) plus
+order locks/service checks prevent another provider attempt on the same order.
+
+Ticket qrVersion=1 indicates a reproducible signed opaque credential; its hash is
+stored. Existing version-zero rows remain historical unless explicitly upgraded
+by the seed for its two known demo codes. WebhookEvent stores normalized payload
+hash, payment ID, outcome and processed time; unique provider/reference serializes
+callbacks. A ticket uniqueness error rolls back all inventory/order/payment/webhook
+writes and permits a safe retry after the underlying inconsistency is repaired.
+Extra distinct transfers are tracked for refund review without revoking valid
+existing tickets. The partial unique active-ticket/seat index remains unchanged.

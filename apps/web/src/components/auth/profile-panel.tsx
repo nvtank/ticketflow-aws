@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -176,7 +177,9 @@ export function ProfilePanel() {
         </Card>
       </div>
       <p className="mt-8 text-sm text-muted-foreground">
-        Vé QR sẽ được mở khi phân hệ thanh toán và phát hành vé hoàn tất.
+        <Link href="/my-tickets" className="text-primary underline">
+          Xem vé và mã QR của tôi
+        </Link>
       </p>
     </div>
   );

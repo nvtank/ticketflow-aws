@@ -1,3 +1,4 @@
+import type * as PaymentProviderModule from '../src/payments/payment-provider';
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
@@ -17,7 +18,10 @@ const { DatabaseService } = require('../dist/database/database.service.js') as t
 const { AuthProvider } = require('../dist/auth/auth-provider.js') as typeof Provider;
 const { HoldLifecycleService } =
   require('../dist/booking/hold-lifecycle.service.js') as typeof Lifecycle;
-export async function bookingFixture(customerCount = 101) {
+export async function bookingFixture(
+  customerCount = 101,
+  providerOverride?: PaymentProviderModule.PaymentProvider,
+) {
   const url = new URL(process.env.DATABASE_URL ?? '');
   if (
     !['localhost', '127.0.0.1'].includes(url.hostname) ||
@@ -25,7 +29,13 @@ export async function bookingFixture(customerCount = 101) {
     url.pathname !== '/tixflow_test'
   )
     throw new Error('Requires isolated local test PostgreSQL.');
-  const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  const builder = Test.createTestingModule({ imports: [AppModule] });
+  if (providerOverride) {
+    const { PaymentProvider } =
+      require('../dist/payments/payment-provider.js') as typeof PaymentProviderModule;
+    builder.overrideProvider(PaymentProvider).useValue(providerOverride);
+  }
+  const module = await builder.compile();
   const app = module.createNestApplication({ logger: false });
   configureApplication(app, parseEnvironment(process.env));
   await app.listen(0, '127.0.0.1');
@@ -113,7 +123,21 @@ export async function bookingFixture(customerCount = 101) {
         where: { eventId: { in: events } },
         select: { id: true },
       });
-    const entityIds = [...events, ...holds.map((h) => h.id), ...orders.map((o) => o.id)];
+    const payments = await db.payment.findMany({
+      where: { orderId: { in: orders.map((o) => o.id) } },
+      select: { id: true },
+    });
+    const entityIds = [
+      ...events,
+      ...holds.map((h) => h.id),
+      ...orders.map((o) => o.id),
+      ...payments.map((p) => p.id),
+    ];
+    await db.webhookEvent.deleteMany({ where: { paymentId: { in: payments.map((p) => p.id) } } });
+    await db.checkIn.deleteMany({ where: { ticket: { eventId: { in: events } } } });
+    await db.ticket.deleteMany({ where: { eventId: { in: events } } });
+    await db.payment.deleteMany({ where: { id: { in: payments.map((p) => p.id) } } });
+    await db.notification.deleteMany({ where: { userId: { in: ids } } });
     await db.auditLog.deleteMany({
       where: { OR: [{ actorId: { in: ids } }, { entityId: { in: entityIds } }] },
     });

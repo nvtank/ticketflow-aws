@@ -29,7 +29,9 @@
     "test:integration": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api test:integration",
     "test:e2e:auth": "pnpm build && playwright test --config playwright.auth.config.ts",
     "test:e2e:events": "pnpm build && playwright test --config playwright.events.config.ts",
-    "test:e2e:booking": "pnpm build && playwright test --config playwright.booking.config.ts"
+    "test:e2e:booking": "pnpm build && playwright test --config playwright.booking.config.ts",
+    "test:e2e:payments": "pnpm build && playwright test --config playwright.payments.config.ts",
+    "payos:webhook:register": "node scripts/register-payos-webhook.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
