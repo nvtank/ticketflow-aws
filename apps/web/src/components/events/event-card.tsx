@@ -46,7 +46,7 @@ export function EventCard({ event }: { event: Event }) {
           <span
             className={`size-1.5 rounded-full ${event.availableSeats ? 'bg-emerald-500' : 'bg-slate-400'}`}
           />
-          {event.availableSeats ? 'Đang mở bán' : 'Hết vé'}
+          {event.availableSeats ? 'Còn vé' : 'Hết vé'}
         </p>
         <h3 className="mt-3 text-lg leading-7 font-bold tracking-tight">
           <Link href={`/events/${event.slug}`} className="hover:text-primary">
