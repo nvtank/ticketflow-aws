@@ -814,3 +814,39 @@ and sanitized `.local/google-ui-inspection.log` record this boundary.
 Four commits cover schema/config, verified backend sessions/linking, UI and
 security/browser tests/runbook. Full hashes are exported after the final commit
 at `test-results/google-login-commits.txt` (ignored); Git is authoritative.
+
+## Experience redesign extension — 24/10/2026
+
+Implementation, automated verification and final local startup are complete. This extension
+uses the confirmed `nvtank` identity and actual commit timestamps outside the original
+seven-phase simulated schedule.
+
+A shared indigo/violet/ink visual system connects the landing, event catalog/detail,
+login/register, account navigation, checkout steps and QR ticket presentation. GSAP
+animates the hero; Motion handles short reveals, active navigation and FAQ expansion,
+respecting reduced-motion preferences. Local concert photography has source credits.
+
+New pages: `/about`, `/contributors`, `/artists`, `/artists/[slug]`, `/community`,
+`/guide`. They link to events, tickets, booking guidance and the supplied team GitHub
+accounts/repository. No dead placeholder pages or invented testimonials were added.
+
+An additive migration and development-only artist seed support the actual directory
+and event associations. Purchase-backed booking reviews enforce ownership, validated
+ratings/comments, single author/event records, transactional concurrent updates and
+audit records. Public reads hide cancelled/ineligible purchases. Completed event
+details remain available from community links. Session cache restoration preserves
+loading public-query observers rather than destroying them during login bootstrap.
+
+Verified so far: API/Next builds, strict typechecks, ESLint, formatting, 7 real database
+integration cases and 22 desktop/mobile browser cases. Local API/web readiness,
+new routes and normal-motion desktop/mobile rendering were checked successfully.
+
+Runbook and final verification details: [experience-redesign.md](experience-redesign.md).
+Runtime `.env` remains ignored/untracked; actual Google/PayOS/signing configuration
+has been scanned out of the changed source. No AWS service or deployment added.
+
+Final delivery: http://localhost:3000, API http://localhost:4000, Swagger /api/docs.
+PostgreSQL/Redis readiness is up; four labelled demo artist profiles are present and
+no customer reviews were seeded. The regular workspace Next build was restored
+from the temporary Linux build directory. Changes are collected in PR #19;
+full hashes/messages are exported locally after the documentation commit at `test-results/experience-redesign-commits.txt`.

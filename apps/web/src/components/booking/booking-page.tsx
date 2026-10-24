@@ -1,5 +1,6 @@
 'use client';
 import { WaitingGate } from './waiting-gate';
+import { BookingSteps } from './booking-steps';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,6 +37,7 @@ function BookingEvent({ slug }: { slug: string }) {
   });
   return (
     <div className="container py-8">
+      <BookingSteps current={1} />
       {event.data ? (
         event.data.waitingRoomEnabled ? (
           <WaitingGate key={event.data.id} eventId={event.data.id}>

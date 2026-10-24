@@ -13,55 +13,31 @@ import {
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
-import { Skeleton } from '@/components/ui/skeleton';
+import { QueryNotice } from '@/components/ui/query-notice';
+export { QueryNotice } from '@/components/ui/query-notice';
+import { ArtistCollection } from '@/components/discovery/artists';
+import { EventReviews } from '@/components/discovery/reviews';
 
-export function QueryNotice({
-  pending,
-  error,
-  retry,
-}: {
-  pending: boolean;
-  error: Error | null;
-  retry: () => void;
-}) {
-  if (pending)
-    return (
-      <div role="status" aria-label="Đang tải dữ liệu" className="space-y-4">
-        <Skeleton className="h-12" />
-        <Skeleton className="h-64" />
-      </div>
-    );
-  if (error)
-    return (
-      <EmptyState
-        title="Chưa thể tải dữ liệu"
-        description={error.message}
-        action={
-          <Button variant="outline" onClick={retry}>
-            Thử lại
-          </Button>
-        }
-      />
-    );
-  return null;
-}
 export function EventInformation({ event }: { event: EventData }) {
   return (
     <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1.7fr)_minmax(280px,1fr)]">
-      <div className="space-y-7">
-        <div className="relative flex min-h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950 via-violet-800 to-indigo-600 p-8 text-white">
-          {event.coverUrl && (
+      <div className="min-w-0 space-y-7">
+        <div className="relative flex min-h-80 overflow-hidden rounded-[24px] bg-gradient-to-br from-indigo-950 via-violet-800 to-indigo-600 p-8 text-white">
+          {
             <Image
-              unoptimized
+              unoptimized={!!event.coverUrl}
               width={1280}
               height={720}
-              src={event.coverUrl}
+              src={
+                event.coverUrl ||
+                (event.category === 'MUSIC' ? '/images/live-stage.jpg' : '/images/microphone.jpg')
+              }
               alt=""
               className="absolute inset-0 size-full object-cover"
             />
-          )}
-          <div className="relative mt-auto rounded-xl bg-slate-950/70 p-5">
+          }
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
+          <div className="relative mt-auto p-1">
             <p className="text-sm text-cyan-200">
               {categoryLabel[event.category] ?? event.category}
             </p>
@@ -90,6 +66,12 @@ export function EventInformation({ event }: { event: EventData }) {
             ))}
           </div>
         )}
+        {event.category === 'MUSIC' && (
+          <section>
+            <h2 className="mb-5 text-xl font-semibold">Âm sắc của sự kiện</h2>
+            <ArtistCollection query={`eventId=${event.id}`} limit={3} />
+          </section>
+        )}
         <Card>
           <h2 className="text-xl font-semibold">Chính sách vé</h2>
           <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
@@ -97,7 +79,7 @@ export function EventInformation({ event }: { event: EventData }) {
           </p>
         </Card>
       </div>
-      <aside className="space-y-5 lg:sticky lg:top-24">
+      <aside className="space-y-5 lg:sticky lg:top-32">
         <Card>
           <p className="flex gap-3">
             <CalendarDays className="size-5 shrink-0 text-primary" />
@@ -168,7 +150,12 @@ export function PublicEventDetail({ slug }: { slug: string }) {
         </Link>
       </Button>
       {query.data ? (
-        <EventInformation event={query.data} />
+        <>
+          <EventInformation event={query.data} />
+          <div className="mt-14 max-w-3xl">
+            <EventReviews eventId={query.data.id} slug={query.data.slug} />
+          </div>
+        </>
       ) : (
         <QueryNotice
           pending={query.isPending}

@@ -14,7 +14,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(
     () =>
       useAuthState.subscribe((state, previous) => {
-        if (state.user?.id !== previous.user?.id) queryClient.clear();
+        if (state.user?.id !== previous.user?.id) {
+          // Reset prior-account data without destroying entries: during hydration
+          // even an in-flight public query can briefly have zero observers.
+          // clear()/removeQueries() can orphan that observer in its loading state.
+          void queryClient.resetQueries();
+        }
       }),
     [queryClient],
   );

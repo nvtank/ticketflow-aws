@@ -2,7 +2,16 @@ import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 // Fresh API state per suite and viewport keeps real IP auth limits unchanged.
-const supported = ['waiting', 'auth', 'events', 'booking', 'payments', 'checkin', 'google'];
+const supported = [
+  'waiting',
+  'auth',
+  'events',
+  'booking',
+  'payments',
+  'checkin',
+  'google',
+  'experience',
+];
 const requested = process.argv.slice(2);
 if (requested.some((suite) => !supported.includes(suite))) throw new Error('Unknown browser suite');
 for (const suite of requested.length ? requested : supported) {

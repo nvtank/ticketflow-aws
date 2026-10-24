@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PaymentAction } from './payment-action';
 import { HoldCountdown } from './hold-countdown';
+import { BookingSteps } from './booking-steps';
 export function CheckoutPanel({ id }: { id: string }) {
   return (
     <AuthGate roles={[UserRole.CUSTOMER]} embedded>
@@ -61,6 +62,7 @@ function CheckoutOrder({ id }: { id: string }) {
   const order = query.data;
   return (
     <div className="container max-w-3xl space-y-6 py-10">
+      <BookingSteps current={order.status === 'PAID' ? 3 : 2} />
       <Link className="text-sm text-primary" href={`/events/${order.event.slug}/booking`}>
         ← Quay lại sơ đồ ghế
       </Link>
