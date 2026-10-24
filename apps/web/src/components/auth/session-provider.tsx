@@ -15,11 +15,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     () =>
       useAuthState.subscribe((state, previous) => {
         if (state.user?.id !== previous.user?.id) {
-          // Remove previous-account data while keeping mounted observers attached.
-          // clear() destroys an in-flight public query during refresh bootstrap,
-          // leaving its mounted useQuery observer stuck in the loading state.
-          queryClient.removeQueries({ type: 'inactive' });
-          void queryClient.resetQueries({ type: 'active' });
+          // Reset prior-account data without destroying entries: during hydration
+          // even an in-flight public query can briefly have zero observers.
+          // clear()/removeQueries() can orphan that observer in its loading state.
+          void queryClient.resetQueries();
         }
       }),
     [queryClient],

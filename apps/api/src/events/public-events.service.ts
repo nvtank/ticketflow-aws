@@ -58,7 +58,7 @@ export class PublicEventsService {
   async resolve(key: string) {
     const event = await this.db.event.findFirst({
       where: {
-        status: 'PUBLISHED',
+        status: { in: ['PUBLISHED', 'COMPLETED'] },
         organization: { status: 'APPROVED' },
         ...(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(key)
           ? { id: key }
