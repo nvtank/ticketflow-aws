@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowUpRight, Menu, Search, Bell } from 'lucide-react';
+import { ArrowUpRight, Menu, Search, Bell, Ticket } from 'lucide-react';
 import { useState } from 'react';
+import { m } from 'motion/react';
 import { Brand } from './brand';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,121 +18,120 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuthState } from '@/stores/auth';
 import { roleHome } from '@/lib/auth-session';
-
-const links = [
-  { href: '/', label: 'Trang chủ' },
-  { href: '/events', label: 'Khám phá sự kiện' },
-  { href: '/#categories', label: 'Danh mục' },
-];
+import { publicNavigation } from '@/lib/site';
 
 export function PublicHeader() {
   const pathname = usePathname();
   const user = useAuthState((state) => state.user);
-  const dark = pathname === '/';
   const [open, setOpen] = useState(false);
   return (
-    <header
-      className={cn(
-        'relative z-30 border-b',
-        dark ? 'border-white/10 bg-[#0b1020] text-white' : 'border-border bg-white',
-      )}
-    >
-      <div className="container flex h-20 items-center justify-between gap-6">
-        <Brand light={dark} />
-        <nav aria-label="Điều hướng chính" className="hidden items-center gap-7 lg:flex">
-          {[
-            ...links,
-            ...(user?.role === 'CUSTOMER' ? [{ href: '/my-tickets', label: 'Vé của tôi' }] : []),
-          ].map(({ href, label }) => (
-            <Link
-              key={`${href}:${label}`}
-              href={href}
-              aria-current={pathname === href ? 'page' : undefined}
-              className={cn(
-                'text-sm font-medium transition-colors hover:text-indigo-400',
-                pathname === href
-                  ? dark
-                    ? 'text-white'
-                    : 'text-primary'
-                  : dark
-                    ? 'text-slate-400'
-                    : 'text-muted-foreground',
-              )}
-            >
-              {label}
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl">
+      <div className="hidden border-b bg-[#f4f2fc] md:block">
+        <div className="container flex h-8 items-center justify-between text-[10px] font-medium tracking-wide">
+          <span className="text-slate-600">
+            Một tấm vé. Vạn trải nghiệm. <span className="ml-2 text-primary">Find your flow ↗</span>
+          </span>
+          <div className="flex gap-5">
+            <Link href="/guide" className="text-slate-600 hover:text-primary">
+              Hướng dẫn đặt vé
             </Link>
-          ))}
+            <Link href="/organizer" className="inline-flex items-center gap-1 text-primary">
+              Dành cho nhà tổ chức
+              <ArrowUpRight className="size-3" />
+            </Link>
+          </div>
+        </div>
+      </div>
+      <div className="container flex h-[76px] items-center justify-between gap-4">
+        <Brand />
+        <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 lg:flex">
+          {publicNavigation.map(({ href, label }) => {
+            const active = pathname === href || pathname.startsWith(href + '/');
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'relative rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors hover:text-primary',
+                  active ? 'text-primary' : 'text-slate-600',
+                )}
+              >
+                {active && (
+                  <m.span
+                    layoutId="public-nav-active"
+                    className="absolute inset-0 rounded-full bg-indigo-50"
+                    transition={{ type: 'spring', bounce: 0.1, duration: 0.4 }}
+                  />
+                )}
+                <span className="relative">{label}</span>
+              </Link>
+            );
+          })}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          <Link
+            href="/events#search"
+            aria-label="Tìm kiếm sự kiện"
+            className="rounded-full p-2.5 text-slate-600 hover:bg-muted"
+          >
+            <Search className="size-5" />
+          </Link>
           {user && (
             <Link
               href="/notifications"
               aria-label="Thông báo"
-              className="rounded-xl p-2.5 hover:bg-muted"
+              className="rounded-full p-2.5 text-slate-600 hover:bg-muted"
             >
               <Bell className="size-5" />
             </Link>
           )}
-          <Link
-            href="/events#search"
-            aria-label="Tìm kiếm sự kiện"
-            className={cn('rounded-xl p-2.5', dark ? 'hover:bg-white/10' : 'hover:bg-muted')}
-          >
-            <Search className="size-5" />
-          </Link>
-          <Link
-            href="/organizer"
-            className={cn(
-              'hidden items-center gap-1.5 text-sm font-medium xl:inline-flex',
-              dark ? 'text-slate-300' : 'text-muted-foreground',
-            )}
-          >
-            Dành cho nhà tổ chức
-            <ArrowUpRight className="size-4" />
-          </Link>
-          <span className="mx-1 hidden h-5 w-px bg-current opacity-15 sm:block" />
-          <Button asChild className="hidden sm:inline-flex">
+          <Button asChild className="hidden max-w-44 rounded-full sm:inline-flex">
             <Link href={user ? roleHome(user.role) : '/login'}>
-              {user ? user.name : 'Đăng nhập'}
+              <span className="truncate">{user ? user.name : 'Đăng nhập'}</span>
+              <ArrowUpRight />
             </Link>
           </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <button
-                className={cn(
-                  'rounded-xl p-2 lg:hidden',
-                  dark ? 'hover:bg-white/10' : 'hover:bg-muted',
-                )}
-                aria-label="Mở menu"
-              >
+              <button className="rounded-full p-2.5 hover:bg-muted lg:hidden" aria-label="Mở menu">
                 <Menu className="size-6" />
               </button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogTitle className="text-lg font-bold">Khám phá TixFlow</DialogTitle>
-              <DialogDescription className="mt-1 text-sm text-muted-foreground">
-                Kết nối với những trải nghiệm bạn yêu thích.
+            <DialogContent className="max-h-[90dvh] overflow-y-auto">
+              <DialogTitle className="text-xl font-bold">Khám phá TixFlow</DialogTitle>
+              <DialogDescription className="mt-2 text-sm text-muted-foreground">
+                Đi theo đam mê. Tìm khoảnh khắc của bạn.
               </DialogDescription>
-              <nav aria-label="Điều hướng trên di động" className="mt-6 flex flex-col gap-2">
+              <nav aria-label="Điều hướng trên di động" className="mt-6 flex flex-col gap-1">
                 {[
-                  ...links,
-                  ...(user?.role === 'CUSTOMER'
-                    ? [{ href: '/my-tickets', label: 'Vé của tôi' }]
-                    : []),
+                  { href: '/', label: 'Trang chủ' },
+                  ...publicNavigation,
+                  { href: '/contributors', label: 'Đội ngũ đóng góp' },
+                  { href: '/guide', label: 'Hướng dẫn đặt vé' },
+                  ...(user ? [{ href: '/my-tickets', label: 'Vé của tôi' }] : []),
                   { href: '/organizer', label: 'Dành cho nhà tổ chức' },
-                  { href: '/system', label: 'Trạng thái hệ thống' },
                   {
                     href: user ? roleHome(user.role) : '/login',
                     label: user ? 'Tài khoản của tôi' : 'Đăng nhập',
                   },
                 ].map(({ href, label }) => (
-                  <DialogClose asChild key={`${href}:${label}`}>
-                    <Link href={href} className="rounded-xl px-4 py-3 font-medium hover:bg-muted">
+                  <DialogClose asChild key={href}>
+                    <Link
+                      href={href}
+                      aria-current={pathname === href ? 'page' : undefined}
+                      className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium hover:bg-indigo-50 hover:text-primary"
+                    >
                       {label}
+                      <ArrowUpRight className="size-4" />
                     </Link>
                   </DialogClose>
                 ))}
               </nav>
+              <p className="mt-5 flex items-center gap-2 border-t pt-4 text-xs text-muted-foreground">
+                <Ticket className="size-4 text-primary" />
+                Mỗi đam mê đều xứng đáng có một chỗ ngồi.
+              </p>
             </DialogContent>
           </Dialog>
         </div>
