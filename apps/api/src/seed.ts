@@ -1,4 +1,5 @@
 import { credentialHash, ticketCredential } from './tickets/ticket-credential';
+import { seedDiscovery } from './discovery/seed-discovery';
 import { createHash, createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { hash } from 'bcryptjs';
@@ -306,6 +307,7 @@ async function seed(): Promise<void> {
       },
       { timeout: 60_000 },
     );
+    await seedDiscovery(prisma);
     console.log(
       'Seed completed: 5 users, 1 organization, 3 events, 300 seats, 1 paid order, 2 tickets. Existing demo passwords and sold inventory preserved.',
     );
