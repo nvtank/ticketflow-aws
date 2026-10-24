@@ -44,14 +44,31 @@ export function MyOrders() {
                         {formatCurrency(order.totalVnd)}
                       </p>
                     </div>
-                    <Button asChild variant="outline">
-                      <Link href={`/checkout/${order.id}`}>Xem đơn hàng</Link>
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button asChild variant="outline">
+                        <Link href={`/checkout/${order.id}`}>Xem đơn hàng</Link>
+                      </Button>
+                      {order.status === 'PAID' && (
+                        <Link
+                          className="text-xs font-semibold text-primary"
+                          href={`/events/${order.event.slug}#reviews`}
+                        >
+                          Chia sẻ trải nghiệm ↗
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </Card>
               ))
             ) : (
-              <Card>Chưa có đơn hàng. Khám phá sự kiện và chọn ghế để bắt đầu.</Card>
+              <Card>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  Chưa có đơn hàng. Khám phá sự kiện và chọn ghế để bắt đầu.
+                </p>
+                <Button asChild variant="outline" className="mt-4">
+                  <Link href="/events">Tìm trải nghiệm tiếp theo</Link>
+                </Button>
+              </Card>
             )}
           </div>
           <div className="mt-5 flex justify-center gap-3">

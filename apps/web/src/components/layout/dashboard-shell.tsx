@@ -65,6 +65,7 @@ export function DashboardShell({
           { href: '/profile', label: 'Hồ sơ của tôi', icon: Users },
           { href: '/system', label: 'Trạng thái hệ thống', icon: Activity },
           { href: '/events', label: 'Khám phá sự kiện', icon: ArrowUpRight },
+          { href: '/guide', label: 'Hướng dẫn sử dụng', icon: Ticket },
         ].map(({ href, label, icon: Icon }) => (
           <Link
             onClick={() => setSidebarOpen(false)}
@@ -74,7 +75,7 @@ export function DashboardShell({
             className={cn(
               'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium',
               pathname === href
-                ? 'bg-indigo-50 text-primary'
+                ? 'bg-indigo-600 text-white shadow-sm'
                 : 'text-muted-foreground hover:bg-muted',
             )}
           >
@@ -95,7 +96,7 @@ export function DashboardShell({
     </div>
   );
   return (
-    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[#f6f5fb] lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-screen border-r bg-white lg:block">{sidebar}</aside>
       <div className="min-w-0">
         <header className="flex min-h-20 items-center justify-between gap-4 border-b bg-white px-5 md:px-9">
