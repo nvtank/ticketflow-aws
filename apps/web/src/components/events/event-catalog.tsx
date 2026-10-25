@@ -1,20 +1,17 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, CalendarDays, MapPin, Search, Music2 } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EVENT_CATEGORIES } from '@tixflow/shared';
 import { apiGet, eventListSchema } from '@/lib/api-client';
-import { categoryLabel, dateTime } from '@/lib/events';
-import { formatCurrency } from '@/lib/utils';
+import { categoryLabel } from '@/lib/events';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { EventGrid } from './event-card';
 import { QueryNotice } from './event-detail';
-const control = 'h-11 w-full rounded-xl border bg-white px-3 text-sm';
+const control = 'h-11 w-full rounded-xl border bg-card px-3 text-sm';
 export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
   const params = useSearchParams(),
     router = useRouter();
@@ -45,7 +42,8 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
       {searchable && (
         <form
           key={params.toString()}
-          className="mb-8 rounded-2xl border bg-white p-5"
+          id="search"
+          className="mb-9 scroll-mt-32 rounded-2xl border bg-card p-5 shadow-sm md:p-6"
           onSubmit={(event) => {
             event.preventDefault();
             const next = new URLSearchParams();
@@ -56,7 +54,11 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
             router.push(`/events?${next}`);
           }}
         >
-          <div className="flex gap-3">
+          <p className="mb-4 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <SlidersHorizontal className="size-4" />
+            Tìm đúng trải nghiệm dành cho bạn
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
             <label className="sr-only" htmlFor="event-search">
               Tìm sự kiện theo tên
             </label>
@@ -163,58 +165,11 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
         />
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {events.data.items.map((event) => (
-              <Card key={event.id} className="overflow-hidden p-0">
-                <div className="relative flex h-44 items-center justify-center bg-gradient-to-br from-indigo-950 via-violet-800 to-indigo-500 text-white">
-                  {event.coverUrl ? (
-                    <Image
-                      unoptimized
-                      width={1280}
-                      height={720}
-                      src={event.coverUrl}
-                      alt=""
-                      loading="lazy"
-                      className="size-full object-cover"
-                    />
-                  ) : (
-                    <Music2 className="size-16 opacity-60" />
-                  )}
-                  <span className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-indigo-900">
-                    {categoryLabel[event.category] ?? event.category}
-                  </span>
-                </div>
-                <div className="p-5">
-                  <Badge>{event.availableSeats ? 'Còn vé' : 'Hết vé'}</Badge>
-                  <h3 className="mt-3 text-xl font-bold">
-                    <Link href={`/events/${event.slug}`}>{event.title}</Link>
-                  </h3>
-                  <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <CalendarDays className="size-4 shrink-0" />
-                    {dateTime(event.startsAt)}
-                  </p>
-                  <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="size-4 shrink-0" />
-                    {event.venueName}, {event.city}
-                  </p>
-                  <div className="mt-6 flex items-center justify-between gap-3 border-t pt-4">
-                    <strong className="text-primary">Từ {formatCurrency(event.minPriceVnd)}</strong>
-                    <Link
-                      href={`/events/${event.slug}`}
-                      className="inline-flex items-center gap-1 text-sm text-primary"
-                    >
-                      Xem chi tiết
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <EventGrid events={events.data.items} />
           {searchable && (
             <nav
               aria-label="Phân trang sự kiện"
-              className="mt-8 flex items-center justify-center gap-4"
+              className="mt-8 flex flex-wrap items-center justify-center gap-4"
             >
               <Button
                 variant="outline"

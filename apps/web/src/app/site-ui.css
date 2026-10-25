@@ -1,0 +1,259 @@
+/* Shared application surfaces derived from the TikFlow homepage. */
+:root {
+  color-scheme: dark;
+  --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Be Vietnam Pro', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.site-main {
+  min-height: 65vh;
+  padding-top: 118px;
+}
+
+:where(h1, h2, h3) {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+.site-main h1,
+.workspace-main h1 {
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.site-main > .container > h1,
+.site-main > .container > div > h1,
+.workspace-main h1 {
+  font-size: clamp(30px, 4vw, 48px);
+}
+
+.site-main .display-title {
+  font-size: clamp(38px, 6vw, 76px);
+}
+
+.site-main .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.6;
+}
+
+.site-main .eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.site-main .experience-card {
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.site-main .flow-cta {
+  border: 1px solid var(--border);
+}
+
+.site-main .world-heading {
+  color: var(--foreground);
+  font-size: clamp(36px, 5vw, 64px);
+}
+
+.site-main .world-label {
+  color: var(--primary);
+  font-family: var(--font-sans);
+}
+
+.site-main .world-label > span {
+  border-radius: 50%;
+}
+
+.site-main .world-button {
+  min-height: 48px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.site-main .world-button:hover {
+  background: #deff9e;
+}
+
+.site-main .world-button-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.site-main .world-button-secondary:hover {
+  background: var(--muted);
+}
+
+.site-main .editorial-hero {
+  border-bottom: 1px solid var(--border);
+  padding-top: 40px;
+  background: radial-gradient(ellipse at 0% 10%, #c8ff5f09, transparent 60%), var(--background);
+}
+
+.editorial-hero-media {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.site-main .editorial-faq,
+.site-main .editorial-cta {
+  border-block: 1px solid var(--border);
+}
+
+.site-main .ticket-perforation::before,
+.site-main .ticket-perforation::after {
+  background: var(--card);
+}
+
+:where(select, textarea) {
+  color: var(--foreground);
+  color-scheme: dark;
+  accent-color: var(--primary);
+}
+
+:where(input, select, textarea)[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+:where(select, textarea):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+:where(input[type='checkbox'], input[type='radio']) {
+  accent-color: var(--primary);
+}
+
+.tf-nav-links a[aria-current='page'] {
+  color: var(--primary);
+}
+
+.tf-site-menu .tf-menu-links a[aria-current='page'] {
+  color: var(--primary);
+}
+
+.tf-nav[data-variant='interior'] .tf-nav-shell {
+  background: #0a0d17f2;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--foreground);
+  font: 700 29px/1 var(--font-display);
+  letter-spacing: -1.8px;
+}
+
+.site-brand > svg {
+  width: 35px;
+  height: 35px;
+  padding: 6px;
+  border-radius: 9px;
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.site-brand sup {
+  margin-left: 2px;
+  font-size: 10px;
+  vertical-align: top;
+  letter-spacing: 0;
+}
+
+.workspace-sidebar {
+  background: #0e111b;
+}
+
+.workspace-sidebar nav a {
+  transition:
+    background 180ms,
+    color 180ms;
+}
+
+.workspace-sidebar nav a[aria-current='page'] {
+  box-shadow: inset 0 0 0 1px #c8ff5f30;
+  background: #c8ff5f12;
+  color: var(--primary);
+}
+
+.workspace-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #090b13eb;
+  backdrop-filter: blur(16px);
+}
+
+.workspace-main {
+  min-height: calc(100dvh - 80px);
+}
+
+.workspace-main :where(th) {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.workspace-main :where(td, th) {
+  padding: 14px 12px;
+  border-color: var(--border);
+  text-align: left;
+}
+
+.workspace-main :where(tbody tr:hover) {
+  background: #ffffff03;
+}
+
+.workspace-sidebar-panel {
+  max-height: 100dvh;
+}
+
+@media (max-width: 360px) {
+  .tf-motion-nav .tf-notifications {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-main {
+    padding-top: 104px;
+  }
+
+  .site-main .page-intro {
+    padding-block: 24px 40px;
+  }
+
+  .site-main .editorial-hero {
+    padding-top: 24px;
+  }
+
+  .site-main .editorial-hero h1 {
+    font-size: clamp(34px, 8vw, 52px);
+    overflow-wrap: anywhere;
+  }
+
+  .site-main .editorial-hero-media {
+    height: 300px;
+  }
+
+  .site-main .flow-cta {
+    border-radius: 20px;
+  }
+
+  .site-main :where(.tf-search-dialog input, select, textarea) {
+    font-size: 16px;
+  }
+}

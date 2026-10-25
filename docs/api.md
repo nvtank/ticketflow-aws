@@ -245,3 +245,28 @@ properties, verified against the running local `/api/docs-json` document.
 Google configuration/challenge/login and authenticated link/methods endpoints are
 documented in [google-auth.md](google-auth.md). Google-only users have no local
 password; email collisions require explicit linking by the authenticated owner.
+
+## Artist discovery and booking reviews
+
+All paths below are under `/api/v1`; query fields validated by DTOs are documented
+in Swagger. Public APIs never return email, ticket IDs or QR credentials.
+
+| Method | Path                              | Access / behavior                                                                                                                                    |
+| ------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/artists`                        | Public. `q`, `genre`, `eventId`, `page`, `pageSize` (max 50); published profiles, genre choices and upcoming public-event counts                     |
+| GET    | `/artists/:slug`                  | Public published profile and up to 24 upcoming events belonging to approved organizations; private events excluded                                   |
+| GET    | `/reviews`                        | Public. `eventId`, `rating` (1–5), `sort=recent\|highest`, pagination; actual average/count/distribution, no invented fallback ratings               |
+| GET    | `/events/:eventId/review-context` | Authenticated own eligibility/review                                                                                                                 |
+| PUT    | `/events/:eventId/review`         | Authenticated. `{rating: 1..5, comment: 10..2000 chars}`. Requires owned paid valid/used ticket, published/completed event and approved organization |
+| DELETE | `/reviews/:id`                    | Authenticated author only; others receive 404                                                                                                        |
+
+One review per author/event. PUT serializes same-author submissions using a
+PostgreSQL transaction advisory lock and locks purchase records while verifying
+eligibility. Both PUT and DELETE audit their changes and are throttled. Public
+reads hide reviews if the author is locked, the ticket cancelled, payment is no
+longer paid, or the event/organization becomes private. Comments are rendered as
+escaped text. These are booking-experience reviews, not attendance testimonials.
+
+Public `GET /events/:key` also reads completed events from approved organizations,
+so a community review can lead back to its event. The upcoming catalog and seat
+purchase flows keep their existing published/open-sales requirements.

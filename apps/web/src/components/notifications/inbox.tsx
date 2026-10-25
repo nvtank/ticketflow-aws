@@ -1,4 +1,5 @@
 'use client';
+import { AccountNavigation } from '@/components/layout/account-navigation';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -47,6 +48,7 @@ function Inbox() {
   });
   return (
     <div className="container max-w-3xl space-y-6 py-10">
+      <AccountNavigation />
       <h1 className="text-3xl font-bold">Thông báo của tôi</h1>
       {query.data ? (
         <>

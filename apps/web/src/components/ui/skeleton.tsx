@@ -3,10 +3,6 @@ import { cn } from '@/lib/utils';
 
 export function Skeleton({ className, ...props }: ComponentProps<'div'>) {
   return (
-    <div
-      aria-hidden="true"
-      className={cn('skeleton rounded-xl bg-slate-200', className)}
-      {...props}
-    />
+    <div aria-hidden="true" className={cn('skeleton rounded-xl bg-muted', className)} {...props} />
   );
 }

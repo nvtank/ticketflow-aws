@@ -45,10 +45,10 @@ const schema = z
     path: ['sections'],
   });
 const seatColors = {
-  AVAILABLE: 'bg-green-100 text-green-900 hover:bg-green-200',
-  UNAVAILABLE: 'bg-slate-100 text-slate-500',
+  AVAILABLE: 'bg-success/15 text-success hover:bg-success/25',
+  UNAVAILABLE: 'bg-muted text-muted-foreground',
   SOLD: 'bg-slate-700 text-white',
-  HELD: 'bg-amber-100 text-amber-900',
+  HELD: 'bg-warning/15 text-warning',
 };
 export function SeatGridEditor({ event }: { event: EventDetail }) {
   const cache = useQueryClient(),
@@ -138,7 +138,7 @@ export function SeatGridEditor({ event }: { event: EventDetail }) {
                       type={numeric ? 'number' : 'text'}
                       {...form.register(`sections.${index}.${name}`, { valueAsNumber: numeric })}
                     />
-                    <span className="mt-1 block text-red-600">
+                    <span className="mt-1 block text-danger">
                       {form.formState.errors.sections?.[index]?.[name]?.message}
                     </span>
                   </label>
@@ -151,7 +151,7 @@ export function SeatGridEditor({ event }: { event: EventDetail }) {
               )}
             </fieldset>
           ))}
-          <p role="status" className="text-xs text-red-600">
+          <p role="status" className="text-xs text-danger">
             {form.formState.errors.sections?.root?.message ??
               form.formState.errors.sections?.message}
           </p>
@@ -176,7 +176,7 @@ export function SeatGridEditor({ event }: { event: EventDetail }) {
           </div>
         </form>
       ) : (
-        <p className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-900">
+        <p className="mt-4 rounded-xl bg-primary/10 p-4 text-sm text-foreground">
           Thông tin đã gửi duyệt hoặc công bố; sơ đồ được khóa.
         </p>
       )}

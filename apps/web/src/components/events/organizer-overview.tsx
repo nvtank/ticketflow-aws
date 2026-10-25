@@ -26,7 +26,7 @@ export function OrganizerOverview() {
     <>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm text-primary">TixFlow Organizer</p>
+          <p className="text-sm text-primary">TikFlow Organizer</p>
           <h1 className="mt-2 text-3xl font-bold">Không gian nhà tổ chức</h1>
           <p className="mt-3 text-muted-foreground">
             Quản lý sự kiện và theo dõi số liệu từ đơn hàng thực tế.

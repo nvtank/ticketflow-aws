@@ -97,7 +97,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
             aria-invalid={!!form.formState.errors.name}
             aria-describedby="name-error"
           />
-          <p id="name-error" className="mt-1 text-xs text-red-600">
+          <p id="name-error" className="mt-1 text-xs text-danger">
             {form.formState.errors.name?.message}
           </p>
         </div>
@@ -116,7 +116,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
           aria-invalid={!!form.formState.errors.email}
           aria-describedby="email-error"
         />
-        <p id="email-error" className="mt-1 text-xs text-red-600">
+        <p id="email-error" className="mt-1 text-xs text-danger">
           {form.formState.errors.email?.message}
         </p>
       </div>
@@ -135,12 +135,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         <p id="password-help" className="mt-2 text-xs leading-5 text-muted-foreground">
           Ít nhất 12 ký tự, tối đa 72 byte UTF-8.
         </p>
-        <p id="password-error" className="mt-1 text-xs text-red-600">
+        <p id="password-error" className="mt-1 text-xs text-danger">
           {form.formState.errors.password?.message}
         </p>
       </div>
       {mutation.isError && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+        <p role="alert" className="rounded-xl bg-danger/10 p-3 text-sm text-danger">
           {mutation.error.message}
         </p>
       )}

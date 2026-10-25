@@ -3,12 +3,13 @@ import { Suspense } from 'react';
 import { AuthForm } from '@/components/auth/auth-form';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { AuthScene } from '@/components/auth/auth-scene';
 
 export const metadata: Metadata = { title: 'Đăng nhập' };
 export default function LoginPage() {
   return (
-    <div className="container flex justify-center py-12 md:py-20">
-      <Card className="w-full max-w-lg p-7 md:p-10">
+    <AuthScene>
+      <Card className="w-full max-w-lg border-0 bg-transparent p-2 shadow-none sm:p-7">
         <Badge>Chào mừng trở lại</Badge>
         <h1 className="mt-5 text-3xl font-bold tracking-tight">Tiếp tục dòng cảm xúc.</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -24,6 +25,6 @@ export default function LoginPage() {
           <AuthForm mode="login" />
         </Suspense>
       </Card>
-    </div>
+    </AuthScene>
   );
 }

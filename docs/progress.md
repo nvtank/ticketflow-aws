@@ -814,3 +814,135 @@ and sanitized `.local/google-ui-inspection.log` record this boundary.
 Four commits cover schema/config, verified backend sessions/linking, UI and
 security/browser tests/runbook. Full hashes are exported after the final commit
 at `test-results/google-login-commits.txt` (ignored); Git is authoritative.
+
+## Experience redesign extension — 24/10/2026
+
+Implementation, automated verification and final local startup are complete. This extension
+uses the confirmed `nvtank` identity and actual commit timestamps outside the original
+seven-phase simulated schedule.
+
+A shared indigo/violet/ink visual system connects the landing, event catalog/detail,
+login/register, account navigation, checkout steps and QR ticket presentation. GSAP
+animates the hero; Motion handles short reveals, active navigation and FAQ expansion,
+respecting reduced-motion preferences. Local concert photography has source credits.
+
+New pages: `/about`, `/contributors`, `/artists`, `/artists/[slug]`, `/community`,
+`/guide`. They link to events, tickets, booking guidance and the supplied team GitHub
+accounts/repository. No dead placeholder pages or invented testimonials were added.
+
+An additive migration and development-only artist seed support the actual directory
+and event associations. Purchase-backed booking reviews enforce ownership, validated
+ratings/comments, single author/event records, transactional concurrent updates and
+audit records. Public reads hide cancelled/ineligible purchases. Completed event
+details remain available from community links. Session cache restoration preserves
+loading public-query observers rather than destroying them during login bootstrap.
+
+Verified so far: API/Next builds, strict typechecks, ESLint, formatting, 7 real database
+integration cases and 22 desktop/mobile browser cases. Local API/web readiness,
+new routes and normal-motion desktop/mobile rendering were checked successfully.
+
+Runbook and final verification details: [experience-redesign.md](experience-redesign.md).
+Runtime `.env` remains ignored/untracked; actual Google/PayOS/signing configuration
+has been scanned out of the changed source. No AWS service or deployment added.
+
+Final delivery: http://localhost:3000, API http://localhost:4000, Swagger /api/docs.
+PostgreSQL/Redis readiness is up; four labelled demo artist profiles are present and
+no customer reviews were seeded. The regular workspace Next build was restored
+from the temporary Linux build directory. Changes are collected in PR #19;
+full hashes/messages are exported locally after the documentation commit at `test-results/experience-redesign-commits.txt`.
+
+## Open Worlds frontend — 24/10/2026
+
+Scope follows the latest request: complete a shared visual foundation and one
+polished homepage before extending cinematic compositions to other routes.
+
+Implemented:
+
+- Central obsidian/forest/grass/sand palette, accessible dark green application
+  controls, Space Grotesk Vietnamese/Latin local fonts and shared section/CTA tokens.
+- Floating block navigation with scroll state, actual account links, active route
+  indicator, mobile Radix menu, unified brand and footer.
+- Online CC0 voxel artwork, locally stored WebP and explicit provenance/license
+  manifest; original concert photos retained for actual event context.
+- SplitText hero entrance, desktop image depth, masked section reveals, a bounded
+  desktop portal pin and native mobile scrolling. Scoped cleanup and reduced motion.
+- Category gallery linked to real filters; live three-event API query with search,
+  loading/error/retry/empty states; keyboard-accessible three-step booking guide.
+- Existing routes and all auth/payment/booking/backend logic retained.
+- Design/audit notes: `docs/world-design.md`; read-only browser suite:
+  `pnpm test:e2e:world` with the local API/web already running.
+
+Initial verification: web build and strict typecheck passed; changed-source ESLint
+passed. Browser suite: 7/8 passed, revealing a rapid close/reopen mobile menu issue.
+The closing CSS animation was removed so Radix can immediately unmount and restore
+focus without a closing overlay competing with reopening. Final verification is
+recorded below after running it. Four-width initial preview had no horizontal
+overflow or page errors; offscreen gallery images correctly remained lazy-loaded.
+No production performance/load claim is made. Existing feature workflows were not
+retested exhaustively in this presentation-only increment.
+
+## Editorial homepage — 24/10/2026
+
+Latest direction: replace the voxel homepage with user-supplied concert photography,
+Gloock + Manrope, film grain and cinematic scroll choreography. Previous additions
+to the other pages are preserved and given their shared editorial base styles.
+
+Implemented source:
+
+- New homepage composition: sticky photograph hero, statement strip, asymmetrical
+  photo pair, velocity ticker, discovery gallery, live events, booking steps, live
+  count-up statistics and a revealing endcap with outlined ghost wordmark.
+- Lenis 1.3.27, synchronized through the GSAP ticker/ScrollTrigger, same-page anchors
+  and cleanup when leaving the homepage. Native touch scrolling is retained.
+- ScrollTrigger hero zoom/staggers, scrubbed statement, photo breathing/parallax,
+  ticker velocity skew clamped to ±6°, 2px progress line and hover treatments.
+- Gloock/Manrope self-hosted from Google Fonts with OFL licenses. Vietnamese body
+  content uses Manrope; Gloock display statements use its supported Latin glyphs.
+- Original local vector-only SVGA ticket animation; dynamically loaded svga-web
+  2.4.4, visible-area playback, reduced-motion fallback and explicit cleanup.
+- Real API event search/listing and event/artist/review counts; no invented metrics.
+- Desktop curtain layering at >=761px; reduced motion and narrower viewports
+  use regular document flow. User requested desktop focus and limited checks.
+- Previous mobile navigation timeout was traced to decorative ordinal text in
+  accessible link names, rather than a broken route. Ordinals are now aria-hidden.
+  Mobile tests were not rerun after the user requested stopping that work.
+
+Verification so far: strict web typecheck passed; production compilation and build
+TypeScript passed. Final output/browser result is recorded below once available.
+See `docs/homepage-editorial.md` for implementation and asset provenance.
+
+Final editorial build (including the bounded hero/curtain stage) passed production
+compilation, TypeScript and route generation. localhost:3000 was restarted and
+returned HTTP 200. The first desktop browser review confirmed Lenis, both fonts,
+all requested photos and actual SVGA canvas rendering, with no page errors or
+failed content requests. It exposed premature endcap layering, corrected by the
+foreground .ed-stage wrapper. The user then prioritized immediately restarting
+localhost; a second full browser pass and mobile testing were not run. Preview
+images under test-results/editorial-preview from the initial review are diagnostic
+and precede the layering fix. Private .env files were not changed or pushed.
+
+## Shared homepage UI across the website — 25/10/2026
+
+The active dark/lime homepage now supplies the shared visual system for all public,
+account/booking/payment and organizer/admin/staff routes. Header/menu/footer,
+wordmark, fonts, semantic colours, controls, cards, charts, dialogs, tables and
+fallbacks were aligned. Existing business logic and server contracts are retained.
+The about-page voxel illustration was replaced by existing local concert photography.
+
+Initial checks passed: web TypeScript, source ESLint, formatting and 62 fixture
+browser cases (31 routes at 1440px and 390px), including error/retry, invalid form
+fields, seat selection, QR backing, checkout confirmation and the mobile workspace
+drawer. A separate 320px signed-in check found clipped navbar controls; the compact
+layout now moves notifications into the existing menu at that width.
+
+Final production compilation, TypeScript and route generation passed. Seven
+production follow-up cases passed: payment success/failure and waiting room on
+desktop/mobile, plus the signed-in 320px navbar/menu. The existing local API was
+restarted; PostgreSQL/Redis health is up. A read-only browser check loaded three
+actual local events and opened event detail without page errors. Production
+preview is running at http://localhost:3000, API at http://localhost:4000.
+Homepage regression also passed desktop/mobile/reduced motion, API retry/search
+navigation and JavaScript-disabled content, without page errors or overflow.
+
+Implementation and repeatable read-only browser checks: `docs/site-ui.md` and
+`pnpm test:e2e:ui`. No credentials, seeds, payment behavior or backend code changed.

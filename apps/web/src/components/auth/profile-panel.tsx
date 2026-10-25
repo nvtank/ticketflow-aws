@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { GoogleAuthButton } from './google-auth-button';
+import { AccountNavigation } from '@/components/layout/account-navigation';
 
 const profileSchema = z.object({
   name: z.string().trim().min(2, 'Họ tên cần ít nhất 2 ký tự.').max(100),
@@ -90,11 +91,15 @@ export function ProfilePanel() {
 
   return (
     <div className="container py-12 md:py-16">
+      <AccountNavigation />
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-primary">Tài khoản TixFlow</p>
+          <p className="eyebrow">Không gian của bạn</p>
           <h1 className="mt-3 text-3xl font-bold">Hồ sơ của tôi</h1>
           <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
+          <p className="mt-3 text-xs leading-6 text-muted-foreground">
+            Chăm chút hồ sơ, quản lý đăng nhập và tìm lại những cuộc hẹn đã đặt.
+          </p>
         </div>
         <LogoutButton />
       </div>
@@ -117,7 +122,7 @@ export function ProfilePanel() {
                 aria-describedby="profile-name-error"
                 aria-invalid={!!profile.formState.errors.name}
               />
-              <p id="profile-name-error" className="mt-1 text-xs text-red-600">
+              <p id="profile-name-error" className="mt-1 text-xs text-danger">
                 {profile.formState.errors.name?.message}
               </p>
             </div>
@@ -133,7 +138,7 @@ export function ProfilePanel() {
                 aria-describedby="profile-phone-error"
                 aria-invalid={!!profile.formState.errors.phone}
               />
-              <p id="profile-phone-error" className="mt-1 text-xs text-red-600">
+              <p id="profile-phone-error" className="mt-1 text-xs text-danger">
                 {profile.formState.errors.phone?.message}
               </p>
             </div>
@@ -180,7 +185,7 @@ export function ProfilePanel() {
                       aria-invalid={!!password.formState.errors[field]}
                       aria-describedby={`${key}-error`}
                     />
-                    <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
+                    <p id={`${key}-error`} className="mt-1 text-xs text-danger">
                       {password.formState.errors[field]?.message}
                     </p>
                   </div>

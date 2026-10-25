@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { QueryNotice } from './event-detail';
 export function OrganizerEventList({ compact = false }: { compact?: boolean }) {
+  const Heading = compact ? 'h2' : 'h1';
+  const ItemHeading = compact ? 'h3' : 'h2';
   const [page, setPage] = useState(1),
     [status, setStatus] = useState('');
   const query = useQuery({
@@ -24,20 +26,20 @@ export function OrganizerEventList({ compact = false }: { compact?: boolean }) {
   return (
     <section>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className={compact ? 'text-xl font-semibold' : 'text-3xl font-bold'}>
+        <Heading className={compact ? 'text-xl font-semibold' : 'text-3xl font-bold'}>
           Sự kiện của tổ chức
-        </h1>
-        <Button asChild>
-          <Link href="/organizer/events/new">
-            <Plus />
-            Tạo sự kiện
+        </Heading>
+        <Button asChild variant={compact ? 'outline' : 'default'}>
+          <Link href={compact ? '/organizer/events' : '/organizer/events/new'}>
+            {compact ? <ArrowUpRight /> : <Plus />}
+            {compact ? 'Xem tất cả' : 'Tạo sự kiện'}
           </Link>
         </Button>
       </div>
       <label className="mb-6 block max-w-xs text-sm">
         Trạng thái
         <select
-          className="mt-2 h-11 w-full rounded-xl border bg-white px-3"
+          className="mt-2 h-11 w-full rounded-xl border bg-card px-3"
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);
@@ -59,14 +61,14 @@ export function OrganizerEventList({ compact = false }: { compact?: boolean }) {
               <Card key={event.id} className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <Badge>{statusLabel[event.status]}</Badge>
-                  <h2 className="mt-3 text-lg font-semibold">{event.title}</h2>
+                  <ItemHeading className="mt-3 text-lg font-semibold">{event.title}</ItemHeading>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {dateTime(event.startsAt)} · {event.city} ·{' '}
                     {event.sections.reduce((sum, s) => sum + s.totalSeats, 0)} ghế
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">{event.organization.name}</p>
                   {event.rejectionReason && (
-                    <p className="mt-3 text-sm text-red-600">
+                    <p className="mt-3 text-sm text-danger">
                       Lý do từ chối: {event.rejectionReason}
                     </p>
                   )}

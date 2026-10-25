@@ -22,7 +22,7 @@ const organizationsSchema = z.array(
   z.object({ id: z.string(), name: z.string(), status: z.string() }),
 );
 const fieldClass =
-  'w-full rounded-xl border bg-white px-3 py-3 text-sm focus-visible:outline-2 focus-visible:outline-primary';
+  'w-full rounded-xl border bg-card px-3 py-3 text-sm focus-visible:outline-2 focus-visible:outline-primary';
 type Values = z.infer<typeof eventFormSchema>;
 export function EventEditor({ event }: { event?: EventDetail }) {
   const router = useRouter(),
@@ -124,7 +124,7 @@ export function EventEditor({ event }: { event?: EventDetail }) {
         aria-invalid={!!form.formState.errors[key]}
         aria-describedby={`${key}-error`}
       />
-      <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
+      <p id={`${key}-error`} className="mt-1 text-xs text-danger">
         {form.formState.errors[key]?.message}
       </p>
     </div>
@@ -142,7 +142,7 @@ export function EventEditor({ event }: { event?: EventDetail }) {
         aria-invalid={!!form.formState.errors[key]}
         aria-describedby={`${key}-error`}
       />
-      <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
+      <p id={`${key}-error`} className="mt-1 text-xs text-danger">
         {form.formState.errors[key]?.message}
       </p>
     </div>
@@ -174,7 +174,7 @@ export function EventEditor({ event }: { event?: EventDetail }) {
                 </option>
               ))}
           </select>
-          <span id="organizationId-error" className="mt-1 block text-xs text-red-600">
+          <span id="organizationId-error" className="mt-1 block text-xs text-danger">
             {form.formState.errors.organizationId?.message}
           </span>
         </div>

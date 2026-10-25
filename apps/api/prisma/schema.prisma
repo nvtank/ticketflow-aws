@@ -42,6 +42,7 @@ model User {
   checkIns         CheckIn[]
   waitingSessions  WaitingRoomSession[]
   notifications    Notification[]
+  reviews          EventReview[]
 
   @@index([role, createdAt])
 }
@@ -192,6 +193,8 @@ model Event {
   orders             Order[]
   assignments        EventStaffAssignment[]
   waitingSessions    WaitingRoomSession[]
+  artists            EventArtist[]
+  reviews            EventReview[]
 
   @@index([status, startsAt])
   @@index([organizationId, status])
@@ -348,9 +351,54 @@ model Ticket {
   status      TicketStatus @default(VALID)
   createdAt   DateTime     @default(now()) @db.Timestamptz(3)
   checkIn     CheckIn?
+  reviews     EventReview[]
 
   @@unique([orderItemId, seatId, eventId])
   @@index([eventId, status])
+}
+
+model Artist {
+  id          String        @id @default(uuid()) @db.Uuid
+  slug        String        @unique @db.VarChar(120)
+  name        String        @db.VarChar(100)
+  genre       String        @db.VarChar(60)
+  tagline     String        @db.VarChar(200)
+  biography   String
+  color       String        @default("violet") @db.VarChar(20)
+  isDemo      Boolean       @default(false)
+  isPublished Boolean       @default(false)
+  events      EventArtist[]
+
+  @@index([isPublished, name])
+}
+
+model EventArtist {
+  eventId  String @db.Uuid
+  artistId String @db.Uuid
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, artistId])
+  @@index([artistId])
+}
+
+model EventReview {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @db.Uuid
+  authorId  String   @db.Uuid
+  ticketId  String   @db.Uuid
+  rating    Int
+  comment   String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, authorId])
+  @@index([createdAt, id])
+  @@index([authorId])
+  @@index([ticketId])
 }
 
 model CheckIn {

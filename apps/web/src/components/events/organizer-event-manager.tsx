@@ -77,7 +77,7 @@ export function OrganizerEventManager({ id }: { id: string }) {
         )}
       </div>
       {event.rejectionReason && (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
           Lý do từ chối: {event.rejectionReason}
         </p>
       )}

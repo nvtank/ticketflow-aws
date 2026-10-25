@@ -73,13 +73,13 @@ export function WaitingGate({
       <Card className="mx-auto max-w-xl space-y-5">
         <Hourglass className="size-9 text-primary" />
         <h1 className="text-2xl font-bold">
-          {admitted ? 'Đã đến lượt đặt vé' : 'Phòng chờ TixFlow'}
+          {admitted ? 'Đã đến lượt đặt vé' : 'Phòng chờ TikFlow'}
         </h1>
         <p className="text-sm text-muted-foreground">
           Mỗi tài khoản giữ một vị trí. Làm mới trang sẽ giữ thứ tự trong thời hạn phiên.
         </p>
         {data.state === 'WAITING' && (
-          <div role="status" className="rounded-xl bg-indigo-50 p-5">
+          <div role="status" className="rounded-xl bg-primary/10 p-5">
             <p>
               Vị trí của bạn: <strong>{data.position}</strong>
             </p>
