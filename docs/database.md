@@ -139,3 +139,20 @@ Google-only accounts and adds ExternalIdentity with unique(provider,subject) and
 unique(userId,provider). Identity creation and session issuance share one transaction.
 Existing passwords/users are preserved. Subject is authoritative; matching an email
 never silently attaches a Google identity. Deleting a user cascades its identities.
+
+## Discovery extension
+
+Additive migration `20261024010000_discovery_reviews` introduces:
+
+- `Artist`: uniquely addressed public profiles with explicit publication and demo
+  flags; no fabricated real-person biographies or profile photos.
+- `EventArtist`: many-to-many links, composite primary key, cascading relation
+  cleanup. Public reads expose only approved published event links.
+- `EventReview`: unique `(eventId, authorId)`, ticket purchase proof, score/comment,
+  UTC created/updated timestamps. Foreign keys cascade on fixture cleanup; rating
+  and trimmed comment length have PostgreSQL CHECK constraints as well as DTO
+  validation. No QR or provider credentials stored in reviews.
+
+Existing seat, hold, order, payment, ticket and authentication columns are preserved.
+`db:seed:discovery` only upserts labelled fictional artist profiles and missing links
+to existing demo music events. It never modifies sold seats or seeds customer reviews.

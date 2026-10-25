@@ -14,7 +14,8 @@
     "predev": "pnpm db:generate",
     "pretypecheck": "pnpm db:generate",
     "test:db:prepare": "dotenv -e ../../.env -- node ../../scripts/prepare-test-db.mjs",
-    "test:integration": "dotenv -e ../../.env -- vitest run --config ../../vitest.integration.config.ts"
+    "test:integration": "dotenv -e ../../.env -- vitest run --config ../../vitest.integration.config.ts",
+    "db:seed:discovery": "dotenv -e ../../.env -- node dist/discovery/seed-discovery-cli.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",

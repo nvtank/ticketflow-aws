@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Toaster } from 'sonner';
 import { ApiClientError } from '@/lib/api-client';
 import { SessionProvider } from '@/components/auth/session-provider';
+import { MotionProvider } from '@/components/motion/reveal';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -24,8 +25,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>{children}</SessionProvider>
-      <Toaster richColors position="top-right" closeButton />
+      <MotionProvider>
+        <SessionProvider>{children}</SessionProvider>
+      </MotionProvider>
+      <Toaster theme="dark" richColors position="top-right" closeButton />
     </QueryClientProvider>
   );
 }

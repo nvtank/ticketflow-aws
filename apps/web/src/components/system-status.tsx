@@ -67,7 +67,7 @@ export function SystemStatus() {
             ) : (
               <p className="mt-3 flex items-center gap-2 text-sm">
                 <span
-                  className={`size-2 rounded-full ${status === 'up' ? 'bg-emerald-500' : status === 'unknown' ? 'bg-slate-400' : 'bg-amber-500'}`}
+                  className={`size-2 rounded-full ${status === 'up' ? 'bg-success' : status === 'unknown' ? 'bg-slate-400' : 'bg-warning'}`}
                 />
                 {status === 'up'
                   ? 'Đã kết nối'

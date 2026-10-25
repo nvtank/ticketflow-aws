@@ -5,7 +5,16 @@ import { useQuery } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
 import { z } from 'zod';
 import { UserRole } from '@tixflow/shared';
-import { Ticket } from 'lucide-react';
+import {
+  Ticket,
+  CalendarDays,
+  MapPin,
+  ArrowUpRight,
+  MessageCircle,
+  ShieldCheck,
+} from 'lucide-react';
+import { AccountNavigation } from '@/components/layout/account-navigation';
+import { BookingSteps } from '@/components/booking/booking-steps';
 import { AuthGate } from '@/components/auth/auth-gate';
 import { apiGet, eventListSchema } from '@/lib/api-client';
 import { ticketSchema, ticketStatusLabel } from '@/lib/payments';
@@ -27,23 +36,41 @@ function TicketCard({
   detail?: boolean;
 }) {
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-indigo-700 to-violet-700 p-6 text-white">
-        <Ticket aria-hidden className="size-7" />
+    <Card className="ticket-card overflow-hidden rounded-[22px] p-0">
+      <div className="flex items-center justify-between gap-3 bg-muted p-6 text-white">
+        <span className="flex items-center gap-2 text-xs font-semibold tracking-widest">
+          <Ticket aria-hidden className="size-5 text-primary" />
+          TIKFLOW / E-TICKET
+        </span>
         <Badge className="border-white/20 bg-white/10 text-white">
           {ticketStatusLabel[t.status]}
         </Badge>
       </div>
       <div className="space-y-4 p-6">
-        <h2 className="text-xl font-bold">{t.event.title}</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl font-bold tracking-tight">{t.event.title}</h2>
+        <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground">
+          <CalendarDays className="mt-1 size-3.5 shrink-0" />
           {dateTime(t.event.startsAt)}
-          <br />
+        </p>
+        <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground">
+          <MapPin className="mt-1 size-3.5 shrink-0" />
           {t.event.venueName}
         </p>
-        <div className="flex items-center justify-between rounded-xl bg-muted p-4">
-          <span className="text-sm">{t.section}</span>
-          <strong className="text-2xl text-primary">{t.seatCode}</strong>
+        <div className="ticket-perforation flex items-center justify-between rounded-xl bg-primary/10 p-4">
+          <div>
+            <p className="text-[9px] font-semibold tracking-widest text-primary uppercase">
+              Khu vực
+            </p>
+            <span className="mt-1 block text-sm font-semibold">{t.section}</span>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-semibold tracking-widest text-primary uppercase">
+              Ghế của bạn
+            </p>
+            <strong className="mt-1 block text-3xl tracking-tight text-primary">
+              {t.seatCode}
+            </strong>
+          </div>
         </div>
         <p className="break-all font-mono text-xs text-muted-foreground">{t.code}</p>
         {detail ? (
@@ -75,12 +102,24 @@ function TicketCard({
             <Button asChild variant="outline">
               <Link href={`/checkout/${t.orderId}`}>Xem đơn hàng</Link>
             </Button>
+            <p className="flex items-center gap-2 text-xs leading-6 text-muted-foreground">
+              <ShieldCheck className="size-4 shrink-0 text-success" />
+              Giữ mã QR riêng tư. Mỗi vé chỉ check-in một lần.
+            </p>
           </>
         ) : (
           <Button asChild className="w-full">
             <Link href={`/my-tickets/${t.id}`}>Xem vé</Link>
           </Button>
         )}
+        <Link
+          href={`/events/${t.event.slug}#reviews`}
+          className="inline-flex items-center gap-2 text-xs font-medium text-primary"
+        >
+          <MessageCircle className="size-3.5" />
+          Xem sự kiện & chia sẻ trải nghiệm
+          <ArrowUpRight className="size-3.5" />
+        </Link>
       </div>
     </Card>
   );
@@ -99,7 +138,9 @@ function TicketDetail({ id }: { id: string }) {
     retry: false,
   });
   return (
-    <div className="container max-w-xl space-y-6 py-10">
+    <div className="container max-w-3xl space-y-6 py-10">
+      <AccountNavigation />
+      <BookingSteps current={3} />
       <Link className="text-sm text-primary" href="/my-tickets">
         ← Vé của tôi
       </Link>
@@ -125,11 +166,12 @@ function TicketsList() {
   });
   return (
     <div className="container space-y-7 py-10">
+      <AccountNavigation />
       <div>
-        <p className="text-sm text-primary">Sẵn sàng cho những khoảnh khắc đáng nhớ</p>
+        <p className="eyebrow">Sẵn sàng cho những khoảnh khắc đáng nhớ</p>
         <h1 className="mt-3 text-3xl font-bold">Vé của tôi</h1>
         <p className="mt-3 text-muted-foreground">
-          Các vé đã được máy chủ xác nhận thanh toán và phát hành.
+          Những cuộc hẹn đang chờ bạn. Mở vé để xem ghế và mã QR của mình.
         </p>
       </div>
       {query.data ? (

@@ -6,11 +6,11 @@ import type { EventDetail } from '@/lib/events';
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 const styles = {
-  AVAILABLE: 'bg-emerald-100 text-emerald-950 hover:bg-emerald-200',
-  HELD_BY_ME: 'bg-violet-600 text-white',
-  HELD_BY_OTHERS: 'bg-amber-200 text-amber-950',
-  SOLD: 'bg-slate-400 text-white',
-  UNAVAILABLE: 'bg-slate-100 text-slate-400',
+  AVAILABLE: 'bg-success/15 text-success hover:bg-success/25',
+  HELD_BY_ME: 'bg-info/20 text-info',
+  HELD_BY_OTHERS: 'bg-warning/20 text-warning',
+  SOLD: 'bg-border text-muted-foreground',
+  UNAVAILABLE: 'bg-muted text-muted-foreground',
 };
 const labels = {
   AVAILABLE: 'Còn trống',
@@ -78,11 +78,11 @@ export function SeatMap({
           </span>
         ))}
         <span className="inline-flex items-center gap-2">
-          <span className="size-3 rounded bg-indigo-600" />
+          <span className="size-3 rounded bg-primary" />
           Đang chọn
         </span>
       </div>
-      <div className="rounded-t-[50%] rounded-b-xl bg-gradient-to-r from-indigo-950 via-violet-800 to-indigo-950 py-7 text-center text-sm tracking-[0.3em] text-white shadow-lg">
+      <div className="rounded-t-[50%] rounded-b-xl border border-primary/30 bg-primary/10 py-7 text-center text-sm tracking-[0.3em] text-primary">
         SÂN KHẤU
       </div>
       <p className="text-xs text-muted-foreground">
@@ -97,7 +97,7 @@ export function SeatMap({
             </span>
           </h3>
           <div
-            className="overflow-x-auto rounded-xl border bg-white p-4"
+            className="overflow-x-auto rounded-xl border bg-card p-4"
             role="region"
             aria-label={`Ghế khu ${section.name}`}
             tabIndex={0}
@@ -126,7 +126,7 @@ export function SeatMap({
                     disabled={locked || seat.status !== 'AVAILABLE'}
                     onClick={() => onToggle(seat.id)}
                     style={{ height: Math.round((44 * zoom) / 100) }}
-                    className={`rounded-lg text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-default ${selected.includes(seat.id) ? 'bg-indigo-600 text-white shadow-md' : styles[seat.status]}`}
+                    className={`rounded-lg text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default ${selected.includes(seat.id) ? 'bg-primary text-primary-foreground shadow-md' : styles[seat.status]}`}
                   >
                     {seat.code}
                   </button>

@@ -30,7 +30,7 @@ export function HoldCountdown({
   }, [seconds, onExpired]);
   return (
     <p
-      className={`font-mono text-2xl font-bold ${seconds < 60 ? 'text-red-600' : 'text-primary'}`}
+      className={`font-mono text-2xl font-bold ${seconds < 60 ? 'text-danger' : 'text-primary'}`}
       role="timer"
       aria-label={label}
     >

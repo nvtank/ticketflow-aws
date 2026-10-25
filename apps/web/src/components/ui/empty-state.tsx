@@ -20,7 +20,7 @@ export function EmptyState({
         className,
       )}
     >
-      <span className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
+      <span className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-muted text-primary">
         <Ticket className="size-6" aria-hidden="true" />
       </span>
       <h3 className="text-lg font-semibold">{title}</h3>

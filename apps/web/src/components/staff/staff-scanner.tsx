@@ -152,7 +152,7 @@ export function StaffScanner({ eventId }: { eventId: string }) {
             <Button onClick={() => void startCamera()}>Bật camera quét QR</Button>
           )}
           {cameraError && (
-            <p role="alert" className="text-sm text-amber-700">
+            <p role="alert" className="text-sm text-warning">
               {cameraError}
             </p>
           )}
@@ -183,14 +183,14 @@ export function StaffScanner({ eventId }: { eventId: string }) {
         <Card className="space-y-4">
           <h2 className="text-xl font-semibold">Kết quả xác minh</h2>
           {error ? (
-            <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-700">
+            <p role="alert" className="rounded-xl bg-danger/10 p-4 text-danger">
               {error}
             </p>
           ) : result ? (
             <>
               <p
                 role="status"
-                className={`rounded-xl p-4 font-semibold ${['VALID', 'CHECKED_IN'].includes(result.outcome) ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}`}
+                className={`rounded-xl p-4 font-semibold ${['VALID', 'CHECKED_IN'].includes(result.outcome) ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}
               >
                 {result.message}
               </p>

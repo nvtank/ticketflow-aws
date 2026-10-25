@@ -23,7 +23,7 @@ const content = {
   },
   ADMIN: {
     heading: 'Tổng quan hệ thống',
-    subtitle: 'Theo dõi nền tảng TixFlow trong môi trường local.',
+    subtitle: 'Theo dõi nền tảng TikFlow trong môi trường local.',
     title: 'Chưa có dữ liệu quản trị',
     description:
       'Quản lý người dùng và phê duyệt sự kiện sẽ được bổ sung ở Phase 3 và 6. Các chỉ số kinh doanh không được giả lập.',

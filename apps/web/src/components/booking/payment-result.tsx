@@ -56,7 +56,10 @@ function Result({ id }: { id: string | null }) {
   return (
     <div className="container max-w-2xl py-16">
       <Card className="space-y-5">
-        <Icon aria-hidden className={`size-12 ${paid ? 'text-emerald-600' : 'text-primary'}`} />
+        <Icon
+          aria-hidden
+          className={`size-12 ${paid ? 'text-success' : pending ? 'text-info' : review ? 'text-warning' : 'text-danger'}`}
+        />
         <h1 className="text-3xl font-bold">
           {paid
             ? 'Thanh toán đã được xác nhận'
