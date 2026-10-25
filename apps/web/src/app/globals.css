@@ -1,18 +1,22 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #fafafc;
-  --foreground: #10152b;
-  --card: #ffffff;
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #7c3aed;
-  --accent: #06b6d4;
-  --muted: #eef0f6;
-  --muted-foreground: #64748b;
-  --border: #e3e7ef;
-  --ring: #4f46e5;
+  --background: #090b13;
+  --foreground: #f8f9fb;
+  --card: #141722;
+  --primary: #c8ff5f;
+  --primary-foreground: #090b13;
+  --secondary: #b6b0ff;
+  --accent: #86dce6;
+  --muted: #1d2130;
+  --muted-foreground: #a6acbc;
+  --border: #303544;
+  --ring: #c8ff5f;
   --radius: 0.875rem;
+  --success: #7ee2ae;
+  --warning: #f5ce7b;
+  --danger: #ff9b9b;
+  --info: #86dce6;
 }
 
 @theme inline {
@@ -27,7 +31,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
-  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Be Vietnam Pro', sans-serif;
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
 }
 
 * {
@@ -58,8 +67,8 @@ select {
   outline-offset: 4px;
 }
 ::selection {
-  background: #c7d2fe;
-  color: #172554;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 .skip-link {
   position: fixed;
@@ -67,9 +76,9 @@ select {
   left: 16px;
   z-index: 100;
   border-radius: 8px;
-  background: white;
+  background: var(--primary);
   padding: 12px 20px;
-  color: #111827;
+  color: var(--primary-foreground);
 }
 .skip-link:focus {
   top: 12px;
@@ -159,8 +168,8 @@ select {
     position: relative;
     overflow: hidden;
     border-bottom: 1px solid var(--border);
-    padding-block: 2rem 3.5rem;
-    background: radial-gradient(ellipse at 90% 15%, #ede9fe 0, transparent 55%), #f8f8fc;
+    padding-block: clamp(32px, 5vw, 72px);
+    background: radial-gradient(ellipse at 90% 0%, #c8ff5f0a, transparent 60%), var(--background);
   }
   .experience-hero {
     position: relative;
@@ -249,7 +258,7 @@ select {
     overflow: hidden;
     border-radius: 28px;
     padding: clamp(28px, 5vw, 60px);
-    background: radial-gradient(ellipse at 80% 0%, #8560f0 0%, transparent 65%), #4331b6;
+    background: radial-gradient(ellipse at 80% 0%, #c8ff5f12 0%, transparent 65%), var(--card);
     color: white;
   }
   .flow-cta:before {
@@ -270,15 +279,15 @@ select {
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: 20px;
-    background: white;
+    background: var(--card);
     transition:
       transform 0.3s ease,
       box-shadow 0.3s ease,
       border-color 0.3s ease;
   }
   .experience-card:hover {
-    border-color: #c4b5fd;
-    box-shadow: 0 18px 40px -20px #35247735;
+    border-color: #c8ff5f66;
+    box-shadow: 0 18px 40px -20px #0009;
     transform: translateY(-4px);
   }
   .artist-art {
@@ -403,8 +412,8 @@ select {
 
   .ticket-perforation {
     position: relative;
-    border-top: 1px dashed #c4b5fd;
-    border-bottom: 1px dashed #c4b5fd;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
   }
   .ticket-perforation:before,
   .ticket-perforation:after {
@@ -414,7 +423,7 @@ select {
     height: 14px;
     top: calc(50% - 7px);
     border-radius: 50%;
-    background: white;
+    background: var(--card);
   }
   .ticket-perforation:before {
     left: -7px;

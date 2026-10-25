@@ -1,89 +1,107 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowUpRight, Compass, Armchair, CreditCard, QrCode, Github } from 'lucide-react';
-import { PageIntro, SectionHeading } from '@/components/discovery/section-heading';
+import { ArrowUpRight, Github } from 'lucide-react';
 import { GuideFaq } from '@/components/discovery/guide-faq';
 import { Reveal } from '@/components/motion/reveal';
+import { EditorialHero } from '@/components/world/editorial-hero';
+import { DisplayHeading, SectionLabel } from '@/components/world/primitives';
+import { FlowCta } from '@/components/discovery/flow-cta';
 import { repositoryUrl } from '@/lib/site';
 export const metadata: Metadata = { title: 'Hướng dẫn & câu hỏi thường gặp' };
 export default function GuidePage() {
   return (
-    <>
-      <PageIntro
+    <div className="world-editorial">
+      <EditorialHero
         eyebrow="Hướng dẫn đặt vé"
-        title="Bớt băn khoăn. Thêm háo hức."
-        description="Từ tìm sự kiện đến mở vé tại cổng — đây là những điều bạn cần biết để sẵn sàng cho trải nghiệm tiếp theo."
+        title={
+          <>
+            Bớt băn khoăn.
+            <br />
+            <em>Thêm háo hức.</em>
+          </>
+        }
+        description="Từ lần nhấn đầu tiên đến khoảnh khắc có mặt. Bốn bước để bạn sẵn sàng."
+        image="/images/live-stage.jpg"
+        alt="Ánh sáng sân khấu trong một buổi diễn âm nhạc"
+        action={{ href: '#booking-guide', label: 'Bắt đầu hành trình' }}
       />
-      <section className="container py-14">
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              icon: Compass,
-              title: 'Tìm sự kiện',
-              text: 'Chọn danh mục, ngày hoặc địa điểm. Đọc thông tin và chính sách của sự kiện.',
-              href: '/events',
-              label: 'Bắt đầu khám phá',
-            },
-            {
-              icon: Armchair,
-              title: 'Chọn & giữ ghế',
-              text: 'Chọn ghế khả dụng và xác nhận giữ chỗ. Kiểm tra đồng hồ hết hạn sau khi giữ thành công.',
-              href: '/events',
-              label: 'Tìm chỗ ngồi',
-            },
-            {
-              icon: CreditCard,
-              title: 'Hoàn tất thanh toán',
-              text: 'Kiểm tra ghế, tổng tiền và thời gian còn lại. Chờ hệ thống xác nhận kết quả thanh toán.',
-              href: '/profile',
-              label: 'Xem đơn hàng',
-            },
-            {
-              icon: QrCode,
-              title: 'Mở vé & tận hưởng',
-              text: 'Vé QR nằm trong tài khoản của bạn. Xuất trình vé hợp lệ để nhân viên xác minh tại cổng.',
-              href: '/my-tickets',
-              label: 'Mở vé của tôi',
-            },
-          ].map(({ icon: Icon, title, text, href, label }, index) => (
-            <Reveal key={title} delay={index * 0.04} className="rounded-2xl border bg-white p-6">
-              <div className="flex items-center justify-between">
-                <Icon className="size-6 text-primary" />
-                <span className="text-xs text-slate-400">0{index + 1}</span>
-              </div>
-              <h2 className="mt-7 text-base font-semibold">{title}</h2>
-              <p className="mt-3 text-xs leading-7 text-muted-foreground">{text}</p>
-              <Link href={href} className="text-link mt-5">
-                {label}
-                <ArrowUpRight className="size-3" />
-              </Link>
-            </Reveal>
-          ))}
+      <section id="booking-guide" className="world-section">
+        <div className="container editorial-guide-layout">
+          <div className="editorial-guide-sticky">
+            <SectionLabel>Từ khám phá đến nhận vé</SectionLabel>
+            <DisplayHeading>
+              Đi từng bước.
+              <br />
+              Đến đúng nơi.
+            </DisplayHeading>
+            <Link href="#faq" className="text-link">
+              Đi đến câu hỏi thường gặp <ArrowUpRight className="size-4" />
+            </Link>
+          </div>
+          <div>
+            {[
+              {
+                title: 'Tìm sự kiện.',
+                text: 'Chọn danh mục, ngày hoặc địa điểm. Đọc thông tin và chính sách của sự kiện.',
+                href: '/events',
+                label: 'Bắt đầu khám phá',
+              },
+              {
+                title: 'Chọn & giữ ghế.',
+                text: 'Chọn vị trí khả dụng và xác nhận giữ chỗ. Đồng hồ 5 phút bắt đầu khi máy chủ xác nhận thành công.',
+                href: '/events',
+                label: 'Tìm chỗ ngồi',
+              },
+              {
+                title: 'Thanh toán.',
+                text: 'Kiểm tra ghế, tổng tiền và thời gian còn lại. Chờ hệ thống xác nhận thanh toán.',
+                href: '/profile',
+                label: 'Xem đơn hàng',
+              },
+              {
+                title: 'Có mặt. Tận hưởng.',
+                text: 'Mở vé QR trong tài khoản và xuất trình vé hợp lệ để nhân viên xác minh tại cổng.',
+                href: '/my-tickets',
+                label: 'Mở vé của tôi',
+              },
+            ].map((step, index) => (
+              <Reveal key={step.title} className="editorial-guide-step">
+                <span className="editorial-step-number">0{index + 1}</span>
+                <div>
+                  <h2>{step.title}</h2>
+                  <p>{step.text}</p>
+                  <Link href={step.href} className="text-link">
+                    {step.label}
+                    <ArrowUpRight className="size-4" />
+                  </Link>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
-      <section id="faq" className="container grid gap-10 pt-4 pb-20 lg:grid-cols-[.8fr_1.2fr]">
-        <div>
-          <SectionHeading
-            eyebrow="Câu hỏi thường gặp"
-            title="Để bạn yên tâm hơn trước mỗi cuộc hẹn."
-            description="Thông tin về giữ chỗ, thanh toán, vé QR và chia sẻ trải nghiệm."
-          />
-          <a
-            href={`${repositoryUrl}/issues`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-link"
-          >
-            <Github className="size-4" />
-            Báo lỗi trên GitHub
-            <ArrowUpRight className="size-4" />
-          </a>
-          <p className="mt-3 text-xs leading-6 text-muted-foreground">
-            Khi báo lỗi, không đăng mật khẩu, thông tin thanh toán hoặc mã QR của bạn.
-          </p>
+      <section id="faq" className="editorial-faq world-section">
+        <div className="container editorial-story-grid">
+          <div>
+            <SectionLabel>Câu hỏi thường gặp</SectionLabel>
+            <DisplayHeading>Cần biết thêm?</DisplayHeading>
+            <a
+              href={`${repositoryUrl}/issues`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link mt-8"
+            >
+              <Github className="size-4" />
+              Báo lỗi trên GitHub <ArrowUpRight className="size-4" />
+            </a>
+            <p className="editorial-note mt-4">
+              Không đăng mật khẩu, thông tin thanh toán hoặc mã QR khi báo lỗi.
+            </p>
+          </div>
+          <GuideFaq />
         </div>
-        <GuideFaq />
       </section>
-    </>
+      <FlowCta />
+    </div>
   );
 }

@@ -19,13 +19,13 @@ export function AuthScene({ children }: { children: React.ReactNode }) {
           Find your flow
         </span>
         <div className="absolute right-10 bottom-10 left-10 text-white">
-          <p className="eyebrow text-cyan-200">A ticket to your next story</p>
+          <p className="eyebrow text-primary">A ticket to your next story</p>
           <p className="mt-5 text-5xl leading-[1.12] font-semibold tracking-tight">
             Bạn thuộc về
             <br />
             những khoảnh khắc
             <br />
-            <span className="text-violet-300">đáng nhớ.</span>
+            <span className="text-primary">đáng nhớ.</span>
           </p>
           <p className="mt-6 text-sm leading-7 text-slate-300">
             Một tài khoản để lưu những tấm vé,
@@ -33,7 +33,7 @@ export function AuthScene({ children }: { children: React.ReactNode }) {
             và bắt đầu những trải nghiệm mới.
           </p>
           <Link href="/about" className="mt-7 inline-flex items-center gap-2 text-xs font-semibold">
-            Tìm hiểu về TixFlow
+            Tìm hiểu về TikFlow
             <ArrowUpRight className="size-4" />
           </Link>
         </div>

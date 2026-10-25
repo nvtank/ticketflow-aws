@@ -19,12 +19,12 @@ export function AccountNavigation() {
           <Link
             key={href}
             href={href}
-            aria-current={pathname === href ? 'page' : undefined}
+            aria-current={pathname === href || pathname.startsWith(href + '/') ? 'page' : undefined}
             className={cn(
               'inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-medium transition-colors',
               pathname === href || pathname.startsWith(href + '/')
-                ? 'bg-indigo-100 text-primary'
-                : 'bg-white text-slate-600 hover:bg-muted',
+                ? 'bg-primary/15 text-primary'
+                : 'bg-card text-muted-foreground hover:bg-muted',
             )}
           >
             <Icon className="size-3.5" />

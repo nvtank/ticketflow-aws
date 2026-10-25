@@ -13,7 +13,7 @@ export default function ContributorsPage() {
       <PageIntro
         eyebrow="Đội ngũ đóng góp"
         title="Không có trải nghiệm tốt nào được tạo nên một mình."
-        description="Gặp những người cùng xây dựng TixFlow, từ ý tưởng và giao diện đến các nghiệp vụ phía sau một tấm vé."
+        description="Gặp những người cùng xây dựng TikFlow, từ ý tưởng và giao diện đến các nghiệp vụ phía sau một tấm vé."
       >
         <Button asChild className="mt-7">
           <a href={repositoryUrl} target="_blank" rel="noopener noreferrer">
@@ -60,7 +60,7 @@ export default function ContributorsPage() {
               href: `${repositoryUrl}#readme`,
             },
           ].map(({ icon: Icon, title, text, label, href }) => (
-            <Reveal key={title} className="rounded-2xl border bg-white p-7">
+            <Reveal key={title} className="rounded-2xl border bg-card p-7">
               <Icon className="size-6 text-primary" />
               <h2 className="mt-5 text-lg font-semibold">{title}</h2>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">{text}</p>
@@ -71,8 +71,8 @@ export default function ContributorsPage() {
             </Reveal>
           ))}
         </div>
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-indigo-50 p-6">
-          <p className="text-sm text-indigo-950">Muốn biết điều gì đã đưa nhóm đến với TixFlow?</p>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-primary/10 p-6">
+          <p className="text-sm text-foreground">Muốn biết điều gì đã đưa nhóm đến với TikFlow?</p>
           <Link href="/about" className="text-link">
             Đọc câu chuyện của chúng tôi
             <ArrowUpRight className="size-4" />

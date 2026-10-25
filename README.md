@@ -315,3 +315,25 @@ pnpm test:e2e:experience
 ```
 
 Chi tiết thiết kế, nhóm thay đổi và kiểm chứng: [Experience redesign](docs/experience-redesign.md).
+
+### Open Worlds — bản thiết kế trước
+
+Trang chủ mới dùng bảng màu obsidian/xanh lá/cát, ảnh voxel CC0 phục vụ local,
+Space Grotesk hỗ trợ tiếng Việt, GSAP và các component dùng chung. Danh mục, tìm
+kiếm và sự kiện tiếp tục kết nối API thật. Xem [hệ thống thiết kế](docs/world-design.md)
+và [tiến độ, kết quả kiểm tra](docs/progress.md). Khi API/web đang chạy, có thể dùng
+`pnpm test:e2e:world` để kiểm tra riêng giao diện mà không seed lại database.
+
+### Homepage biên tập — bản thiết kế trước
+
+Bản biên tập trước dùng ảnh concert trong `public/images`, Gloock + Manrope,
+Lenis, GSAP/ScrollTrigger và animation SVGA vector riêng của TixFlow. Hướng này
+thay thế bố cục voxel của homepage. Xem [tài liệu homepage](docs/homepage-editorial.md)
+và [tiến độ kiểm chứng](docs/progress.md). Các trang đặt vé và API vẫn dùng luồng
+nghiệp vụ hiện có.
+
+### UI/UX đồng bộ theo homepage
+
+Toàn bộ website dùng nền tối, điểm nhấn lime và font của homepage hiện tại.
+Xem [phạm vi và kiểm chứng UI](docs/site-ui.md). Chạy `pnpm test:e2e:ui`
+khi web preview đang mở để kiểm tra giao diện bằng dữ liệu QA trong trình duyệt.

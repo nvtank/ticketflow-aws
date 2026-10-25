@@ -1,27 +1,38 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { ArtistDirectory } from '@/components/discovery/artists';
-import { PageIntro } from '@/components/discovery/section-heading';
 import { FlowCta } from '@/components/discovery/flow-cta';
+import { EditorialHero } from '@/components/world/editorial-hero';
 export const metadata: Metadata = { title: 'Nghệ sĩ & âm sắc' };
 export default function ArtistsPage() {
   return (
-    <>
-      <PageIntro
+    <div className="world-editorial">
+      <EditorialHero
         eyebrow="Nghệ sĩ"
-        title="Tìm âm sắc chạm đến bạn."
-        description="Một giọng hát, một ban nhạc, một chất riêng. Khám phá những câu chuyện âm nhạc và lịch hẹn cùng nghệ sĩ trên TixFlow."
-      />
-      <Suspense
-        fallback={
-          <p role="status" className="container py-16">
-            Đang tải nghệ sĩ…
-          </p>
+        title={
+          <>
+            Mỗi âm sắc.
+            <br />
+            <em>Một thế giới.</em>
+          </>
         }
-      >
-        <ArtistDirectory />
-      </Suspense>
+        description="Tìm một chất riêng. Đọc câu chuyện phía sau âm nhạc. Hẹn gặp nhau ở sân khấu tiếp theo."
+        image="/images/microphone.jpg"
+        alt="Microphone trên sân khấu, hình minh họa cho không gian âm nhạc"
+        action={{ href: '#artist-directory', label: 'Gặp gỡ nghệ sĩ' }}
+      />
+      <div id="artist-directory" className="editorial-directory">
+        <Suspense
+          fallback={
+            <p role="status" className="container py-16">
+              Đang tải nghệ sĩ…
+            </p>
+          }
+        >
+          <ArtistDirectory />
+        </Suspense>
+      </div>
       <FlowCta />
-    </>
+    </div>
   );
 }

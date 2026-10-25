@@ -38,7 +38,7 @@ export function EventInformation({ event }: { event: EventData }) {
           }
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
           <div className="relative mt-auto p-1">
-            <p className="text-sm text-cyan-200">
+            <p className="text-sm text-primary">
               {categoryLabel[event.category] ?? event.category}
             </p>
             <h1 className="mt-2 text-3xl font-bold md:text-4xl">{event.title}</h1>

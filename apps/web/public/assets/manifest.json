@@ -1,0 +1,47 @@
+{
+  "artDirection": "TixFlow Open Worlds",
+  "assets": [
+    {
+      "path": "hero/crystal-world.webp",
+      "title": "The Crystal Sky Islands",
+      "author": "Jesper Norrlander / Summer Engine",
+      "source": "https://www.summerengine.com/asset-store/the-crystal-sky-islands-be2e8c2c",
+      "original": "https://res.cloudinary.com/dol86wsz1/image/upload/v1792016859/summer_art/img-2526cf19-faea-4552-b0de-63d52a356f0c-1792016858611-0_1792016858611_8e3kez7c.png",
+      "license": "CC0 1.0, as declared on the source asset page",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "provenance": "Source describes generation with Nano Banana 2 Lite, 2026-10-14. Existing online artwork, not generated for this project.",
+      "modifications": "WebP delivery via source CDN; CSS overlays, cropping and saturation at display time only.",
+      "usage": "Atmospheric illustration; does not represent an event venue.",
+      "width": 1376,
+      "height": 768,
+      "bytes": 155546
+    },
+    {
+      "path": "fonts/space-grotesk-{latin,vietnamese}-wght-normal.woff2",
+      "source": "https://registry.npmjs.org/@fontsource-variable/space-grotesk/-/space-grotesk-5.3.0.tgz",
+      "author": "Space Grotesk Project Authors",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "fonts/OFL.txt",
+      "modifications": "None. Original variable WOFF2 subsets."
+    },
+    {
+      "path": "fonts/gloock-regular.ttf",
+      "source": "https://github.com/google/fonts/tree/main/ofl/gloock",
+      "license": "SIL OFL 1.1",
+      "licenseFile": "fonts/GLOOCK-OFL.txt"
+    },
+    {
+      "path": "fonts/manrope-variable.ttf",
+      "source": "https://github.com/google/fonts/tree/main/ofl/manrope",
+      "license": "SIL OFL 1.1",
+      "licenseFile": "fonts/MANROPE-OFL.txt"
+    },
+    {
+      "path": "animations/tixflow-ticket.svga",
+      "source": "scripts/generate-home-svga.py",
+      "author": "TixFlow project",
+      "provenance": "Original vector ticket animation generated from source, no third-party artwork."
+    }
+  ],
+  "homepageDirection": "Editorial photography, Gloock + Manrope; prior voxel art retained for other pages."
+}

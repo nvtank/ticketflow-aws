@@ -28,7 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MotionProvider>
         <SessionProvider>{children}</SessionProvider>
       </MotionProvider>
-      <Toaster richColors position="top-right" closeButton />
+      <Toaster theme="dark" richColors position="top-right" closeButton />
     </QueryClientProvider>
   );
 }

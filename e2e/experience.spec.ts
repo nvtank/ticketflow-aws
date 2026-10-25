@@ -22,7 +22,7 @@ test('home search and artist discovery lead to published event details', async (
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Đừng chỉ');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName('Feel the real thing.');
   await page.getByLabel('Tìm trải nghiệm của bạn').fill('TixFlow Music');
   await page.getByRole('button', { name: 'Tìm sự kiện', exact: true }).click();
   await expect(page).toHaveURL(/\/events\?q=TixFlow\+Music/);

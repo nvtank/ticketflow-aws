@@ -122,7 +122,7 @@ export function ProfilePanel() {
                 aria-describedby="profile-name-error"
                 aria-invalid={!!profile.formState.errors.name}
               />
-              <p id="profile-name-error" className="mt-1 text-xs text-red-600">
+              <p id="profile-name-error" className="mt-1 text-xs text-danger">
                 {profile.formState.errors.name?.message}
               </p>
             </div>
@@ -138,7 +138,7 @@ export function ProfilePanel() {
                 aria-describedby="profile-phone-error"
                 aria-invalid={!!profile.formState.errors.phone}
               />
-              <p id="profile-phone-error" className="mt-1 text-xs text-red-600">
+              <p id="profile-phone-error" className="mt-1 text-xs text-danger">
                 {profile.formState.errors.phone?.message}
               </p>
             </div>
@@ -185,7 +185,7 @@ export function ProfilePanel() {
                       aria-invalid={!!password.formState.errors[field]}
                       aria-describedby={`${key}-error`}
                     />
-                    <p id={`${key}-error`} className="mt-1 text-xs text-red-600">
+                    <p id={`${key}-error`} className="mt-1 text-xs text-danger">
                       {password.formState.errors[field]?.message}
                     </p>
                   </div>

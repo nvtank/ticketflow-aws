@@ -36,7 +36,7 @@ export function WorkspaceAccount({ workspace }: { workspace: 'organizer' | 'staf
       {account.isPending ? (
         <Skeleton className="mt-4 h-5 w-48" />
       ) : account.isError ? (
-        <p role="alert" className="mt-3 text-sm text-red-700">
+        <p role="alert" className="mt-3 text-sm text-danger">
           {account.error.message}
         </p>
       ) : (
@@ -50,7 +50,7 @@ export function WorkspaceAccount({ workspace }: { workspace: 'organizer' | 'staf
           {organizations.isPending ? (
             <Skeleton className="mt-3 h-5 w-40" />
           ) : organizations.isError ? (
-            <p role="alert" className="mt-2 text-sm text-red-700">
+            <p role="alert" className="mt-2 text-sm text-danger">
               {organizations.error.message}
             </p>
           ) : organizations.data?.length ? (

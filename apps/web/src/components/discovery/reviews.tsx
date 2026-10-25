@@ -19,7 +19,7 @@ export function Stars({ rating, className }: { rating: number; className?: strin
   return (
     <span
       aria-label={`${rating} trên 5 sao`}
-      className={cn('inline-flex gap-1 text-amber-500', className)}
+      className={cn('inline-flex gap-1 text-warning', className)}
     >
       {[1, 2, 3, 4, 5].map((value) => (
         <Star
@@ -56,7 +56,7 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
                 setRating(event.target.value);
                 setPage(1);
               }}
-              className="ml-3 h-10 rounded-xl border bg-white px-3 text-sm text-foreground"
+              className="ml-3 h-10 rounded-xl border bg-card px-3 text-sm text-foreground"
             >
               <option value="">Tất cả số sao</option>
               {[5, 4, 3, 2, 1].map((value) => (
@@ -73,7 +73,7 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
               setSort(event.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-xl border bg-white px-3 text-sm"
+            className="h-10 rounded-xl border bg-card px-3 text-sm"
           >
             <option value="recent">Mới nhất</option>
             <option value="highest">Đánh giá cao nhất</option>
@@ -89,7 +89,7 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
       ) : (
         <>
           {!compact && (
-            <div className="mb-8 grid gap-8 rounded-2xl border bg-white p-6 sm:grid-cols-[1fr_2fr]">
+            <div className="mb-8 grid gap-8 rounded-2xl border bg-card p-6 sm:grid-cols-[1fr_2fr]">
               <div>
                 <p className="text-xs text-muted-foreground">Trải nghiệm đặt vé</p>
                 <p className="mt-2 text-5xl font-semibold tracking-tight">
@@ -106,7 +106,7 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
                     <span className="w-9 shrink-0">{row.rating} sao</span>
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-violet-500"
+                        className="h-full rounded-full bg-primary"
                         style={{
                           width: `${query.data.summary.count ? (row.count / query.data.summary.count) * 100 : 0}%`,
                         }}
@@ -121,21 +121,21 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
           {query.data.items.length ? (
             <div className={cn('grid gap-5', !eventId && 'md:grid-cols-2 lg:grid-cols-3')}>
               {query.data.items.map((review) => (
-                <article key={review.id} className="rounded-2xl border bg-white p-6">
+                <article key={review.id} className="rounded-2xl border bg-card p-6">
                   <Stars rating={review.rating} />
-                  <p className="review-text mt-5 text-sm leading-7 text-slate-700">
+                  <p className="review-text mt-5 text-sm leading-7 text-foreground">
                     {review.comment}
                   </p>
                   <div className="mt-6 flex items-center gap-3 border-t pt-4">
                     <span
-                      className="flex size-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700"
+                      className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary"
                       aria-hidden="true"
                     >
                       {review.author.name.slice(0, 1)}
                     </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold">{review.author.name}</p>
-                      <p className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700">
+                      <p className="mt-1 flex items-center gap-1 text-[10px] text-success">
                         <BadgeCheck className="size-3" />
                         Đã mua vé ·{' '}
                         {new Date(review.createdAt).toLocaleDateString('vi-VN', {
@@ -155,8 +155,8 @@ export function ReviewFeed({ eventId, compact = false }: { eventId?: string; com
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center rounded-2xl border border-dashed bg-white px-6 py-12 text-center">
-              <span className="flex size-14 items-center justify-center rounded-full bg-violet-50 text-violet-600">
+            <div className="flex flex-col items-center rounded-2xl border border-dashed bg-card px-6 py-12 text-center">
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <MessageCircle className="size-6" />
               </span>
               <h3 className="mt-5 text-lg font-semibold">
@@ -257,7 +257,7 @@ function ReviewForm({
     onError: (error: Error) => toast.error(error.message),
   });
   return (
-    <div className="mb-8 rounded-2xl border border-violet-200 bg-white p-6">
+    <div className="mb-8 rounded-2xl border border-primary/30 bg-card p-6">
       <h3 className="text-lg font-semibold">
         {review ? 'Chỉnh sửa đánh giá của bạn' : 'Trải nghiệm đặt vé của bạn thế nào?'}
       </h3>
@@ -287,7 +287,7 @@ function ReviewForm({
                         ref={value === 1 ? field.ref : undefined}
                         className="peer sr-only"
                       />
-                      <span className="flex items-center gap-1 rounded-lg border px-2.5 py-2 text-xs text-slate-500 peer-checked:border-primary peer-checked:bg-indigo-50 peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+                      <span className="flex items-center gap-1 rounded-lg border px-2.5 py-2 text-xs text-muted-foreground peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
                         {value}
                         <Star aria-hidden="true" className="size-3" />
                         <span className="sr-only">sao</span>
@@ -300,7 +300,7 @@ function ReviewForm({
           </div>
         </fieldset>
         {errors.rating && (
-          <p role="alert" className="mt-2 text-xs text-red-600">
+          <p role="alert" className="mt-2 text-xs text-danger">
             {errors.rating.message}
           </p>
         )}
@@ -318,7 +318,7 @@ function ReviewForm({
           aria-invalid={!!errors.comment}
         />
         {errors.comment && (
-          <p role="alert" className="mt-2 text-xs text-red-600">
+          <p role="alert" className="mt-2 text-xs text-danger">
             {errors.comment.message}
           </p>
         )}
@@ -341,7 +341,7 @@ function ReviewForm({
           )}
         </div>
         {save.error && (
-          <p role="alert" className="mt-3 text-sm text-red-600">
+          <p role="alert" className="mt-3 text-sm text-danger">
             {save.error.message}
           </p>
         )}
@@ -383,7 +383,7 @@ export function EventReviews({ eventId, slug }: { eventId: string; slug: string 
         </p>
       </div>
       {!user ? (
-        <p className="mb-6 rounded-xl bg-indigo-50 p-4 text-sm leading-7 text-indigo-900">
+        <p className="mb-6 rounded-xl bg-primary/10 p-4 text-sm leading-7 text-foreground">
           <Link
             href={`/login?next=${encodeURIComponent(`/events/${slug}#reviews`)}`}
             className="font-semibold underline"

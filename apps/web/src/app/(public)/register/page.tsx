@@ -11,7 +11,7 @@ export default function RegisterPage() {
     <AuthScene>
       <Card className="w-full max-w-lg border-0 bg-transparent p-2 shadow-none sm:p-7">
         <Badge>Trải nghiệm bắt đầu từ đây</Badge>
-        <h1 className="mt-5 text-3xl font-bold tracking-tight">Tạo tài khoản TixFlow.</h1>
+        <h1 className="mt-5 text-3xl font-bold tracking-tight">Tạo tài khoản TikFlow.</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           Một tài khoản, mở ra những khoảnh khắc mới.
         </p>

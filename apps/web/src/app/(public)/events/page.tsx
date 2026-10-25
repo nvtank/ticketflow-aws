@@ -18,7 +18,7 @@ export default function EventsPage() {
             <Link
               href={`/events?category=${category.value}`}
               key={category.value}
-              className="rounded-full border bg-white px-4 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-primary hover:text-primary"
+              className="rounded-full border bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
             >
               {category.name} ↗
             </Link>

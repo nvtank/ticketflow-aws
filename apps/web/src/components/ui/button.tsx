@@ -5,12 +5,12 @@ import type { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',
+  'inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-indigo-700 shadow-sm',
-        secondary: 'bg-muted text-foreground hover:bg-slate-200',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        secondary: 'bg-muted text-foreground hover:bg-border',
         outline: 'border border-border bg-transparent hover:bg-muted',
         ghost: 'bg-transparent hover:bg-muted',
       },

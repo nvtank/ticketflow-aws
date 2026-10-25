@@ -33,7 +33,7 @@ export function ArtistArtwork({
     >
       <div className="artist-orbit" />
       <span className="absolute top-6 left-6 text-[9px] tracking-[.22em] uppercase">
-        TixFlow / {artist.genre}
+        TikFlow / {artist.genre}
       </span>
       <AudioLines className="absolute top-6 right-6 size-5 opacity-70" />
       <span className="artist-initial">{initials}</span>
@@ -123,7 +123,7 @@ export function ArtistDirectory() {
     <div className="container py-12">
       <form
         key={params.toString()}
-        className="mb-9 flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row"
+        className="mb-9 flex flex-col gap-3 rounded-2xl border bg-card p-5 sm:flex-row"
         onSubmit={(event) => {
           event.preventDefault();
           const next = new URLSearchParams();
@@ -151,7 +151,7 @@ export function ArtistDirectory() {
           id="artist-genre"
           name="genre"
           defaultValue={params.get('genre') ?? ''}
-          className="h-11 rounded-xl border bg-white px-3 text-sm"
+          className="h-11 rounded-xl border bg-card px-3 text-sm"
         >
           <option value="">Tất cả thể loại</option>
           {query.data?.genres.map((genre) => (
@@ -252,7 +252,7 @@ export function ArtistProfile({ slug }: { slug: string }) {
                 {query.data.biography}
               </p>
               {query.data.isDemo && (
-                <p className="mt-5 inline-block rounded-full bg-violet-50 px-3 py-1.5 text-xs text-violet-700">
+                <p className="mt-5 inline-block rounded-full bg-primary/10 px-3 py-1.5 text-xs text-primary">
                   Nghệ sĩ demo · Hồ sơ hư cấu
                 </p>
               )}

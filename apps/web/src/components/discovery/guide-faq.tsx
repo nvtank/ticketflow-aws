@@ -29,21 +29,21 @@ const questions = [
       'Một số sự kiện sử dụng phòng chờ để giới hạn số người đặt vé cùng lúc. Giữ trang mở và chờ đến lượt. Vào được khu đặt vé không bảo đảm còn ghế; hãy kiểm tra sơ đồ khi được cấp quyền vào.',
   },
   {
-    title: 'Ai có thể viết đánh giá trên TixFlow?',
+    title: 'Ai có thể viết đánh giá trên TikFlow?',
     answer:
       'Người đã đăng nhập và có vé đã thanh toán, còn hợp lệ của sự kiện có thể đánh giá trải nghiệm đặt vé. Mỗi người có một đánh giá cho mỗi sự kiện, có thể cập nhật hoặc xóa. Nội dung tập trung vào quá trình đặt và nhận vé, không phải xác nhận đã tham dự một sự kiện chưa diễn ra.',
   },
   {
     title: 'Các sự kiện và nghệ sĩ demo có diễn ra thật không?',
     answer:
-      'TixFlow hiện là dự án chạy local. Sự kiện trong dữ liệu mẫu và nghệ sĩ có nhãn Demo phục vụ kiểm thử và khám phá sản phẩm, không phải lịch biểu diễn hay thông báo bán vé thực tế.',
+      'TikFlow hiện là dự án chạy local. Sự kiện trong dữ liệu mẫu và nghệ sĩ có nhãn Demo phục vụ kiểm thử và khám phá sản phẩm, không phải lịch biểu diễn hay thông báo bán vé thực tế.',
   },
 ];
 export function GuideFaq() {
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
   return (
-    <div className="divide-y rounded-2xl border bg-white px-5 md:px-8">
+    <div className="divide-y rounded-2xl border bg-card px-5 md:px-8">
       {questions.map((question, index) => (
         <div key={question.title}>
           <h3>

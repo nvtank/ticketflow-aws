@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { EventGrid } from './event-card';
 import { QueryNotice } from './event-detail';
-const control = 'h-11 w-full rounded-xl border bg-white px-3 text-sm';
+const control = 'h-11 w-full rounded-xl border bg-card px-3 text-sm';
 export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
   const params = useSearchParams(),
     router = useRouter();
@@ -43,7 +43,7 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
         <form
           key={params.toString()}
           id="search"
-          className="mb-9 scroll-mt-32 rounded-2xl border bg-white p-5 shadow-sm md:p-6"
+          className="mb-9 scroll-mt-32 rounded-2xl border bg-card p-5 shadow-sm md:p-6"
           onSubmit={(event) => {
             event.preventDefault();
             const next = new URLSearchParams();
@@ -54,11 +54,11 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
             router.push(`/events?${next}`);
           }}
         >
-          <p className="mb-4 flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <p className="mb-4 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <SlidersHorizontal className="size-4" />
             Tìm đúng trải nghiệm dành cho bạn
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <label className="sr-only" htmlFor="event-search">
               Tìm sự kiện theo tên
             </label>
@@ -169,7 +169,7 @@ export function EventCatalog({ searchable = false }: { searchable?: boolean }) {
           {searchable && (
             <nav
               aria-label="Phân trang sự kiện"
-              className="mt-8 flex items-center justify-center gap-4"
+              className="mt-8 flex flex-wrap items-center justify-center gap-4"
             >
               <Button
                 variant="outline"

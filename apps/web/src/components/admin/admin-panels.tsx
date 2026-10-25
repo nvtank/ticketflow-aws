@@ -105,7 +105,7 @@ export function AdminUsers() {
           }}
         />
         <select
-          className="rounded-xl border bg-white p-3 text-sm"
+          className="rounded-xl border bg-card p-3 text-sm"
           aria-label="Lọc vai trò"
           value={role}
           onChange={(e) => {
@@ -228,7 +228,7 @@ export function AdminOrganizations() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Quản lý tổ chức</h1>
       <select
-        className="rounded-xl border bg-white p-3"
+        className="rounded-xl border bg-card p-3"
         aria-label="Trạng thái tổ chức"
         value={status}
         onChange={(e) => {

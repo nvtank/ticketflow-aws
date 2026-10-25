@@ -20,7 +20,7 @@ export function SectionHeading({
   return (
     <div className="mb-9 flex flex-wrap items-end justify-between gap-6">
       <div className="max-w-2xl">
-        <p className={cn('eyebrow', light && 'text-violet-300')}>{eyebrow}</p>
+        <p className={cn('eyebrow', light && 'text-primary')}>{eyebrow}</p>
         <h2 className="section-title mt-3">{title}</h2>
         {description && (
           <p

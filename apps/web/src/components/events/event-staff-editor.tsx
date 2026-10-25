@@ -79,7 +79,7 @@ export function EventStaffEditor({ id }: { id: string }) {
             query.data.map((item) => (
               <li
                 key={item.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 p-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/40 p-3"
               >
                 <span className="text-sm">
                   {item.user.name}

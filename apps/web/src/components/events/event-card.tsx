@@ -22,7 +22,7 @@ export function EventCard({ event }: { event: Event }) {
         href={`/events/${event.slug}`}
         tabIndex={-1}
         aria-hidden="true"
-        className="relative block aspect-[1.55] overflow-hidden bg-indigo-950"
+        className="relative block aspect-[1.55] overflow-hidden bg-muted"
       >
         <Image
           unoptimized={!!event.coverUrl}
@@ -33,18 +33,20 @@ export function EventCard({ event }: { event: Event }) {
           className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        <span className="absolute top-4 left-4 rounded-full border border-white/30 bg-white/95 px-3 py-1.5 text-[10px] font-semibold text-indigo-950">
+        <span className="absolute top-4 left-4 rounded-full border border-white/30 bg-card/95 px-3 py-1.5 text-[10px] font-semibold text-foreground">
           {categoryLabel[event.category] ?? event.category}
         </span>
-        <span className="absolute right-4 bottom-4 rounded-xl bg-white px-3 py-2 text-center text-indigo-950">
+        <span className="absolute right-4 bottom-4 rounded-xl bg-card px-3 py-2 text-center text-foreground">
           <strong className="block text-xl leading-6">{day}</strong>
           <span className="text-[9px] font-semibold uppercase">Tháng {month}</span>
         </span>
       </Link>
       <div className="flex flex-1 flex-col p-5">
-        <p className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700">
+        <p
+          className={`flex items-center gap-1.5 text-[10px] font-semibold ${event.availableSeats ? 'text-success' : 'text-muted-foreground'}`}
+        >
           <span
-            className={`size-1.5 rounded-full ${event.availableSeats ? 'bg-emerald-500' : 'bg-slate-400'}`}
+            className={`size-1.5 rounded-full ${event.availableSeats ? 'bg-success' : 'bg-slate-400'}`}
           />
           {event.availableSeats ? 'Còn vé' : 'Hết vé'}
         </p>
@@ -77,7 +79,7 @@ export function EventCard({ event }: { event: Event }) {
             </div>
             <Link
               href={`/events/${event.slug}`}
-              className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-2.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               Xem chi tiết
               <ArrowUpRight className="size-4" />
@@ -99,7 +101,7 @@ export function EventGrid({ events }: { events: Event[] }) {
 }
 export function EventEmptyHint() {
   return (
-    <div className="flex gap-3 rounded-2xl bg-indigo-50 p-6 text-sm text-indigo-900">
+    <div className="flex gap-3 rounded-2xl bg-primary/10 p-6 text-sm text-foreground">
       <AudioLines className="size-5 shrink-0" />
       <p>
         Lịch diễn sẽ xuất hiện tại đây khi có sự kiện được công bố. Khám phá{' '}

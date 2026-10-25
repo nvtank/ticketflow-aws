@@ -37,10 +37,10 @@ function TicketCard({
 }) {
   return (
     <Card className="ticket-card overflow-hidden rounded-[22px] p-0">
-      <div className="flex items-center justify-between gap-3 bg-[#18142e] p-6 text-white">
+      <div className="flex items-center justify-between gap-3 bg-muted p-6 text-white">
         <span className="flex items-center gap-2 text-xs font-semibold tracking-widest">
-          <Ticket aria-hidden className="size-5 text-violet-300" />
-          TIXFLOW / E-TICKET
+          <Ticket aria-hidden className="size-5 text-primary" />
+          TIKFLOW / E-TICKET
         </span>
         <Badge className="border-white/20 bg-white/10 text-white">
           {ticketStatusLabel[t.status]}
@@ -56,15 +56,15 @@ function TicketCard({
           <MapPin className="mt-1 size-3.5 shrink-0" />
           {t.event.venueName}
         </p>
-        <div className="ticket-perforation flex items-center justify-between rounded-xl bg-[#f3f0ff] p-4">
+        <div className="ticket-perforation flex items-center justify-between rounded-xl bg-primary/10 p-4">
           <div>
-            <p className="text-[9px] font-semibold tracking-widest text-violet-500 uppercase">
+            <p className="text-[9px] font-semibold tracking-widest text-primary uppercase">
               Khu vực
             </p>
             <span className="mt-1 block text-sm font-semibold">{t.section}</span>
           </div>
           <div className="text-right">
-            <p className="text-[9px] font-semibold tracking-widest text-violet-500 uppercase">
+            <p className="text-[9px] font-semibold tracking-widest text-primary uppercase">
               Ghế của bạn
             </p>
             <strong className="mt-1 block text-3xl tracking-tight text-primary">
@@ -103,7 +103,7 @@ function TicketCard({
               <Link href={`/checkout/${t.orderId}`}>Xem đơn hàng</Link>
             </Button>
             <p className="flex items-center gap-2 text-xs leading-6 text-muted-foreground">
-              <ShieldCheck className="size-4 shrink-0 text-emerald-600" />
+              <ShieldCheck className="size-4 shrink-0 text-success" />
               Giữ mã QR riêng tư. Mỗi vé chỉ check-in một lần.
             </p>
           </>

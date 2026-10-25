@@ -181,7 +181,7 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
         </p>
       </div>
       {query.isError && (
-        <p role="alert" className="rounded-xl bg-amber-50 p-4 text-sm">
+        <p role="alert" className="rounded-xl bg-warning/10 p-4 text-sm">
           Chưa thể đồng bộ ghế mới nhất.{' '}
           <button className="underline" onClick={() => void query.refetch()}>
             Thử lại
@@ -189,7 +189,7 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
         </p>
       )}
       {!saleOpen && (
-        <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+        <p className="rounded-xl bg-warning/10 p-4 text-sm text-warning">
           Sự kiện hiện chưa mở bán hoặc đã kết thúc bán vé.
         </p>
       )}

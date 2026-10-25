@@ -28,7 +28,7 @@ export function EventHistory({ id, admin = false }: { id: string; admin?: boolea
         <ol className="mt-5 space-y-4">
           {query.data.length ? (
             query.data.map((item) => (
-              <li key={item.id} className="border-l-2 border-indigo-100 pl-4">
+              <li key={item.id} className="border-l-2 border-border pl-4">
                 <p className="text-sm font-medium">{labels[item.action] ?? item.action}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {item.actor?.name ?? 'Hệ thống'} · {dateTime(item.createdAt)}
@@ -36,7 +36,7 @@ export function EventHistory({ id, admin = false }: { id: string; admin?: boolea
                 {typeof item.metadata === 'object' &&
                   item.metadata !== null &&
                   'reason' in item.metadata && (
-                    <p className="mt-2 text-sm text-red-600">{String(item.metadata.reason)}</p>
+                    <p className="mt-2 text-sm text-danger">{String(item.metadata.reason)}</p>
                   )}
               </li>
             ))

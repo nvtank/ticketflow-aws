@@ -37,7 +37,9 @@
     "test:e2e:integration": "pnpm build && node scripts/run-browser-regression.mjs",
     "test:e2e:google": "pnpm build && node scripts/run-browser-regression.mjs google",
     "db:seed:discovery": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api db:seed:discovery",
-    "test:e2e:experience": "pnpm build && node scripts/run-browser-regression.mjs experience"
+    "test:e2e:experience": "pnpm build && node scripts/run-browser-regression.mjs experience",
+    "test:e2e:world": "playwright test --config playwright.world.config.ts",
+    "test:e2e:ui": "node scripts/check-site-ui.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

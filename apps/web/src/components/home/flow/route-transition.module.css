@@ -1,0 +1,44 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  pointer-events: none;
+  visibility: hidden;
+  overflow: hidden;
+}
+.sheet {
+  height: 100%;
+  background: #c8ff5f;
+  color: #10150a;
+  position: relative;
+  transform: translateY(105%);
+  font-family: 'Space Grotesk', sans-serif;
+  padding: 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  will-change: transform;
+}
+.sheet + .sheet {
+  border-left: 1px dashed #10150a66;
+}
+.sheet > span {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.sheet > strong {
+  font-size: clamp(50px, 13vw, 220px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.07em;
+}
+.sheet + .sheet > strong {
+  align-self: flex-end;
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    display: none;
+  }
+}
