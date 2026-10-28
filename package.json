@@ -39,7 +39,10 @@
     "db:seed:discovery": "pnpm --filter @tixflow/shared build && pnpm --filter @tixflow/api build && pnpm --filter @tixflow/api db:seed:discovery",
     "test:e2e:experience": "pnpm build && node scripts/run-browser-regression.mjs experience",
     "test:e2e:world": "playwright test --config playwright.world.config.ts",
-    "test:e2e:ui": "node scripts/check-site-ui.mjs"
+    "test:e2e:ui": "node scripts/check-site-ui.mjs",
+    "test:e2e:performance": "node scripts/check-home-performance.mjs",
+    "test:e2e:horizontal": "node scripts/check-horizontal-scroll.mjs",
+    "test:e2e:seating-ui": "node scripts/check-seat-designer.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

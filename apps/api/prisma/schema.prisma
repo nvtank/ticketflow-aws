@@ -184,6 +184,7 @@ model Event {
   maxTicketsPerOrder Int                    @default(4)
   checkInRevision    Int                    @default(0)
   inventoryRevision  Int                    @default(0)
+  seatMapLayout      Json?
   createdAt          DateTime               @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime               @updatedAt @db.Timestamptz(3)
   sections           EventSection[]

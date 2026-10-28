@@ -197,9 +197,6 @@
   background: #090b13e8;
   top: 12px;
 }
-.tf-nav[data-hidden='true'] {
-  transform: translateY(-150%);
-}
 .tf-brand {
   font-size: 30px;
   letter-spacing: -2px;
@@ -1981,8 +1978,8 @@
 .tf-home .tf-energy-title {
   font-size: clamp(86px, 13.4vw, 210px);
   font-weight: 600;
-  line-height: 0.87;
-  letter-spacing: -0.075em;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   position: relative;
   z-index: 2;
   text-align: center;
@@ -1993,6 +1990,12 @@
   display: block;
   padding: 0.08em;
   overflow: clip;
+}
+.tf-energy-title > .tf-energy-line {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: 0.18em;
 }
 .tf-energy-photo {
   position: absolute;
@@ -2092,7 +2095,7 @@
   }
   .tf-home .tf-energy-title {
     font-size: 17vw;
-    line-height: 0.95;
+    line-height: 1.08;
   }
   .tf-energy-photo {
     width: 30vw;
@@ -3232,7 +3235,7 @@ body:has(.ch-hero) .tf-intro-print > div > span {
   font-size: clamp(80px, 17vw, 260px) !important;
 }
 .tf-ticket-flipper {
-  transition-duration: 2s;
+  transition-duration: 0.4s;
 }
 @media (max-width: 1100px) {
   .ch-hero h1.ch-title {
@@ -4188,5 +4191,101 @@ body:has(.ch-hero) .tf-intro-print > div > span {
 @media (prefers-reduced-motion: reduce) {
   .tf-site-menu[data-state='closed'] {
     animation: none;
+  }
+}
+
+/* First-paint intro: compositor transforms, bounded duration, no font/JS loading gate. */
+html[data-tf-intro='playing'] .tf-intro:not([data-phase='ready']) {
+  display: block;
+  animation: tf-intro-exit 0.25s ease-out 0.85s both;
+}
+html[data-tf-intro='playing'] .tf-intro-ticket {
+  animation: tf-intro-ticket-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-tf-intro='playing'] .tf-intro-meter span {
+  transform: none;
+}
+.tf-intro-stub > strong {
+  font-size: 28px;
+}
+@keyframes tf-intro-ticket-in {
+  from {
+    transform: translate(-50%, -44%) rotate(-10deg) scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-7deg) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes tf-intro-exit {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Header scroll uses transform only; never animate layout position or blur. */
+.tf-nav.tf-motion-nav[data-scrolled='true'] {
+  top: 22px;
+  background: transparent;
+}
+.tf-motion-nav .tf-nav-shell {
+  background: #0a0d17f2;
+  backdrop-filter: none;
+}
+.tf-motion-nav .tf-nav-links a[aria-current='page'] {
+  color: #c8ff5f;
+}
+.tf-motion-nav .tf-nav-links a:hover,
+.tf-motion-nav .tf-nav-links a:focus-visible {
+  background: #c8ff5f;
+  color: #0a0d17;
+}
+/* Gradient stays static: animating background-position repaints the large title each frame. */
+.ch-last-line [data-hero-line] {
+  animation: none;
+}
+@media (max-width: 700px) {
+  .tf-nav.tf-motion-nav[data-scrolled='true'] {
+    top: 12px;
+  }
+}
+@media (max-width: 380px) {
+  .tf-motion-nav .tf-nav-shell {
+    gap: 6px;
+    padding: 8px;
+  }
+  .tf-motion-nav .tf-nav-actions {
+    gap: 5px;
+  }
+  .tf-motion-nav .tf-brand {
+    gap: 6px;
+  }
+  .tf-motion-nav .tf-nav-wordmark {
+    font-size: 20px;
+  }
+  .tf-motion-nav .tf-nav-emblem {
+    width: 28px;
+    height: 28px;
+  }
+  .tf-motion-nav .tf-site-menu-trigger {
+    min-width: 35px;
+    width: 35px;
+    padding: 0;
+    justify-content: center;
+  }
+  .tf-menu-button-label,
+  .tf-notifications {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-tf-intro='playing'] .tf-intro {
+    display: none;
   }
 }

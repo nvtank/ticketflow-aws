@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EVENT_CATEGORIES } from '@tixflow/shared';
+import { savedSeatLayoutSchema } from './seating';
 import { eventListSchema } from './api-client';
 export const eventStatusSchema = z.enum([
   'DRAFT',
@@ -19,6 +20,7 @@ export const eventDetailSchema = eventListSchema.shape.items.element.extend({
   galleryUrls: z.array(z.url()),
   maxTicketsPerOrder: z.number().int(),
   inventoryRevision: z.number().int(),
+  seatMapLayout: savedSeatLayoutSchema.nullish(),
   waitingRoomEnabled: z.boolean(),
   waitingRoomCapacity: z.number().int(),
   rejectionReason: z.string().nullable(),

@@ -42,22 +42,20 @@ test('organizer creates seats, admin rejects and approves, customer discovers th
   await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
   await expect(page).toHaveURL(/\/organizer\/events\/[a-f0-9-]+$/);
   const id = page.url().split('/').pop()!;
-  const standard = page.locator('fieldset').nth(0);
-  await standard.getByLabel('Số hàng', { exact: true }).fill('2');
-  await standard.getByLabel('Số cột', { exact: true }).fill('5');
-  await page.getByRole('button', { name: 'Thêm khu vực', exact: true }).click();
-  const vip = page.locator('fieldset').nth(1);
-  await vip.getByLabel('Tên khu vực', { exact: true }).fill('VIP');
-  await vip.getByLabel('Loại vé', { exact: true }).fill('VIP');
-  await vip.getByLabel('Giá VND', { exact: true }).fill('1200000');
-  await vip.getByLabel('Số hàng', { exact: true }).fill('1');
-  await vip.getByLabel('Số cột', { exact: true }).fill('2');
-  await page.getByRole('button', { name: 'Tạo sơ đồ ghế', exact: true }).click();
-  await expect(page.getByText('Đã tạo sơ đồ ghế.', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Ghế A01: AVAILABLE', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Ghế A01: UNAVAILABLE', exact: true }),
-  ).toBeVisible();
+  await page.getByRole('button', { name: 'Dãy 10 ghế', exact: true }).click();
+  await page.getByLabel('Số hàng', { exact: true }).fill('2');
+  await page.getByLabel('Ghế mỗi hàng', { exact: true }).fill('5');
+  await page.getByText('Khóa ghế không mở bán (0)', { exact: true }).click();
+  await page.getByRole('button', { name: 'Khóa ghế A01', exact: true }).click();
+  await page.getByRole('button', { name: 'Thêm zone', exact: true }).click();
+  await page.getByLabel('Tên zone', { exact: true }).fill('VIP');
+  await page.getByLabel('Giá vé / ghế (VND)', { exact: true }).fill('1200000');
+  await page.getByRole('button', { name: 'Dãy 6 ghế', exact: true }).click();
+  await page.getByLabel('Ghế mỗi hàng', { exact: true }).fill('2');
+  await page.getByRole('button', { name: 'Lưu sơ đồ', exact: true }).click();
+  await expect(page.getByText('Đã lưu sơ đồ chỗ ngồi.', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.locator('[data-layout-block]')).toHaveCount(2);
   await page.getByLabel('Email nhân viên', { exact: true }).fill('staff@tixflow.local');
   await page.getByRole('button', { name: 'Phân công', exact: true }).click();
   await expect(page.getByText('staff@tixflow.local', { exact: true })).toBeVisible();
