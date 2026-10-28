@@ -510,6 +510,145 @@ describe('Event management with real PostgreSQL and Redis', () => {
       results[0]?.status === 'fulfilled' ? 6 : 200,
     );
   });
+  it('persists a visual layout, enforces ownership/revision and sells seats at zone prices', async () => {
+    const draft = await events.create(users.get('ORGANIZER')!, {
+      ...body(),
+      title: 'Visual venue fixture',
+    });
+    const path = `/api/v1/organizer/events/${draft.id}/seat-map/design`;
+    const input = {
+      version: 1,
+      expectedRevision: 0,
+      width: 2400,
+      height: 1800,
+      stage: { x: 900, y: 80, width: 600, height: 160 },
+      zones: [
+        { id: 'vip', name: 'VIP', priceVnd: 1200000, color: '#7c3aed' },
+        { id: 'standard', name: 'Standard', priceVnd: 499000, color: '#0284c7' },
+      ],
+      blocks: [
+        {
+          id: 'left',
+          zoneId: 'vip',
+          x: 200,
+          y: 400,
+          rotation: 15,
+          rows: 2,
+          columns: 5,
+          disabledSeats: [0],
+        },
+        {
+          id: 'right',
+          zoneId: 'standard',
+          x: 1000,
+          y: 500,
+          rotation: -15,
+          rows: 1,
+          columns: 8,
+          disabledSeats: [],
+        },
+      ],
+    };
+    await http().post(path).send(input).expect(401);
+    await http().post(path).set('Authorization', bearer('CUSTOMER')).send(input).expect(403);
+    await http().post(path).set('Authorization', bearer('OTHER')).send(input).expect(403);
+    let saved = await http().post(path).set('Authorization', bearer()).send(input).expect(200);
+    expect(saved.body.availableSeats).toBe(17);
+    expect(saved.body.seatMapLayout.blocks[0].rowLabels).toEqual(['A', 'B']);
+    expect(saved.body.seatMapLayout.blocks[1].rowLabels).toEqual(['C']);
+    const sections = saved.body.sections as { id: string; name: string; availableSeats: number }[];
+    expect(saved.body.seatMapLayout.zones.find((z: { name: string }) => z.name === 'VIP').id).toBe(
+      sections.find((z) => z.name === 'VIP')!.id,
+    );
+    const read = await http()
+      .get(`/api/v1/organizer/events/${draft.id}`)
+      .set('Authorization', bearer())
+      .expect(200);
+    expect(read.body.seatMapLayout).toEqual(saved.body.seatMapLayout);
+    let original = await db.seat.findMany({
+      where: { eventId: draft.id },
+      orderBy: { code: 'asc' },
+    });
+    expect(original).toHaveLength(18);
+    expect(original.find((s) => s.code === 'A01')!.status).toBe('UNAVAILABLE');
+    await http().post(path).set('Authorization', bearer()).send(input).expect(409);
+    for (const invalid of [
+      { ...input, blocks: [{ ...input.blocks[0], zoneId: 'missing' }, input.blocks[1]] },
+      { ...input, blocks: [input.blocks[0], { ...input.blocks[1], x: 200, y: 400 }] },
+      { ...input, blocks: [{ ...input.blocks[0], disabledSeats: [1000] }, input.blocks[1]] },
+      { ...input, blocks: [{ ...input.blocks[0], rows: 0 }, input.blocks[1]] },
+      { ...input, stage: { ...input.stage, width: 9000 } },
+    ])
+      await http()
+        .post(path)
+        .set('Authorization', bearer())
+        .send({ ...invalid, expectedRevision: 1 })
+        .expect(400);
+    expect(
+      await db.seat.findMany({ where: { eventId: draft.id }, orderBy: { code: 'asc' } }),
+    ).toEqual(original);
+    const competitors = await Promise.all(
+      [0, 1].map(() =>
+        http()
+          .post(path)
+          .set('Authorization', bearer())
+          .send({ ...input, expectedRevision: 1 }),
+      ),
+    );
+    expect(competitors.map((r) => r.status).sort()).toEqual([200, 409]);
+    saved = competitors.find((r) => r.status === 200)!;
+    original = await db.seat.findMany({ where: { eventId: draft.id }, orderBy: { code: 'asc' } });
+    expect(original).toHaveLength(18);
+    await review.submit(draft.id, users.get('ORGANIZER')!);
+    await http()
+      .post(path)
+      .set('Authorization', bearer())
+      .send({ ...input, expectedRevision: 1 })
+      .expect(409);
+    await review.decide(draft.id, users.get('ADMIN')!, true);
+    const detail = await http().get(`/api/v1/events/${draft.slug}`).expect(200);
+    expect(detail.body.seatMapLayout).toEqual(saved.body.seatMapLayout);
+    const booking = await http()
+      .get(`/api/v1/events/${draft.id}/booking-state`)
+      .set('Authorization', bearer('CUSTOMER'))
+      .expect(200);
+    expect(booking.body.seats.find((s: { code: string }) => s.code === 'A02').priceVnd).toBe(
+      1200000,
+    );
+    expect(booking.body.seats.find((s: { code: string }) => s.code === 'C01').priceVnd).toBe(
+      499000,
+    );
+    await http()
+      .post(`/api/v1/events/${draft.id}/holds`)
+      .set('Authorization', bearer('CUSTOMER'))
+      .send({ seatIds: [original.find((s) => s.code === 'A01')!.id], idempotencyKey: randomUUID() })
+      .expect(409);
+    const hold = await http()
+      .post(`/api/v1/events/${draft.id}/holds`)
+      .set('Authorization', bearer('CUSTOMER'))
+      .send({
+        seatIds: [
+          original.find((s) => s.code === 'A02')!.id,
+          original.find((s) => s.code === 'C01')!.id,
+        ],
+        idempotencyKey: randomUUID(),
+      })
+      .expect(201);
+    const order = await http()
+      .post('/api/v1/orders')
+      .set('Authorization', bearer('CUSTOMER'))
+      .send({ holdId: hold.body.id, idempotencyKey: randomUUID() })
+      .expect(201);
+    expect(order.body.totalVnd).toBe(1699000);
+    await db.event.update({ where: { id: draft.id }, data: { status: 'DRAFT' } });
+    const current = await db.event.findUniqueOrThrow({ where: { id: draft.id } });
+    await http()
+      .post(path)
+      .set('Authorization', bearer())
+      .send({ ...input, expectedRevision: current.inventoryRevision })
+      .expect(409);
+    expect(await db.seat.count({ where: { eventId: draft.id } })).toBe(18);
+  });
   it('documents DTO fields and event paths in Swagger', async () => {
     const swagger = await http().get('/api/docs-json').expect(200);
     expect(swagger.body.paths['/api/v1/organizer/events']).toBeDefined();
