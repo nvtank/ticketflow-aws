@@ -12,13 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { QueryNotice } from './event-detail';
 import { EventEditor } from './event-editor';
-import { SeatGridEditor } from './seat-grid-editor';
+import { SeatDesigner } from './seat-designer';
 import { EventStaffEditor } from './event-staff-editor';
 import { WaitingSettings } from './waiting-settings';
 import { EventHistory } from './event-history';
 export function OrganizerEventManager({ id }: { id: string }) {
   const cache = useQueryClient(),
     router = useRouter();
+  const [seatDraftDirty, setSeatDraftDirty] = useState(false);
   const [removing, setRemoving] = useState(false);
   const remove = useMutation({
     mutationFn: () => apiRequest('DELETE', `/organizer/events/${id}`, z.undefined()),
@@ -66,7 +67,11 @@ export function OrganizerEventManager({ id }: { id: string }) {
           <p className="mt-2 text-xs text-muted-foreground">{event.organization.name}</p>
         </div>
         {['DRAFT', 'REJECTED'].includes(event.status) && (
-          <Button disabled={submit.isPending} onClick={() => submit.mutate()}>
+          <Button
+            disabled={submit.isPending || seatDraftDirty}
+            title={seatDraftDirty ? 'Lưu sơ đồ chỗ ngồi trước khi gửi duyệt.' : undefined}
+            onClick={() => submit.mutate()}
+          >
             {submit.isPending ? 'Đang gửi…' : 'Gửi duyệt sự kiện'}
           </Button>
         )}
@@ -93,7 +98,7 @@ export function OrganizerEventManager({ id }: { id: string }) {
           Nội dung đã gửi duyệt hoặc công bố được khóa để bảo toàn thông tin đã duyệt.
         </p>
       )}
-      <SeatGridEditor key={event.id} event={event} />
+      <SeatDesigner key={event.id} event={event} onDirtyChange={setSeatDraftDirty} />
       <WaitingSettings
         key={`${id}:${event.waitingRoomEnabled}:${event.waitingRoomCapacity}`}
         event={event}

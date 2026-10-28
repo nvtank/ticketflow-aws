@@ -8,6 +8,7 @@ const labels: Record<string, string> = {
   EVENT_CREATED: 'Tạo sự kiện',
   EVENT_EDITED: 'Chỉnh sửa bản nháp',
   EVENT_GRID_GENERATED: 'Tạo sơ đồ ghế',
+  EVENT_SEAT_LAYOUT_SAVED: 'Lưu thiết kế chỗ ngồi',
   EVENT_SEAT_CONFIGURED: 'Cấu hình ghế',
   EVENT_SUBMITTED: 'Gửi duyệt',
   EVENT_APPROVED: 'Phê duyệt',
