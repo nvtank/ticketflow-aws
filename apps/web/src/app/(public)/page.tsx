@@ -20,6 +20,13 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <FlowExperience>
+      <link
+        rel="preload"
+        href="/assets/fonts/anton-regular.ttf"
+        as="font"
+        type="font/ttf"
+        crossOrigin="anonymous"
+      />
       <HeroSection />
       <MarqueeSection />
       <FeaturedEvents />

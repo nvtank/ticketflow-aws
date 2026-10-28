@@ -4,6 +4,7 @@ import { Minus, Plus } from 'lucide-react';
 import type { BookingData } from '@/lib/booking';
 import type { EventDetail } from '@/lib/events';
 import { formatCurrency } from '@/lib/utils';
+import { LayoutCanvas } from '@/components/seating/layout-canvas';
 import { Button } from '@/components/ui/button';
 const styles = {
   AVAILABLE: 'bg-success/15 text-success hover:bg-success/25',
@@ -33,6 +34,39 @@ export function SeatMap({
   onToggle: (id: string) => void;
 }) {
   const [zoom, setZoom] = useState(100);
+  if (event.seatMapLayout)
+    return (
+      <div className="min-w-0 space-y-4">
+        <h2 className="text-xl font-semibold">Sơ đồ ghế</h2>
+        <div className="flex flex-wrap gap-3 text-xs">
+          {event.seatMapLayout.zones.map((zone) => (
+            <span
+              key={zone.id}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-2"
+            >
+              <span className="size-3 rounded-full" style={{ background: zone.color }} />
+              {zone.name} · {formatCurrency(zone.priceVnd)}
+            </span>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+          <span>■ Màu zone: còn trống</span>
+          <span>● Viền vàng: đang chọn</span>
+          <span>■ Cam: đang giữ</span>
+          <span>■ Xám: đã bán / không mở bán</span>
+        </div>
+        <LayoutCanvas
+          design={event.seatMapLayout}
+          seats={snapshot.seats}
+          selectedSeats={selected}
+          onToggle={onToggle}
+          locked={locked}
+        />
+        <p className="text-xs text-muted-foreground">
+          Ghế đang chọn chỉ được giữ sau khi máy chủ xác nhận.
+        </p>
+      </div>
+    );
   const rank = (id: string) =>
     Math.min(
       ...snapshot.seats

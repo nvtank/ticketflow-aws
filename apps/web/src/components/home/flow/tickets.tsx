@@ -18,7 +18,7 @@ export function DigitalTicket({
   return (
     <div className={`tf-ticket ${compact ? 'tf-ticket-compact' : ''}`}>
       <div className="tf-ticket-cover">
-        <FlowImage src={media.arena} />
+        <FlowImage src={media.arena} sizes="(max-width: 700px) 90vw, 400px" />
         <span>tikflow®</span>
         <strong>
           AFTER
@@ -245,7 +245,7 @@ export function BookingExperience() {
           {step === 0 ? (
             <>
               <div data-flip-id="booking-token" className="tf-demo-poster tf-demo-token">
-                <FlowImage src={media.stage} />
+                <FlowImage src={media.stage} sizes="(max-width: 700px) 90vw, 500px" />
                 <h3>
                   YOUR NEXT
                   <br />

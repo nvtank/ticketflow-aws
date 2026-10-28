@@ -42,7 +42,9 @@ up -d --wait`. PostgreSQL/Redis có healthcheck, named volumes và chỉ publish
 | Liveness / metrics local   | `/api/v1/health/live` / `/api/v1/metrics` |
 | PostgreSQL / Redis         | localhost:5432 / localhost:6379           |
 
-`pnpm dev` build shared rồi chạy hai app với watch. Sau khi sửa shared, chạy lại
+`pnpm dev` build shared rồi chạy hai app với watch. Frontend chờ API health sẵn sàng
+trước khi mở cổng 3000 để tránh lỗi proxy `ECONNREFUSED` lúc backend còn compile.
+Nếu chờ quá 3 phút, xem log `apps/api` và kiểm tra `pnpm infra:up`. Sau khi sửa shared, chạy lại
 `pnpm --filter @tixflow/shared build`. Production build local: `pnpm build`, rồi
 `pnpm --filter @tixflow/api start` và `pnpm --filter @tixflow/web start` trong hai terminal.
 Browser dùng Next.js proxy cùng origin. API_INTERNAL_URL được cố định lúc build;
@@ -337,3 +339,15 @@ nghiệp vụ hiện có.
 Toàn bộ website dùng nền tối, điểm nhấn lime và font của homepage hiện tại.
 Xem [phạm vi và kiểm chứng UI](docs/site-ui.md). Chạy `pnpm test:e2e:ui`
 khi web preview đang mở để kiểm tra giao diện bằng dữ liệu QA trong trình duyệt.
+
+### Kiểm tra hiệu năng và chuyển động
+
+Khi API/web đang chạy, dùng `pnpm test:e2e:performance` để kiểm tra intro xuất hiện
+trước hydration, tự đóng khi JavaScript chậm, navbar/menu/tìm kiếm/chuyển trang ở
+1440/1152/1024/390/320px, reduced motion và nội dung khi tắt JavaScript. Không seed
+hoặc thay đổi dữ liệu. Ảnh và kết quả nằm trong thư mục tạm `tixflow-home-performance`.
+Xem [phạm vi tối ưu](docs/home-performance.md).
+
+### Thiết kế sơ đồ chỗ ngồi
+
+Trang quản lý sự kiện có **Venue Studio** để kéo thả dãy ghế và sân khấu, chia zone, đặt giá VND từng zone, xoay/nhân bản dãy và khóa ghế không mở bán. Sơ đồ lưu vào database và được dùng trực tiếp khi khách chọn ghế. Xem [hướng dẫn sử dụng và kiểm thử](docs/seating-designer.md). Sau khi cập nhật code, chạy `pnpm db:migrate` rồi khởi động lại API.

@@ -13,8 +13,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" data-scroll-behavior="smooth">
+    <html lang="vi" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var root=document.documentElement;try{if(location.pathname!=='/'||matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.dataset.tfIntroStarted=String(performance.now());root.dataset.tfIntro='playing';setTimeout(function(){root.dataset.tfIntro='done';window.dispatchEvent(new Event('tikflow:intro-complete'));},1800);}catch(e){root.dataset.tfIntro='done';}})();`,
+          }}
+        />
         <link
           rel="preload"
           href="/assets/fonts/be-vietnam-pro-regular.ttf"

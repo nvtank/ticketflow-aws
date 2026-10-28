@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { QueryNotice } from '@/components/ui/query-notice';
 export { QueryNotice } from '@/components/ui/query-notice';
+import { LayoutCanvas } from '@/components/seating/layout-canvas';
 import { ArtistCollection } from '@/components/discovery/artists';
 import { EventReviews } from '@/components/discovery/reviews';
 
@@ -26,6 +27,8 @@ export function EventInformation({ event }: { event: EventData }) {
           {
             <Image
               unoptimized={!!event.coverUrl}
+              priority
+              sizes="(max-width: 1023px) 100vw, 65vw"
               width={1280}
               height={720}
               src={
@@ -71,6 +74,15 @@ export function EventInformation({ event }: { event: EventData }) {
             <h2 className="mb-5 text-xl font-semibold">Âm sắc của sự kiện</h2>
             <ArtistCollection query={`eventId=${event.id}`} limit={3} />
           </section>
+        )}
+        {event.seatMapLayout && (
+          <Card>
+            <h2 className="mb-4 text-xl font-semibold">Bố trí khu vực & sân khấu</h2>
+            <LayoutCanvas design={event.seatMapLayout} />
+            <p className="mt-3 text-xs text-muted-foreground">
+              Trạng thái ghế còn trống được cập nhật tại bước chọn ghế.
+            </p>
+          </Card>
         )}
         <Card>
           <h2 className="text-xl font-semibold">Chính sách vé</h2>

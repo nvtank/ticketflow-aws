@@ -1,3 +1,4 @@
+import type { SavedSeatLayout } from './seating';
 export const API_PREFIX = '/api/v1';
 export const DEFAULT_HOLD_SECONDS = 300;
 export const MAX_TICKETS_PER_ORDER = 4;
@@ -108,6 +109,7 @@ export interface EventDetail extends EventSummary {
   waitingRoomEnabled: boolean;
   waitingRoomCapacity: number;
   inventoryRevision: number;
+  seatMapLayout?: SavedSeatLayout | null;
   rejectionReason: string | null;
   organization: { id: string; name: string };
   venue: { id: string; name: string; address: string; city: string };
@@ -299,3 +301,5 @@ export interface WaitingRoomStatus {
   serverTime: string;
   admissionToken: string | null;
 }
+
+export * from './seating';

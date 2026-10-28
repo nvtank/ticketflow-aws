@@ -5,5 +5,5 @@ import { FlowNavigation } from '@/components/home/flow/navigation';
 
 export function PublicHeader() {
   const pathname = usePathname();
-  return <FlowNavigation key={pathname} interior={pathname !== '/'} />;
+  return <FlowNavigation interior={pathname !== '/'} />;
 }

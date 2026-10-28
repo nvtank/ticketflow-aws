@@ -22,10 +22,10 @@ export function MarqueeSection() {
           />
           <span>THE PEOPLE / 01</span>
         </div>
-        <h2 className="tf-energy-title">
+        <h2 className="tf-energy-title" aria-label="FEEL THE FLOW.">
           <span data-energy-word>FEEL</span>
-          <span data-energy-word>
-            THE <em>FLOW.</em>
+          <span className="tf-energy-line" data-energy-word>
+            <span>THE</span> <em>FLOW.</em>
           </span>
         </h2>
         <div className="tf-energy-photo tf-energy-photo-b" data-energy-photo>

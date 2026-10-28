@@ -30,6 +30,7 @@ export function useFlowEvents() {
     queryFn: ({ signal }) =>
       apiGet('/events?pageSize=9&sort=date', eventListSchema, { anonymous: true, signal }),
     retry: false,
+    retryOnMount: false,
   });
 }
 export function Poster({
@@ -58,6 +59,7 @@ export function Poster({
               : [media.stage, media.arena, media.artist, media.crowd][index % 4]!)
         }
         alt={event.title}
+        sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 32vw"
       />
       <div className="tf-poster-top">
         <span>{categoryLabel[event.category] || event.category}</span>
