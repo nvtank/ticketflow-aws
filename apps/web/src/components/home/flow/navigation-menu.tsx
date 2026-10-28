@@ -25,21 +25,21 @@ export function NavigationMenu({ groups }: { groups: MenuGroup[] }) {
         .timeline()
         .fromTo(
           panel,
-          { clipPath: 'inset(0% 0% 100% 0% round 18px)' },
-          { clipPath: 'inset(0% 0% 0% 0% round 18px)', duration: 1.15, ease: 'power4.inOut' },
+          { y: -12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.24, ease: 'power3.out' },
           0,
         )
         .from(
           '[data-menu-title]',
-          { yPercent: 115, rotation: 4, opacity: 0, duration: 2, stagger: 0.1, ease: 'power4.out' },
-          0.15,
+          { yPercent: 20, opacity: 0, duration: 0.3, stagger: 0.03, ease: 'power4.out' },
+          0.04,
         )
         .from(
           '[data-menu-item]',
-          { y: 35, rotationX: -30, opacity: 0, duration: 1, stagger: 0.045, ease: 'power3.out' },
-          0.35,
+          { y: 8, opacity: 0, duration: 0.24, stagger: 0.012, ease: 'power3.out' },
+          0.08,
         )
-        .from('.tf-menu-bottom', { y: 25, opacity: 0, duration: 0.8, ease: 'power3.out' }, 0.8);
+        .from('.tf-menu-bottom', { y: 8, opacity: 0, duration: 0.24, ease: 'power3.out' }, 0.12);
       const preference = () => {
         if (reduced.matches) timeline.progress(1).kill();
       };

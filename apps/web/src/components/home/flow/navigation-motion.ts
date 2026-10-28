@@ -22,7 +22,7 @@ export function useNavigationMotion(
   }, [menuOpen, searchOpen]);
 
   useGSAP(
-    (context, contextSafe) => {
+    (_context, contextSafe) => {
       const element = nav.current;
       if (!element || !contextSafe) return;
       const shell = element.querySelector<HTMLElement>('.tf-nav-shell')!;
@@ -39,14 +39,14 @@ export function useNavigationMotion(
       let hidden = false;
       let raf = 0;
       let maxScroll = 1;
-      let entered = false;
       const duration = (seconds: number) => (reduced.matches ? 0 : seconds);
       const show = contextSafe(() => {
         hidden = false;
         element.dataset.hidden = 'false';
         gsap.to(element, {
+          y: 0,
           yPercent: 0,
-          duration: duration(0.55),
+          duration: duration(0.25),
           ease: 'power3.out',
           overwrite: 'auto',
         });
@@ -80,7 +80,7 @@ export function useNavigationMotion(
           gsap.to(shell, {
             scale: compact && fine.matches && !reduced.matches ? 0.965 : 1,
             backgroundColor: compact ? '#0a0d17f2' : '#0a0d17aa',
-            duration: duration(0.7),
+            duration: duration(0.25),
             ease: 'power3.out',
             overwrite: 'auto',
           });
@@ -95,8 +95,9 @@ export function useNavigationMotion(
             hidden = nextHidden;
             element.dataset.hidden = String(hidden);
             gsap.to(element, {
+              y: 0,
               yPercent: hidden ? -155 : 0,
-              duration: duration(hidden ? 0.4 : 0.65),
+              duration: duration(0.25),
               ease: 'power3.out',
               overwrite: 'auto',
             });
@@ -118,34 +119,8 @@ export function useNavigationMotion(
       window.addEventListener('resize', measure);
       measure();
 
-      const playEntrance = contextSafe(() => {
-        if (entered) return;
-        entered = true;
-        if (reduced.matches) return;
-        gsap.fromTo(
-          element,
-          { y: -90, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: element.dataset.variant === 'interior' ? 0.6 : 2,
-            ease: 'power4.out',
-            clearProps: 'opacity',
-          },
-        );
-        gsap.fromTo(
-          emblem,
-          { rotation: -130, scale: 0.6 },
-          { rotation: 0, scale: 1, duration: 1.5, ease: 'power3.out' },
-        );
-      });
-      const intro = document.querySelector<HTMLElement>('.tf-intro');
-      if (!intro || intro.dataset.phase === 'ready' || reduced.matches) playEntrance();
-      // The intro dispatches this synchronously inside its GSAP context. Keep the
-      // header a separate owner instead of recording it as the intro's child.
-      const introReady = () => context.ignore(playEntrance);
-      window.addEventListener('tikflow:intro-complete', introReady);
-
+      // Keep the server-rendered header visible. Entrance and scroll transforms
+      // previously competed on the same element and could leave it off-screen.
       const handlers: (() => void)[] = [];
       const moveHighlight = contextSafe((link: HTMLElement) => {
         gsap.to(indicator, {
@@ -264,7 +239,6 @@ export function useNavigationMotion(
         resize.disconnect();
         window.removeEventListener('scroll', schedule);
         window.removeEventListener('resize', measure);
-        window.removeEventListener('tikflow:intro-complete', introReady);
         linkGroup.removeEventListener('pointerleave', hideHighlight);
         linkGroup.removeEventListener('focusout', hideHighlight);
         brand.removeEventListener('pointerenter', spin);

@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useRef, type ComponentProps } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -13,9 +13,16 @@ export function TransitionLink(props: ComponentProps<typeof Link>) {
     <Link
       {...props}
       onNavigate={(event) => {
-        props.onNavigate?.(event);
+        let prevented = false;
+        props.onNavigate?.({
+          ...event,
+          preventDefault: () => {
+            prevented = true;
+            event.preventDefault();
+          },
+        });
         if (typeof props.href !== 'string' || props.href.startsWith('#')) return;
-        if (navigate?.(props.href)) event.preventDefault();
+        if (!prevented) navigate?.(props.href);
       }}
     />
   );
@@ -24,8 +31,7 @@ export function FlowRouteTransition() {
   const scope = useRef<HTMLDivElement>(null);
   const pending = useRef<string | null>(null);
   const timeout = useRef(0);
-  const path = usePathname(),
-    router = useRouter();
+  const path = usePathname();
   const { contextSafe } = useGSAP({ scope });
   useGSAP(
     () => {
@@ -43,10 +49,9 @@ export function FlowRouteTransition() {
           { yPercent: 105 },
           {
             yPercent: 0,
-            duration: 0.42,
-            stagger: 0.06,
+            duration: 0.18,
+            stagger: 0.025,
             ease: 'power3.inOut',
-            onComplete: () => router.push(href),
           },
         );
         timeout.current = window.setTimeout(
@@ -71,10 +76,11 @@ export function FlowRouteTransition() {
       if (!pending.current || path !== pending.current) return;
       clearTimeout(timeout.current);
       pending.current = null;
+      gsap.killTweensOf(`.${styles.sheet}`);
       gsap.to(`.${styles.sheet}`, {
         yPercent: -105,
-        duration: 0.6,
-        stagger: 0.06,
+        duration: 0.25,
+        stagger: 0.025,
         ease: 'power3.inOut',
         onComplete: () => gsap.set(scope.current, { autoAlpha: 0, pointerEvents: 'none' }),
       });
