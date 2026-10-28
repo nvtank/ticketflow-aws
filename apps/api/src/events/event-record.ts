@@ -51,6 +51,7 @@ export function eventView(event: EventRecord) {
     waitingRoomEnabled: event.waitingRoomEnabled,
     waitingRoomCapacity: event.waitingRoomCapacity,
     inventoryRevision: event.inventoryRevision,
+    seatMapLayout: event.seatMapLayout,
     rejectionReason: event.rejectionReason,
     organization: { id: event.organization.id, name: event.organization.name },
     venue: event.venue,

@@ -24,6 +24,7 @@ import {
   AssignStaffDto,
 } from './events.dto';
 import { OrganizerEventsService } from './organizer-events.service';
+import { SeatDesignDto } from './seat-design.dto';
 import { SeatManagementService } from './seat-management.service';
 import { EventReviewService } from './event-review.service';
 import { EventStaffService } from './event-staff.service';
@@ -83,6 +84,13 @@ export class OrganizerEventsController {
     @Body() input: GridDto,
   ) {
     return this.seats.generate(id, p.user.id, input);
+  }
+  @Post('events/:id/seat-map/design') @HttpCode(200) @ApiBody({ type: SeatDesignDto }) design(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentPrincipal() p: Principal,
+    @Body() input: SeatDesignDto,
+  ) {
+    return this.seats.saveDesign(id, p.user.id, input);
   }
   @Get('events/:id/seats') snapshot(
     @Param('id', ParseUUIDPipe) id: string,
