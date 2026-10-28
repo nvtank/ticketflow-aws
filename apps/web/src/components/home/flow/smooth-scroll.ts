@@ -3,7 +3,6 @@ import { useEffect, type RefObject } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import Snap from 'lenis/snap';
 
 /** One clock, one interpolation layer. Native touch and horizontal gestures stay native. */
 export function useFlowScroll(scope: RefObject<HTMLDivElement | null>) {
@@ -14,12 +13,9 @@ export function useFlowScroll(scope: RefObject<HTMLDivElement | null>) {
     const previousBehavior = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto';
     let lenis: Lenis | undefined;
-    let snap: Snap | undefined;
     const tick = (seconds: number) => lenis?.raf(seconds * 1000);
     const dispose = () => {
       gsap.ticker.remove(tick);
-      snap?.destroy();
-      snap = undefined;
       lenis?.destroy();
       lenis = undefined;
     };
@@ -43,28 +39,36 @@ export function useFlowScroll(scope: RefObject<HTMLDivElement | null>) {
         },
       });
       lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.lagSmoothing(0);
       gsap.ticker.add(tick, false, true);
-      snap = new Snap(lenis, {
-        type: 'proximity',
-        distanceThreshold: '8%',
-        debounce: 250,
-        duration: 0.45,
-        lerp: 0.18,
-      });
-      scope.current
-        ?.querySelectorAll<HTMLElement>('[data-flow-snap]')
-        .forEach((el) => snap?.addElement(el, { align: 'start' }));
     };
     const refresh = () => {
       lenis?.resize();
-      snap?.resize();
     };
     setup();
     reduced.addEventListener('change', setup);
     desktop.addEventListener('change', setup);
     ScrollTrigger.addEventListener('refresh', refresh);
     let mounted = true;
+    // Async event results above the pinned scenes change their document offsets.
+    // Observe that section only: observing the pin spacers would refresh in a loop.
+    let layoutFrame = 0;
+    let featuredWidth = -1;
+    let featuredHeight = -1;
+    const featured = scope.current?.querySelector<HTMLElement>('.tf-featured');
+    const layoutObserver = new ResizeObserver(([entry]) => {
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      if (width === featuredWidth && height === featuredHeight) return;
+      featuredWidth = width;
+      featuredHeight = height;
+      if (!layoutFrame) {
+        layoutFrame = requestAnimationFrame(() => {
+          layoutFrame = 0;
+          if (mounted) ScrollTrigger.refresh();
+        });
+      }
+    });
+    if (featured) layoutObserver.observe(featured);
     const category = scope.current?.querySelector<HTMLElement>('.tf-vibes');
     const warmup = category
       ? new IntersectionObserver(
@@ -86,9 +90,10 @@ export function useFlowScroll(scope: RefObject<HTMLDivElement | null>) {
     });
     return () => {
       mounted = false;
+      cancelAnimationFrame(layoutFrame);
+      layoutObserver.disconnect();
       warmup?.disconnect();
       dispose();
-      gsap.ticker.lagSmoothing(500, 33);
       html.style.scrollBehavior = previousBehavior;
       reduced.removeEventListener('change', setup);
       desktop.removeEventListener('change', setup);
