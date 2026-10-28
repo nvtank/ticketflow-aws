@@ -341,7 +341,8 @@ try {
       for (const path of routes) {
         if (process.env.SITE_QA_PATH && !path.includes(process.env.SITE_QA_PATH)) continue;
         waiting = path.includes('qa=waiting');
-        const response = await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
+        // Booking keeps live requests active; wait for rendered UI instead of network silence.
+        const response = await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });
         if (response.status() !== 200) throw Error(`${path}: HTTP ${response.status()}`);
         await page.locator('h1').first().waitFor({ state: 'visible' });
         await page.evaluate(() => document.fonts.ready);
