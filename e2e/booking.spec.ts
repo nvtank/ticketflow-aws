@@ -60,11 +60,13 @@ test('two customers hold seats, receive realtime updates, reload and cancel a se
     'false',
   );
   await page.getByRole('button', { name: 'Xác nhận giữ ghế', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Ghế bạn đang giữ', exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
+  const checkoutUrl = page.url();
   const code = labels[0]!.match(/^Ghế ([A-Z]+\d+):/)![1]!;
   await expect(
     other.getByRole('button', { name: `Ghế ${code}: Người khác đang giữ`, exact: true }),
   ).toBeDisabled({ timeout: 4000 });
+  await page.goto(`/events/${slug}/booking`);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Ghế bạn đang giữ', exact: true })).toBeVisible();
   await expect(page.getByRole('timer', { name: 'Thời gian giữ ghế còn lại' })).toHaveText(
@@ -73,7 +75,7 @@ test('two customers hold seats, receive realtime updates, reload and cancel a se
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('customer-seat-map.png'), fullPage: true });
   await page.getByRole('button', { name: 'Tiếp tục đến đơn hàng', exact: true }).click();
-  await expect(page).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
+  await expect(page).toHaveURL(checkoutUrl);
   await expect(page.getByRole('heading', { name: 'Đơn hàng của bạn', exact: true })).toBeVisible();
   await expect(page.getByText('4.800.000 ₫', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Hủy đơn hàng', exact: true }).click();
@@ -84,8 +86,6 @@ test('two customers hold seats, receive realtime updates, reload and cancel a se
   ).toBeEnabled({ timeout: 4000 });
   await other.getByRole('button', { name: `Ghế ${code}: Còn trống`, exact: true }).click();
   await other.getByRole('button', { name: 'Xác nhận giữ ghế', exact: true }).click();
-  await expect(other.getByRole('heading', { name: 'Ghế bạn đang giữ', exact: true })).toBeVisible();
-  await other.getByRole('button', { name: 'Tiếp tục đến đơn hàng', exact: true }).click();
   await expect(other).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
   await other.screenshot({ path: info.outputPath('pending-order.png'), fullPage: true });
   await page.goto(other.url());
@@ -94,4 +94,42 @@ test('two customers hold seats, receive realtime updates, reload and cancel a se
   await other.getByRole('button', { name: 'Xác nhận hủy đơn', exact: true }).click();
   await expect(other.getByText('Đã hủy', { exact: true }).first()).toBeVisible();
   await context.close();
+});
+
+test('a failed checkout preserves held seats and retries the same order request', async ({
+  page,
+}) => {
+  await login(page, 'customer@tixflow.local');
+  const response = await page.request.get('http://127.0.0.1:4000/api/v1/events?q=TixFlow%20Music');
+  const result = (await response.json()) as { items: { slug: string }[] };
+  await page.goto(`/events/${result.items[0]!.slug}/booking`);
+  await page
+    .getByRole('button', { name: /^Ghế .*: Còn trống$/ })
+    .first()
+    .click();
+  let failedRequest: unknown;
+  await page.route('**/api/v1/orders', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
+    failedRequest = route.request().postDataJSON();
+    await route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Chưa thể tạo đơn hàng. Hãy thử lại.' }),
+    });
+  });
+  await page.getByRole('button', { name: 'Xác nhận giữ ghế', exact: true }).click();
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Chưa thể chuyển sang thanh toán' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ghế bạn đang giữ', exact: true })).toBeVisible();
+  await page.unroute('**/api/v1/orders');
+  const retry = page.waitForRequest(
+    (request) => request.url().endsWith('/api/v1/orders') && request.method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Tiếp tục đến đơn hàng', exact: true }).click();
+  expect((await retry).postDataJSON()).toEqual(failedRequest);
+  await expect(page).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
+  await page.getByRole('button', { name: 'Hủy đơn hàng', exact: true }).click();
+  await page.getByRole('button', { name: 'Xác nhận hủy đơn', exact: true }).click();
+  await expect(page.getByText('Đã hủy', { exact: true }).first()).toBeVisible();
 });

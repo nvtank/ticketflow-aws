@@ -10,7 +10,13 @@ import { UserRole } from '@tixflow/shared';
 import { AuthGate } from '@/components/auth/auth-gate';
 import { apiGet, apiRequest } from '@/lib/api-client';
 import { eventDetailSchema, dateTime, type EventDetail } from '@/lib/events';
-import { bookingSchema, holdSchema, orderSchema, newerBookingSnapshot } from '@/lib/booking';
+import {
+  bookingSchema,
+  holdSchema,
+  orderSchema,
+  newerBookingSnapshot,
+  type BookingData,
+} from '@/lib/booking';
 import { useBookingSelection } from '@/stores/booking-selection';
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -88,6 +94,22 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
         query.data.seats.filter((s) => s.status === 'AVAILABLE').map((s) => s.id),
       );
   }, [event.id, query.data]);
+  const checkout = useMutation({
+    mutationFn: async (hold: NonNullable<BookingData['activeHold']>) => {
+      if (hold.orderId) return { id: hold.orderId };
+      if (orderKey.current?.holdId !== hold.id)
+        orderKey.current = { holdId: hold.id, key: crypto.randomUUID() };
+      return apiRequest('POST', '/orders', orderSchema, {
+        holdId: hold.id,
+        idempotencyKey: orderKey.current.key,
+      });
+    },
+    onSuccess: (order) => router.push(`/checkout/${order.id}`),
+    onError: (error) => {
+      toast.error(error.message);
+      void invalidate();
+    },
+  });
   const reserve = useMutation({
     mutationFn: (seatIds: string[]) => {
       const fingerprint = [...seatIds].sort().join(',');
@@ -99,15 +121,16 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
         idempotencyKey: requestKey.current.key,
       });
     },
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       selection.clear(event.id);
       requestKey.current = null;
       toast.success(
         result.state === 'ACTIVE'
-          ? 'Đã giữ ghế. Vui lòng hoàn tất trong thời gian còn lại.'
+          ? 'Đã giữ ghế. Đang chuyển sang thanh toán…'
           : 'Lượt giữ trước đã kết thúc.',
       );
-      await invalidate();
+      if (result.state === 'ACTIVE') checkout.mutate(result);
+      void invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -121,23 +144,6 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
       toast.success('Đã hủy giữ ghế.');
       await invalidate();
     },
-    onError: (error) => {
-      toast.error(error.message);
-      void invalidate();
-    },
-  });
-  const checkout = useMutation({
-    mutationFn: () => {
-      const hold = query.data?.activeHold;
-      if (!hold) throw new Error('Lượt giữ ghế không còn hiệu lực.');
-      if (orderKey.current?.holdId !== hold.id)
-        orderKey.current = { holdId: hold.id, key: crypto.randomUUID() };
-      return apiRequest('POST', '/orders', orderSchema, {
-        holdId: hold.id,
-        idempotencyKey: orderKey.current.key,
-      });
-    },
-    onSuccess: (order) => router.push(`/checkout/${order.id}`),
     onError: (error) => {
       toast.error(error.message);
       void invalidate();
@@ -198,7 +204,7 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
           event={event}
           snapshot={data}
           selected={selected}
-          locked={!!hold || reserve.isPending || !saleOpen}
+          locked={!!hold || reserve.isPending || checkout.isPending || !saleOpen}
           onToggle={(id) => {
             if (!selection.toggle(event.id, id, data.maxTicketsPerOrder))
               toast.error(`Tối đa ${data.maxTicketsPerOrder} vé mỗi lượt.`);
@@ -240,28 +246,41 @@ function BookingFlow({ event, admissionToken }: { event: EventDetail; admissionT
               <Button
                 className="w-full"
                 disabled={checkout.isPending}
-                onClick={() =>
-                  hold.orderId ? router.push(`/checkout/${hold.orderId}`) : checkout.mutate()
-                }
+                onClick={() => checkout.mutate(hold)}
               >
                 {checkout.isPending ? 'Đang tạo đơn…' : 'Tiếp tục đến đơn hàng'}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => setConfirmRelease(true)}>
+              {checkout.isError && (
+                <p role="alert" className="text-sm text-danger">
+                  Chưa thể chuyển sang thanh toán: {checkout.error.message} Ghế vẫn được giữ trong
+                  thời gian còn lại. Bấm tiếp tục để thử lại.
+                </p>
+              )}
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={checkout.isPending}
+                onClick={() => setConfirmRelease(true)}
+              >
                 Hủy giữ ghế
               </Button>
             </>
           ) : (
             <>
               <p className="text-xs leading-6 text-muted-foreground">
-                Chưa giữ chỗ khi bạn chỉ chọn ghế. Sau khi xác nhận thành công, bạn có tối đa 5
-                phút; tạo đơn hàng không gia hạn thời gian này.
+                Xác nhận giữ ghế để chuyển sang thanh toán. Bạn có tối đa 5 phút để hoàn tất; tạo
+                đơn hàng không gia hạn thời gian này.
               </p>
               <Button
                 className="w-full"
-                disabled={!selected.length || reserve.isPending || !saleOpen}
+                disabled={!selected.length || reserve.isPending || checkout.isPending || !saleOpen}
                 onClick={() => reserve.mutate(selected)}
               >
-                {reserve.isPending ? 'Đang xác nhận…' : 'Xác nhận giữ ghế'}
+                {checkout.isPending
+                  ? 'Đang chuyển sang thanh toán…'
+                  : reserve.isPending
+                    ? 'Đang xác nhận…'
+                    : 'Xác nhận giữ ghế'}
               </Button>
             </>
           )}

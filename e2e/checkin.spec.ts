@@ -55,7 +55,7 @@ test('customer buys a ticket, assigned staff admits once and organizer sees the 
     .first()
     .click();
   await page.getByRole('button', { name: 'Xác nhận giữ ghế', exact: true }).click();
-  await page.getByRole('button', { name: 'Tiếp tục đến đơn hàng', exact: true }).click();
+  await expect(page).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
   await page.getByRole('button', { name: 'Thanh toán mô phỏng (local)', exact: true }).click();
   await page.getByRole('button', { name: 'Thanh toán thành công', exact: true }).click();
   await page.getByRole('link', { name: 'Xem vé của tôi', exact: true }).click();

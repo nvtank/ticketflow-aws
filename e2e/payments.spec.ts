@@ -43,8 +43,6 @@ async function checkout(page: Page, count = 2) {
   const available = page.getByRole('button', { name: /^Ghế .*: Còn trống$/ });
   for (let i = 0; i < count; i++) await available.nth(i).click();
   await page.getByRole('button', { name: 'Xác nhận giữ ghế', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Ghế bạn đang giữ', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Tiếp tục đến đơn hàng', exact: true }).click();
   await expect(page).toHaveURL(/\/checkout\/[a-f0-9-]+$/);
   const orderId = page.url().split('/').pop()!;
   await page.getByRole('button', { name: 'Thanh toán mô phỏng (local)', exact: true }).click();
